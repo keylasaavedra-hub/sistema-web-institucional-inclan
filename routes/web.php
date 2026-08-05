@@ -20,6 +20,7 @@ use App\Http\Controllers\Admin\ConvocatoriaController as AdminConvocatoriaContro
 use App\Http\Controllers\ConvocatoriaController;
 use App\Http\Controllers\PostulacionController;
 use App\Http\Controllers\Admin\PostulacionController as AdminPostulacionController;
+use App\Http\Controllers\Admin\GaleriaController as AdminGaleriaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -348,6 +349,56 @@ Route::get('/dashboard', function () {
     ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    /*
+|--------------------------------------------------------------------------
+| GALERÍA INSTITUCIONAL - ADMINISTRACIÓN
+|--------------------------------------------------------------------------
+*/
+
+    Route::get(
+        '/admin/galerias',
+        [AdminGaleriaController::class, 'index']
+    )->name('admin.galerias.index');
+
+    Route::get(
+        '/admin/galerias/crear',
+        [AdminGaleriaController::class, 'crear']
+    )->name('admin.galerias.crear');
+
+    Route::post(
+        '/admin/galerias',
+        [AdminGaleriaController::class, 'guardar']
+    )->name('admin.galerias.guardar');
+
+    Route::get(
+        '/admin/galerias/{galeria}/editar',
+        [AdminGaleriaController::class, 'editar']
+    )->whereNumber('galeria')
+        ->name('admin.galerias.editar');
+
+    Route::put(
+        '/admin/galerias/{galeria}',
+        [AdminGaleriaController::class, 'actualizar']
+    )->whereNumber('galeria')
+        ->name('admin.galerias.actualizar');
+
+    Route::patch(
+        '/admin/galerias/archivos/{archivo}/estado',
+        [AdminGaleriaController::class, 'cambiarEstadoArchivo']
+    )->whereNumber('archivo')
+        ->name('admin.galerias.archivos.estado');
+
+    Route::delete(
+        '/admin/galerias/archivos/{archivo}',
+        [AdminGaleriaController::class, 'eliminarArchivo']
+    )->whereNumber('archivo')
+        ->name('admin.galerias.archivos.eliminar');
+
+    Route::delete(
+        '/admin/galerias/{galeria}',
+        [AdminGaleriaController::class, 'eliminar']
+    )->whereNumber('galeria')
+        ->name('admin.galerias.eliminar');
 
     /*
 |--------------------------------------------------------------------------
