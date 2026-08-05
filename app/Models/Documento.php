@@ -2,11 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Documento extends Model
 {
+    use HasFactory;
+
     protected $table = 'documentos';
 
     protected $fillable = [
@@ -48,5 +52,35 @@ class Documento extends Model
             AreaInstitucional::class,
             'area_id'
         );
+    }
+
+    public function usuario(): BelongsTo
+    {
+        return $this->belongsTo(
+            User::class,
+            'usuario_id'
+        );
+    }
+
+    public function versiones(): HasMany
+    {
+        return $this->hasMany(
+            VersionDocumento::class,
+            'documento_id'
+        )
+            ->orderByDesc('created_at')
+            ->orderByDesc('id');
+    }
+
+    public function scopeActivos($query)
+    {
+        return $query->where('estado', 'activo');
+    }
+
+    public function scopePublicos($query)
+    {
+        return $query
+            ->where('es_publico', true)
+            ->where('estado', 'activo');
     }
 }
