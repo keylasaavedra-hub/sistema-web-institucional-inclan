@@ -28,6 +28,7 @@ use App\Http\Controllers\Admin\DocumentoController as AdminDocumentoController;
 use App\Http\Controllers\Admin\PublicacionController as AdminPublicacionController;
 use App\Http\Controllers\Admin\CategoriaPublicacionController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Admin\UsuarioController;
 
 /*
 |--------------------------------------------------------------------------
@@ -370,6 +371,19 @@ Route::get(
     ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    Route::prefix('admin/usuarios')
+        ->name('admin.usuarios.')
+        ->controller(UsuarioController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/crear', 'crear')->name('crear');
+            Route::post('/', 'guardar')->name('guardar');
+            Route::get('/{usuario}/editar', 'editar')->name('editar');
+            Route::put('/{usuario}', 'actualizar')->name('actualizar');
+            Route::patch('/{usuario}/estado', 'cambiarEstado')->name('estado');
+            Route::delete('/{usuario}', 'eliminar')->name('eliminar');
+        });
+
     /*
 |--------------------------------------------------------------------------
 | GALERÍA INSTITUCIONAL - ADMINISTRACIÓN
