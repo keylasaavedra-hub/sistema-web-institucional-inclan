@@ -251,6 +251,81 @@
                     @endif
                 </div>
 
+                {{-- MULTIMEDIA --}}
+                <p
+                    class="mt-8 px-3 text-[11px] font-extrabold uppercase
+                           tracking-[0.18em] text-emerald-300">
+                    Multimedia
+                </p>
+
+                <div class="mt-3 space-y-2">
+
+                    {{-- GALERÍAS --}}
+                    <a
+                        href="{{ route('admin.galerias.index') }}"
+                        class="flex items-center gap-3 rounded-2xl
+                               px-4 py-3 text-sm font-bold transition
+                               {{ request()->routeIs('admin.galerias.*')
+                                    ? 'bg-white text-emerald-950 shadow-lg'
+                                    : 'text-emerald-50 hover:bg-white/10 hover:text-white' }}">
+                        <svg
+                            class="h-5 w-5 shrink-0"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.9">
+                            <rect x="3" y="5" width="18" height="14" rx="2" />
+                            <circle cx="8" cy="10" r="1.5" />
+                            <path d="m4 16 5-4 4 3 3-3 4 4" />
+                        </svg>
+
+                        <span>Galerías</span>
+                    </a>
+
+                    {{-- VIDEOS --}}
+                    <a
+                        href="{{ route('admin.videos.index') }}"
+                        class="flex items-center gap-3 rounded-2xl
+                               px-4 py-3 text-sm font-bold transition
+                               {{ request()->routeIs('admin.videos.*')
+                                    ? 'bg-white text-emerald-950 shadow-lg'
+                                    : 'text-emerald-50 hover:bg-white/10 hover:text-white' }}">
+                        <svg
+                            class="h-5 w-5 shrink-0"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.9">
+                            <rect x="3" y="5" width="18" height="14" rx="2" />
+                            <path d="m10 9 5 3-5 3z" />
+                        </svg>
+
+                        <span>Videos</span>
+                    </a>
+
+                    {{-- PROMOCIONES --}}
+                    <a
+                        href="{{ route('admin.promociones.index') }}"
+                        class="flex items-center gap-3 rounded-2xl
+                               px-4 py-3 text-sm font-bold transition
+                               {{ request()->routeIs('admin.promociones.*')
+                                    ? 'bg-white text-emerald-950 shadow-lg'
+                                    : 'text-emerald-50 hover:bg-white/10 hover:text-white' }}">
+                        <svg
+                            class="h-5 w-5 shrink-0"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.9">
+                            <circle cx="12" cy="7" r="3" />
+                            <path d="M5 20a7 7 0 0 1 14 0" />
+                            <path d="M4 5h4M16 5h4" />
+                        </svg>
+
+                        <span>Promociones</span>
+                    </a>
+                </div>
+
                 <p
                     class="mt-8 px-3 text-[11px] font-extrabold uppercase
                            tracking-[0.18em] text-emerald-300">
