@@ -24,6 +24,8 @@ use App\Http\Controllers\Admin\GaleriaController as AdminGaleriaController;
 use App\Http\Controllers\GaleriaController;
 use App\Http\Controllers\Admin\VideoController as AdminVideoController;
 use App\Http\Controllers\VideoController;
+use App\Http\Controllers\Admin\PromocionController as AdminPromocionController;
+use App\Http\Controllers\PromocionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -162,6 +164,22 @@ Route::get(
     [VideoController::class, 'mostrar']
 )->whereNumber('video')
     ->name('videos.mostrar');
+/*
+|--------------------------------------------------------------------------
+| PROMOCIONES ESCOLARES - PORTAL PÚBLICO
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/promociones',
+    [PromocionController::class, 'index']
+)->name('promociones.index');
+
+Route::get(
+    '/promociones/{promocion}',
+    [PromocionController::class, 'mostrar']
+)->whereNumber('promocion')
+    ->name('promociones.mostrar');
 /*
 |--------------------------------------------------------------------------
 | SERVICIOS COMPLEMENTARIOS
@@ -438,6 +456,56 @@ Route::middleware('auth')->group(function () {
 
 
 
+    /*
+|--------------------------------------------------------------------------
+| PROMOCIONES ESCOLARES - ADMINISTRACIÓN
+|--------------------------------------------------------------------------
+*/
+
+    Route::get(
+        '/admin/promociones',
+        [AdminPromocionController::class, 'index']
+    )->name('admin.promociones.index');
+
+    Route::get(
+        '/admin/promociones/crear',
+        [AdminPromocionController::class, 'crear']
+    )->name('admin.promociones.crear');
+
+    Route::post(
+        '/admin/promociones',
+        [AdminPromocionController::class, 'guardar']
+    )->name('admin.promociones.guardar');
+
+    Route::get(
+        '/admin/promociones/{promocion}/editar',
+        [AdminPromocionController::class, 'editar']
+    )->whereNumber('promocion')
+        ->name('admin.promociones.editar');
+
+    Route::put(
+        '/admin/promociones/{promocion}',
+        [AdminPromocionController::class, 'actualizar']
+    )->whereNumber('promocion')
+        ->name('admin.promociones.actualizar');
+
+    Route::patch(
+        '/admin/promociones/imagenes/{imagen}/estado',
+        [AdminPromocionController::class, 'cambiarEstadoImagen']
+    )->whereNumber('imagen')
+        ->name('admin.promociones.imagenes.estado');
+
+    Route::delete(
+        '/admin/promociones/imagenes/{imagen}',
+        [AdminPromocionController::class, 'eliminarImagen']
+    )->whereNumber('imagen')
+        ->name('admin.promociones.imagenes.eliminar');
+
+    Route::delete(
+        '/admin/promociones/{promocion}',
+        [AdminPromocionController::class, 'eliminar']
+    )->whereNumber('promocion')
+        ->name('admin.promociones.eliminar');
     /*
 |--------------------------------------------------------------------------
 | VIDEOS INSTITUCIONALES - ADMINISTRACIÓN
