@@ -6,25 +6,39 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-   public function up(): void
-{
-    Schema::create('roles', function (Blueprint $table) {
-        $table->id();
-        $table->string('nombre', 50)->unique();
-        $table->string('descripcion', 200)->nullable();
-        $table->boolean('estado')->default(true);
-        $table->timestamps();
-    });
-}
+    public function up(): void
+    {
+        Schema::create('documentos', function (Blueprint $table) {
+            $table->id();
 
-    /**
-     * Reverse the migrations.
-     */
+            $table->string('titulo', 180);
+            $table->string('slug', 200)->unique();
+
+            $table->string('categoria', 80);
+            $table->text('descripcion')->nullable();
+
+            $table->string('archivo_original', 255);
+            $table->string('archivo_ruta', 255);
+            $table->string('archivo_tipo', 100)->nullable();
+            $table->unsignedBigInteger('archivo_tamanio')->nullable();
+
+            $table->date('fecha_publicacion')->nullable();
+            $table->unsignedInteger('descargas')->default(0);
+
+            $table->boolean('destacado')->default(false);
+            $table->boolean('activo')->default(true);
+
+            $table->timestamps();
+
+            $table->index('categoria');
+            $table->index('fecha_publicacion');
+            $table->index('activo');
+            $table->index('destacado');
+        });
+    }
+
     public function down(): void
-{
-    Schema::dropIfExists('roles');
-}
+    {
+        Schema::dropIfExists('documentos');
+    }
 };
