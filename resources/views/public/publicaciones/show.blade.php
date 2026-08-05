@@ -1,13 +1,37 @@
 <x-public-layout :title="$publicacion->titulo">
 
     @php
-        $imagen = $publicacion->imagen_portada
-            && file_exists(public_path($publicacion->imagen_portada))
-                ? asset($publicacion->imagen_portada)
-                : asset('images/noticia-default.jpg');
+    $portadaEnStorage = $publicacion->imagen_portada
+    && \Illuminate\Support\Facades\Storage::disk('public')
+    ->exists($publicacion->imagen_portada);
 
-        $archivoDisponible = $publicacion->archivo_adjunto
-            && file_exists(public_path($publicacion->archivo_adjunto));
+    $portadaEnPublic = $publicacion->imagen_portada
+    && file_exists(public_path($publicacion->imagen_portada));
+
+    if ($portadaEnStorage) {
+    $imagen = asset('storage/' . $publicacion->imagen_portada);
+    } elseif ($portadaEnPublic) {
+    $imagen = asset($publicacion->imagen_portada);
+    } else {
+    $imagen = asset('images/noticia-default.jpg');
+    }
+
+    $adjuntoEnStorage = $publicacion->archivo_adjunto
+    && \Illuminate\Support\Facades\Storage::disk('public')
+    ->exists($publicacion->archivo_adjunto);
+
+    $adjuntoEnPublic = $publicacion->archivo_adjunto
+    && file_exists(public_path($publicacion->archivo_adjunto));
+
+    $archivoDisponible = $adjuntoEnStorage || $adjuntoEnPublic;
+
+    if ($adjuntoEnStorage) {
+    $urlAdjunto = asset('storage/' . $publicacion->archivo_adjunto);
+    } elseif ($adjuntoEnPublic) {
+    $urlAdjunto = asset($publicacion->archivo_adjunto);
+    } else {
+    $urlAdjunto = null;
+    }
     @endphp
 
     <article class="bg-gray-50">
@@ -20,8 +44,7 @@
 
                 <a
                     href="{{ route('publicaciones.index') }}"
-                    class="inline-flex items-center gap-2 text-sm font-bold text-amber-300 hover:text-white"
-                >
+                    class="inline-flex items-center gap-2 text-sm font-bold text-amber-300 hover:text-white">
                     ← Volver a noticias
                 </a>
 
@@ -54,8 +77,7 @@
                 <img
                     src="{{ $imagen }}"
                     alt="{{ $publicacion->titulo }}"
-                    class="max-h-[620px] w-full object-cover"
-                >
+                    class="max-h-[620px] w-full object-cover">
             </div>
 
             <div class="mt-10 rounded-3xl bg-white p-7 shadow-sm sm:p-10">
@@ -65,70 +87,67 @@
                 </div>
 
                 @if ($archivoDisponible)
-                    <div class="mt-10 border-t border-gray-100 pt-8">
+                <div class="mt-10 border-t border-gray-100 pt-8">
 
-                        <h2 class="text-xl font-extrabold text-emerald-950">
-                            Documento adjunto
-                        </h2>
+                    <h2 class="text-xl font-extrabold text-emerald-950">
+                        Documento adjunto
+                    </h2>
 
-                        <a
-                            href="{{ asset($publicacion->archivo_adjunto) }}"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="mt-4 inline-flex items-center gap-2 rounded-xl bg-emerald-800 px-6 py-3 font-bold text-white transition hover:bg-emerald-700"
-                        >
-                            Abrir documento
-                        </a>
+                    <a
+                        href="{{ $urlAdjunto }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="mt-4 inline-flex items-center gap-2 rounded-xl bg-emerald-800 px-6 py-3 font-bold text-white transition hover:bg-emerald-700">
+                        Abrir documento
+                    </a>
 
-                    </div>
+                </div>
                 @endif
 
             </div>
 
             @if ($relacionadas->isNotEmpty())
 
-                <section class="mt-16">
+            <section class="mt-16">
 
-                    <h2 class="text-3xl font-extrabold text-emerald-950">
-                        También puede interesarte
-                    </h2>
+                <h2 class="text-3xl font-extrabold text-emerald-950">
+                    También puede interesarte
+                </h2>
 
-                    <div class="mt-8 grid gap-6 md:grid-cols-3">
+                <div class="mt-8 grid gap-6 md:grid-cols-3">
 
-                        @foreach ($relacionadas as $relacionada)
+                    @foreach ($relacionadas as $relacionada)
 
-                            @php
-                                $imagenRelacionada = $relacionada->imagen_portada
-                                    && file_exists(public_path($relacionada->imagen_portada))
-                                        ? asset($relacionada->imagen_portada)
-                                        : asset('images/noticia-default.jpg');
-                            @endphp
+                    @php
+                    $imagenRelacionada = $relacionada->imagen_portada
+                    && file_exists(public_path($relacionada->imagen_portada))
+                    ? asset($relacionada->imagen_portada)
+                    : asset('images/noticia-default.jpg');
+                    @endphp
 
-                            <a
-                                href="{{ route('publicaciones.show', $relacionada->slug) }}"
-                                class="group overflow-hidden rounded-2xl bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
-                            >
-                                <img
-                                    src="{{ $imagenRelacionada }}"
-                                    alt="{{ $relacionada->titulo }}"
-                                    class="h-44 w-full object-cover transition duration-500 group-hover:scale-105"
-                                >
+                    <a
+                        href="{{ route('publicaciones.show', $relacionada->slug) }}"
+                        class="group overflow-hidden rounded-2xl bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+                        <img
+                            src="{{ $imagenRelacionada }}"
+                            alt="{{ $relacionada->titulo }}"
+                            class="h-44 w-full object-cover transition duration-500 group-hover:scale-105">
 
-                                <div class="p-5">
-                                    <p class="text-xs font-bold text-amber-600">
-                                        {{ $relacionada->categoria ?? 'Publicación' }}
-                                    </p>
+                        <div class="p-5">
+                            <p class="text-xs font-bold text-amber-600">
+                                {{ $relacionada->categoria ?? 'Publicación' }}
+                            </p>
 
-                                    <h3 class="mt-2 font-extrabold text-emerald-950">
-                                        {{ $relacionada->titulo }}
-                                    </h3>
-                                </div>
-                            </a>
+                            <h3 class="mt-2 font-extrabold text-emerald-950">
+                                {{ $relacionada->titulo }}
+                            </h3>
+                        </div>
+                    </a>
 
-                        @endforeach
+                    @endforeach
 
-                    </div>
-                </section>
+                </div>
+            </section>
 
             @endif
 

@@ -27,97 +27,104 @@
 
                 @forelse ($publicaciones as $publicacion)
 
-                    @php
-                        $imagen = $publicacion->imagen_portada
-                            && file_exists(public_path($publicacion->imagen_portada))
-                                ? asset($publicacion->imagen_portada)
-                                : asset('images/noticia-default.jpg');
-                    @endphp
+                @php
+                $portadaEnStorage = $publicacion->imagen_portada
+                && \Illuminate\Support\Facades\Storage::disk('public')
+                ->exists($publicacion->imagen_portada);
 
-                    <article class="group overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-lg transition hover:-translate-y-1 hover:shadow-xl">
+                $portadaEnPublic = $publicacion->imagen_portada
+                && file_exists(public_path($publicacion->imagen_portada));
 
-                        <a href="{{ route('publicaciones.show', $publicacion->slug) }}">
-                            <div class="relative h-60 overflow-hidden bg-gray-100">
+                if ($portadaEnStorage) {
+                $imagen = asset('storage/' . $publicacion->imagen_portada);
+                } elseif ($portadaEnPublic) {
+                $imagen = asset($publicacion->imagen_portada);
+                } else {
+                $imagen = asset('images/noticia-default.jpg');
+                }
+                @endphp
 
-                                <img
-                                    src="{{ $imagen }}"
-                                    alt="{{ $publicacion->titulo }}"
-                                    class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                                >
+                <article class="group overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-lg transition hover:-translate-y-1 hover:shadow-xl">
 
-                                @if ($publicacion->destacada)
-                                    <span class="absolute left-4 top-4 rounded-full bg-amber-400 px-3 py-1 text-xs font-bold text-emerald-950">
-                                        Destacada
-                                    </span>
-                                @endif
+                    <a href="{{ route('publicaciones.show', $publicacion->slug) }}">
+                        <div class="relative h-60 overflow-hidden bg-gray-100">
 
-                            </div>
-                        </a>
+                            <img
+                                src="{{ $imagen }}"
+                                alt="{{ $publicacion->titulo }}"
+                                class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
 
-                        <div class="p-7">
-
-                            <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">
-                                {{ $publicacion->categoria ?? 'Publicación' }}
+                            @if ($publicacion->destacada)
+                            <span class="absolute left-4 top-4 rounded-full bg-amber-400 px-3 py-1 text-xs font-bold text-emerald-950">
+                                Destacada
                             </span>
+                            @endif
 
-                            <h2 class="mt-4 text-xl font-extrabold text-emerald-950">
-                                <a
-                                    href="{{ route('publicaciones.show', $publicacion->slug) }}"
-                                    class="transition hover:text-emerald-700"
-                                >
-                                    {{ $publicacion->titulo }}
-                                </a>
-                            </h2>
+                        </div>
+                    </a>
 
-                            <p class="mt-3 text-sm leading-6 text-gray-600">
-                                {{ \Illuminate\Support\Str::limit(
+                    <div class="p-7">
+
+                        <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">
+                            {{ $publicacion->categoria ?? 'Publicación' }}
+                        </span>
+
+                        <h2 class="mt-4 text-xl font-extrabold text-emerald-950">
+                            <a
+                                href="{{ route('publicaciones.show', $publicacion->slug) }}"
+                                class="transition hover:text-emerald-700">
+                                {{ $publicacion->titulo }}
+                            </a>
+                        </h2>
+
+                        <p class="mt-3 text-sm leading-6 text-gray-600">
+                            {{ \Illuminate\Support\Str::limit(
                                     strip_tags($publicacion->contenido),
                                     145
                                 ) }}
-                            </p>
+                        </p>
 
-                            <div class="mt-6 flex items-center justify-between gap-4">
+                        <div class="mt-6 flex items-center justify-between gap-4">
 
-                                <span class="text-xs text-gray-500">
-                                    {{ $publicacion->fecha_publicacion
+                            <span class="text-xs text-gray-500">
+                                {{ $publicacion->fecha_publicacion
                                         ? \Illuminate\Support\Carbon::parse(
                                             $publicacion->fecha_publicacion
                                         )->format('d/m/Y')
                                         : 'Sin fecha' }}
-                                </span>
+                            </span>
 
-                                <a
-                                    href="{{ route('publicaciones.show', $publicacion->slug) }}"
-                                    class="text-sm font-bold text-emerald-700 hover:text-emerald-900"
-                                >
-                                    Leer más →
-                                </a>
-
-                            </div>
+                            <a
+                                href="{{ route('publicaciones.show', $publicacion->slug) }}"
+                                class="text-sm font-bold text-emerald-700 hover:text-emerald-900">
+                                Leer más →
+                            </a>
 
                         </div>
-                    </article>
+
+                    </div>
+                </article>
 
                 @empty
 
-                    <div class="md:col-span-2 lg:col-span-3 rounded-3xl border border-dashed border-emerald-200 bg-white p-14 text-center">
-                        <h2 class="text-2xl font-extrabold text-emerald-950">
-                            No hay publicaciones disponibles
-                        </h2>
+                <div class="md:col-span-2 lg:col-span-3 rounded-3xl border border-dashed border-emerald-200 bg-white p-14 text-center">
+                    <h2 class="text-2xl font-extrabold text-emerald-950">
+                        No hay publicaciones disponibles
+                    </h2>
 
-                        <p class="mt-3 text-gray-600">
-                            Las nuevas noticias y comunicados aparecerán aquí.
-                        </p>
-                    </div>
+                    <p class="mt-3 text-gray-600">
+                        Las nuevas noticias y comunicados aparecerán aquí.
+                    </p>
+                </div>
 
                 @endforelse
 
             </div>
 
             @if ($publicaciones->hasPages())
-                <div class="mt-12">
-                    {{ $publicaciones->links() }}
-                </div>
+            <div class="mt-12">
+                {{ $publicaciones->links() }}
+            </div>
             @endif
 
         </div>
