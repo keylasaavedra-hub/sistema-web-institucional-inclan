@@ -9,27 +9,37 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('consultas', function (Blueprint $table) {
-            $table->string('apellidos', 100)
-                ->after('nombres');
+            if (! Schema::hasColumn('consultas', 'apellidos')) {
+                $table->string('apellidos', 100)->after('nombres');
+            }
 
-            $table->text('respuesta')
-                ->nullable()
-                ->after('estado');
+            if (! Schema::hasColumn('consultas', 'telefono')) {
+                $table->string('telefono', 20)->nullable()->after('correo');
+            }
 
-            $table->timestamp('respondido_en')
-                ->nullable()
-                ->after('respuesta');
+            if (! Schema::hasColumn('consultas', 'respuesta')) {
+                $table->text('respuesta')->nullable()->after('estado');
+            }
+
+            if (! Schema::hasColumn('consultas', 'respondido_en')) {
+                $table->dateTime('respondido_en')->nullable()->after('respuesta');
+            }
+
+            if (! Schema::hasColumn('consultas', 'fecha_atencion')) {
+                $table->dateTime('fecha_atencion')->nullable()->after('respondido_en');
+            }
+
+            if (! Schema::hasColumn('consultas', 'fecha_cierre')) {
+                $table->dateTime('fecha_cierre')->nullable()->after('fecha_atencion');
+            }
         });
     }
 
     public function down(): void
     {
-        Schema::table('consultas', function (Blueprint $table) {
-            $table->dropColumn([
-                'apellidos',
-                'respuesta',
-                'respondido_en',
-            ]);
-        });
+        /*
+         * No se eliminan columnas porque algunas forman parte
+         * de la estructura original de la tabla consultas.
+         */
     }
 };
