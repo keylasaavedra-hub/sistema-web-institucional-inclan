@@ -27,6 +27,7 @@ use App\Http\Controllers\VideoController;
 use App\Http\Controllers\Admin\PromocionController as AdminPromocionController;
 use App\Http\Controllers\PromocionController;
 use App\Http\Controllers\Admin\DocumentoController as AdminDocumentoController;
+use App\Http\Controllers\Admin\PublicacionController as AdminPublicacionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -457,6 +458,42 @@ Route::middleware('auth')->group(function () {
 
 
 
+
+    /*
+|--------------------------------------------------------------------------
+| PUBLICACIONES - ADMINISTRACIÓN
+|--------------------------------------------------------------------------
+*/
+
+    Route::get(
+        '/admin/publicaciones',
+        [AdminPublicacionController::class, 'index']
+    )->name('admin.publicaciones.index');
+
+    Route::get(
+        '/admin/publicaciones/crear',
+        [AdminPublicacionController::class, 'crear']
+    )->name('admin.publicaciones.crear');
+
+    Route::post(
+        '/admin/publicaciones',
+        [AdminPublicacionController::class, 'guardar']
+    )->name('admin.publicaciones.guardar');
+
+    Route::get(
+        '/admin/publicaciones/{publicacion}/editar',
+        [AdminPublicacionController::class, 'editar']
+    )->name('admin.publicaciones.editar');
+
+    Route::put(
+        '/admin/publicaciones/{publicacion}',
+        [AdminPublicacionController::class, 'actualizar']
+    )->name('admin.publicaciones.actualizar');
+
+    Route::delete(
+        '/admin/publicaciones/{publicacion}',
+        [AdminPublicacionController::class, 'eliminar']
+    )->name('admin.publicaciones.eliminar');
     /*
 |--------------------------------------------------------------------------
 | DOCUMENTOS - ADMINISTRACIÓN

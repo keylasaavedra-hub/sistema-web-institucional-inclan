@@ -201,6 +201,28 @@
                         <span>Calendario</span>
                     </a>
 
+                    {{-- PUBLICACIONES --}}
+                    <a
+                        href="{{ route('admin.publicaciones.index') }}"
+                        class="flex items-center gap-3 rounded-2xl
+           px-4 py-3 text-sm font-bold transition
+           {{ request()->routeIs('admin.publicaciones.*')
+                ? 'bg-white text-emerald-950 shadow-lg'
+                : 'text-emerald-50 hover:bg-white/10 hover:text-white' }}">
+                        <svg
+                            class="h-5 w-5 shrink-0"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.9">
+                            <path d="M6 3h9l3 3v15H6z" />
+                            <path d="M14 3v4h4" />
+                            <path d="M9 11h6M9 15h6" />
+                        </svg>
+
+                        <span>Publicaciones</span>
+                    </a>
+
                     <a
                         href="{{ route('admin.convocatorias.index') }}"
                         class="flex items-center gap-3 rounded-2xl
