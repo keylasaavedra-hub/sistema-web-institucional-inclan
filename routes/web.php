@@ -26,6 +26,7 @@ use App\Http\Controllers\Admin\VideoController as AdminVideoController;
 use App\Http\Controllers\VideoController;
 use App\Http\Controllers\Admin\PromocionController as AdminPromocionController;
 use App\Http\Controllers\PromocionController;
+use App\Http\Controllers\Admin\DocumentoController as AdminDocumentoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -456,6 +457,62 @@ Route::middleware('auth')->group(function () {
 
 
 
+    /*
+|--------------------------------------------------------------------------
+| DOCUMENTOS - ADMINISTRACIÓN
+|--------------------------------------------------------------------------
+*/
+
+    Route::get(
+        '/admin/documentos',
+        [AdminDocumentoController::class, 'index']
+    )->name('admin.documentos.index');
+
+    Route::get(
+        '/admin/documentos/crear',
+        [AdminDocumentoController::class, 'crear']
+    )->name('admin.documentos.crear');
+
+    Route::post(
+        '/admin/documentos',
+        [AdminDocumentoController::class, 'guardar']
+    )->name('admin.documentos.guardar');
+
+    Route::get(
+        '/admin/documentos/{documento}/editar',
+        [AdminDocumentoController::class, 'editar']
+    )->whereNumber('documento')
+        ->name('admin.documentos.editar');
+
+    Route::put(
+        '/admin/documentos/{documento}',
+        [AdminDocumentoController::class, 'actualizar']
+    )->whereNumber('documento')
+        ->name('admin.documentos.actualizar');
+
+    Route::post(
+        '/admin/documentos/{documento}/versiones',
+        [AdminDocumentoController::class, 'nuevaVersion']
+    )->whereNumber('documento')
+        ->name('admin.documentos.versiones.guardar');
+
+    Route::get(
+        '/admin/documentos/{documento}/descargar',
+        [AdminDocumentoController::class, 'descargarActual']
+    )->whereNumber('documento')
+        ->name('admin.documentos.descargar');
+
+    Route::get(
+        '/admin/documentos/versiones/{version}/descargar',
+        [AdminDocumentoController::class, 'descargarVersion']
+    )->whereNumber('version')
+        ->name('admin.documentos.versiones.descargar');
+
+    Route::delete(
+        '/admin/documentos/{documento}',
+        [AdminDocumentoController::class, 'eliminar']
+    )->whereNumber('documento')
+        ->name('admin.documentos.eliminar');
     /*
 |--------------------------------------------------------------------------
 | PROMOCIONES ESCOLARES - ADMINISTRACIÓN

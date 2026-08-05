@@ -159,6 +159,28 @@
                         <span>Mesa de partes</span>
                     </a>
 
+                    {{-- DOCUMENTOS --}}
+                    <a
+                        href="{{ route('admin.documentos.index') }}"
+                        class="flex items-center gap-3 rounded-2xl
+           px-4 py-3 text-sm font-bold transition
+           {{ request()->routeIs('admin.documentos.*')
+                ? 'bg-white text-emerald-950 shadow-lg'
+                : 'text-emerald-50 hover:bg-white/10 hover:text-white' }}">
+                        <svg
+                            class="h-5 w-5 shrink-0"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.9">
+                            <path d="M6 3h9l3 3v15H6z" />
+                            <path d="M14 3v4h4" />
+                            <path d="M9 12h6M9 16h4" />
+                        </svg>
+
+                        <span>Documentos</span>
+                    </a>
+
                     <a
                         href="{{ route('admin.eventos.index') }}"
                         class="flex items-center gap-3 rounded-2xl
