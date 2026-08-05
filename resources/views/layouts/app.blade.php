@@ -20,6 +20,22 @@
 <body
     class="font-sans antialiased"
     x-data="{ sidebarOpen: false }">
+    @php
+    $usuarioActual = auth()->user();
+    $esAdministrador = $usuarioActual?->esAdministrador() ?? false;
+
+    $permisosUsuario = $esAdministrador
+    ? collect()
+    : (
+    $usuarioActual?->rol?->permisos
+    ?->where('estado', true)
+    ->pluck('codigo')
+    ?? collect()
+    );
+
+    $puede = fn (string $codigo): bool =>
+    $esAdministrador || $permisosUsuario->contains($codigo);
+    @endphp
     <div class="min-h-screen bg-slate-50">
 
         {{-- FONDO OSCURO PARA CELULAR --}}
@@ -93,6 +109,7 @@
                 <div class="mt-3 space-y-2">
 
                     {{-- DASHBOARD --}}
+                    @if ($puede('dashboard.ver'))
                     <a
                         href="{{ route('dashboard') }}"
                         class="flex items-center gap-3 rounded-2xl
@@ -114,8 +131,10 @@
 
                         <span>Dashboard</span>
                     </a>
+                    @endif
 
                     {{-- CONSULTAS --}}
+                    @if ($puede('consultas.ver'))
                     <a
                         href="{{ route('admin.consultas.index') }}"
                         class="flex items-center gap-3 rounded-2xl
@@ -135,9 +154,13 @@
 
                         <span>Consultas</span>
                     </a>
+                    @endif
 
                     {{-- SOLICITUDES / TRÁMITES --}}
-                    @if (Route::has('admin.tramites.index'))
+                    @if (
+                    Route::has('admin.tramites.index')
+                    && $puede('solicitudes.ver')
+                    )
                     <a
                         href="{{ route('admin.tramites.index') }}"
                         class="flex items-center gap-3 rounded-2xl
@@ -158,8 +181,10 @@
 
                         <span>Mesa de partes</span>
                     </a>
+                    @endif
 
                     {{-- DOCUMENTOS --}}
+                    @if ($puede('documentos.gestionar'))
                     <a
                         href="{{ route('admin.documentos.index') }}"
                         class="flex items-center gap-3 rounded-2xl
@@ -180,7 +205,10 @@
 
                         <span>Documentos</span>
                     </a>
+                    @endif
 
+                    {{-- CALENDARIO --}}
+                    @if ($puede('publicaciones.gestionar'))
                     <a
                         href="{{ route('admin.eventos.index') }}"
                         class="flex items-center gap-3 rounded-2xl
@@ -200,8 +228,10 @@
 
                         <span>Calendario</span>
                     </a>
+                    @endif
 
                     {{-- PUBLICACIONES --}}
+                    @if ($puede('publicaciones.gestionar'))
                     <a
                         href="{{ route('admin.publicaciones.index') }}"
                         class="flex items-center gap-3 rounded-2xl
@@ -222,7 +252,9 @@
 
                         <span>Publicaciones</span>
                     </a>
+                    @endif
 
+                    @if ($puede('publicaciones.gestionar'))
                     <a
                         href="{{ route('admin.categorias-publicacion.index') }}"
                         class="flex items-center gap-3 rounded-2xl
@@ -244,7 +276,9 @@
 
                         <span>Categorías de publicaciones</span>
                     </a>
+                    @endif
 
+                    @if ($puede('convocatorias.gestionar'))
                     <a
                         href="{{ route('admin.convocatorias.index') }}"
                         class="flex items-center gap-3 rounded-2xl
@@ -265,8 +299,10 @@
 
                         <span>Convocatorias</span>
                     </a>
+                    @endif
 
                     {{-- POSTULACIONES --}}
+                    @if ($puede('postulaciones.revisar'))
                     <a
                         href="{{ route('admin.postulaciones.index') }}"
                         class="flex items-center gap-3 rounded-2xl
@@ -288,33 +324,8 @@
 
                         <span>Postulaciones</span>
                     </a>
-
-                    @else
-                    <div
-                        class="flex cursor-not-allowed items-center
-                                   gap-3 rounded-2xl px-4 py-3
-                                   text-sm font-bold text-emerald-100/50"
-                        title="Módulo pendiente">
-                        <svg
-                            class="h-5 w-5 shrink-0"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.9">
-                            <path d="M6 3h9l3 3v15H6z" />
-                            <path d="M14 3v4h4" />
-                            <path d="M9 12h6M9 16h4" />
-                        </svg>
-
-                        <span>Mesa de partes</span>
-
-                        <span
-                            class="ml-auto rounded-full bg-white/10
-                                       px-2 py-1 text-[10px] uppercase">
-                            Próximo
-                        </span>
-                    </div>
                     @endif
+
                 </div>
 
                 {{-- MULTIMEDIA --}}
@@ -327,6 +338,7 @@
                 <div class="mt-3 space-y-2">
 
                     {{-- GALERÍAS --}}
+                    @if ($puede('galerias.gestionar'))
                     <a
                         href="{{ route('admin.galerias.index') }}"
                         class="flex items-center gap-3 rounded-2xl
@@ -347,8 +359,10 @@
 
                         <span>Galerías</span>
                     </a>
+                    @endif
 
                     {{-- VIDEOS --}}
+                    @if ($puede('galerias.gestionar'))
                     <a
                         href="{{ route('admin.videos.index') }}"
                         class="flex items-center gap-3 rounded-2xl
@@ -368,8 +382,10 @@
 
                         <span>Videos</span>
                     </a>
+                    @endif
 
                     {{-- PROMOCIONES --}}
+                    @if ($puede('promociones.gestionar'))
                     <a
                         href="{{ route('admin.promociones.index') }}"
                         class="flex items-center gap-3 rounded-2xl
@@ -390,6 +406,7 @@
 
                         <span>Promociones</span>
                     </a>
+                    @endif
                 </div>
 
                 <p
@@ -496,6 +513,65 @@
                         </svg>
                     </a>
                 </div>
+                @if (
+                $puede('usuarios.ver')
+                || $puede('seguridad.administrar')
+                )
+                <p
+                    class="mt-8 px-3 text-[11px] font-extrabold uppercase
+               tracking-[0.18em] text-emerald-300">
+                    Seguridad
+                </p>
+
+                <div class="mt-3 space-y-2">
+                    @if ($puede('usuarios.ver'))
+                    <a
+                        href="{{ route('admin.usuarios.index') }}"
+                        class="flex items-center gap-3 rounded-2xl
+                       px-4 py-3 text-sm font-bold transition
+                       {{ request()->routeIs('admin.usuarios.*')
+                            ? 'bg-white text-emerald-950 shadow-lg'
+                            : 'text-emerald-50 hover:bg-white/10 hover:text-white' }}">
+                        <svg
+                            class="h-5 w-5 shrink-0"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.9">
+                            <path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M22 21v-2a4 4 0 00-3-3.87" />
+                            <path d="M16 3.13a4 4 0 010 7.75" />
+                        </svg>
+
+                        <span>Usuarios</span>
+                    </a>
+                    @endif
+
+                    @if ($puede('seguridad.administrar'))
+                    <a
+                        href="{{ route('admin.roles.index') }}"
+                        class="flex items-center gap-3 rounded-2xl
+                       px-4 py-3 text-sm font-bold transition
+                       {{ request()->routeIs('admin.roles.*')
+                            ? 'bg-white text-emerald-950 shadow-lg'
+                            : 'text-emerald-50 hover:bg-white/10 hover:text-white' }}">
+                        <svg
+                            class="h-5 w-5 shrink-0"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.9">
+                            <circle cx="12" cy="8" r="4" />
+                            <path d="M4 21v-2a6 6 0 016-6h4a6 6 0 016 6v2" />
+                            <path d="M18 8h4M20 6v4" />
+                        </svg>
+
+                        <span>Roles y permisos</span>
+                    </a>
+                    @endif
+                </div>
+                @endif
             </nav>
 
             {{-- USUARIO --}}
