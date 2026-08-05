@@ -28,6 +28,7 @@ use App\Http\Controllers\Admin\PromocionController as AdminPromocionController;
 use App\Http\Controllers\PromocionController;
 use App\Http\Controllers\Admin\DocumentoController as AdminDocumentoController;
 use App\Http\Controllers\Admin\PublicacionController as AdminPublicacionController;
+use App\Http\Controllers\Admin\CategoriaPublicacionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -459,6 +460,36 @@ Route::middleware('auth')->group(function () {
 
 
 
+    /*
+|--------------------------------------------------------------------------
+| CATEGORÍAS DE PUBLICACIONES
+|--------------------------------------------------------------------------
+*/
+
+    Route::get(
+        '/admin/categorias-publicacion',
+        [CategoriaPublicacionController::class, 'index']
+    )->name('admin.categorias-publicacion.index');
+
+    Route::post(
+        '/admin/categorias-publicacion',
+        [CategoriaPublicacionController::class, 'guardar']
+    )->name('admin.categorias-publicacion.guardar');
+
+    Route::put(
+        '/admin/categorias-publicacion/{categoria}',
+        [CategoriaPublicacionController::class, 'actualizar']
+    )->name('admin.categorias-publicacion.actualizar');
+
+    Route::patch(
+        '/admin/categorias-publicacion/{categoria}/estado',
+        [CategoriaPublicacionController::class, 'cambiarEstado']
+    )->name('admin.categorias-publicacion.estado');
+
+    Route::delete(
+        '/admin/categorias-publicacion/{categoria}',
+        [CategoriaPublicacionController::class, 'eliminar']
+    )->name('admin.categorias-publicacion.eliminar');
     /*
 |--------------------------------------------------------------------------
 | PUBLICACIONES - ADMINISTRACIÓN
