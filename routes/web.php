@@ -29,6 +29,7 @@ use App\Http\Controllers\Admin\PublicacionController as AdminPublicacionControll
 use App\Http\Controllers\Admin\CategoriaPublicacionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\UsuarioController;
+use App\Http\Controllers\Admin\RolController;
 
 /*
 |--------------------------------------------------------------------------
@@ -384,6 +385,18 @@ Route::middleware('auth')->group(function () {
             Route::delete('/{usuario}', 'eliminar')->name('eliminar');
         });
 
+    Route::prefix('admin/roles')
+        ->name('admin.roles.')
+        ->controller(RolController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/crear', 'crear')->name('crear');
+            Route::post('/', 'guardar')->name('guardar');
+            Route::get('/{rol}/editar', 'editar')->name('editar');
+            Route::put('/{rol}', 'actualizar')->name('actualizar');
+            Route::patch('/{rol}/estado', 'cambiarEstado')->name('estado');
+            Route::delete('/{rol}', 'eliminar')->name('eliminar');
+        });
     /*
 |--------------------------------------------------------------------------
 | GALERÍA INSTITUCIONAL - ADMINISTRACIÓN
