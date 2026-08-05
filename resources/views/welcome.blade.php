@@ -1713,7 +1713,9 @@
                     ['Consultas institucionales', route('consultas.crear')],
                     ['Mesa de partes virtual', route('mesa-partes.crear')],
                     ['Documentos y formatos', route('documentos.index')],
-                    ['Convocatorias vigentes', '/convocatorias'],
+                    ['Convocatorias vigentes', route('convocatorias.index')],
+                    ['Consultar postulación', route('postulaciones.seguimiento')],
+                    ['Resultados de convocatorias', route('postulaciones.resultados')],
                     ['Calendario institucional', '#calendario'],
                     ] as $opcion)
                     <a

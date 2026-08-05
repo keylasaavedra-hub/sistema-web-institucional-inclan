@@ -10,12 +10,11 @@
 
     <title>{{ $title }} | IE Crl. José Joaquín Inclán</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-<link
-    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&display=swap"
-    rel="stylesheet"
->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&display=swap"
+        rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -23,7 +22,7 @@
 <body class="min-h-screen bg-white text-slate-800 antialiased">
 
     @php
-        $siewebUrl = $sieweb->url ?? 'https://inclanpiura.sieweb.com.pe/sistema/login';
+    $siewebUrl = $sieweb->url ?? 'https://inclanpiura.sieweb.com.pe/sistema/login';
     @endphp
 
     <header
@@ -108,25 +107,22 @@
                         {{-- Institución --}}
                         <div
                             class="relative"
-                            @click.outside="menuAbierto === 'institucion' && cerrarMenus()"
-                        >
+                            @click.outside="menuAbierto === 'institucion' && cerrarMenus()">
                             <button
                                 type="button"
                                 @click="alternar('institucion')"
                                 class="inline-flex min-h-12 items-center gap-2 rounded-2xl
                                        px-3.5 text-[13px] font-extrabold text-slate-700
-                                       transition hover:bg-emerald-50 hover:text-emerald-950"
-                            >
+                                       transition hover:bg-emerald-50 hover:text-emerald-950">
                                 <svg
                                     class="h-5 w-5 text-emerald-700"
                                     viewBox="0 0 24 24"
                                     fill="none"
                                     stroke="currentColor"
-                                    stroke-width="2"
-                                >
-                                    <path d="M3 21h18"/>
-                                    <path d="M5 21V9l7-4 7 4v12"/>
-                                    <path d="M9 13h2v3H9zM13 13h2v3h-2z"/>
+                                    stroke-width="2">
+                                    <path d="M3 21h18" />
+                                    <path d="M5 21V9l7-4 7 4v12" />
+                                    <path d="M9 13h2v3H9zM13 13h2v3h-2z" />
                                 </svg>
 
                                 Institución
@@ -135,13 +131,11 @@
                                     class="h-4 w-4 transition-transform"
                                     :class="menuAbierto === 'institucion' ? 'rotate-180' : ''"
                                     viewBox="0 0 20 20"
-                                    fill="currentColor"
-                                >
+                                    fill="currentColor">
                                     <path
                                         fill-rule="evenodd"
                                         d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-                                        clip-rule="evenodd"
-                                    />
+                                        clip-rule="evenodd" />
                                 </svg>
                             </button>
 
@@ -151,8 +145,7 @@
                                 x-transition
                                 class="absolute left-0 top-full mt-3 w-[360px]
                                        overflow-hidden rounded-3xl border border-amber-200
-                                       bg-white p-2 shadow-2xl shadow-emerald-950/15"
-                            >
+                                       bg-white p-2 shadow-2xl shadow-emerald-950/15">
                                 <div class="rounded-2xl bg-emerald-950 px-4 py-3 text-white">
                                     <p class="text-xs font-extrabold uppercase tracking-[0.16em] text-amber-300">
                                         Nuestra institución
@@ -168,22 +161,19 @@
                                     <a
                                         href="{{ url('/institucion/resena-historica') }}"
                                         class="group flex items-start gap-3 rounded-2xl px-4 py-3
-                                               transition hover:bg-emerald-50"
-                                    >
+                                               transition hover:bg-emerald-50">
                                         <span
                                             class="flex h-10 w-10 shrink-0 items-center justify-center
                                                    rounded-xl border border-amber-200 bg-emerald-950
-                                                   text-white transition group-hover:bg-emerald-900"
-                                        >
+                                                   text-white transition group-hover:bg-emerald-900">
                                             <svg
                                                 class="h-5 w-5"
                                                 viewBox="0 0 24 24"
                                                 fill="none"
                                                 stroke="currentColor"
-                                                stroke-width="1.8"
-                                            >
-                                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-                                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                                                stroke-width="1.8">
+                                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
                                             </svg>
                                         </span>
 
@@ -200,22 +190,19 @@
                                     <a
                                         href="{{ url('/institucion/mision-vision-valores') }}"
                                         class="group flex items-start gap-3 rounded-2xl px-4 py-3
-                                               transition hover:bg-emerald-50"
-                                    >
+                                               transition hover:bg-emerald-50">
                                         <span
                                             class="flex h-10 w-10 shrink-0 items-center justify-center
                                                    rounded-xl border border-amber-200 bg-emerald-950
-                                                   text-white transition group-hover:bg-emerald-900"
-                                        >
+                                                   text-white transition group-hover:bg-emerald-900">
                                             <svg
                                                 class="h-5 w-5"
                                                 viewBox="0 0 24 24"
                                                 fill="none"
                                                 stroke="currentColor"
-                                                stroke-width="1.8"
-                                            >
-                                                <circle cx="12" cy="12" r="9"/>
-                                                <path d="m8 12 2.5 2.5L16 9"/>
+                                                stroke-width="1.8">
+                                                <circle cx="12" cy="12" r="9" />
+                                                <path d="m8 12 2.5 2.5L16 9" />
                                             </svg>
                                         </span>
 
@@ -232,23 +219,20 @@
                                     <a
                                         href="{{ url('/institucion/infraestructura') }}"
                                         class="group flex items-start gap-3 rounded-2xl px-4 py-3
-                                               transition hover:bg-emerald-50"
-                                    >
+                                               transition hover:bg-emerald-50">
                                         <span
                                             class="flex h-10 w-10 shrink-0 items-center justify-center
                                                    rounded-xl border border-amber-200 bg-emerald-950
-                                                   text-white transition group-hover:bg-emerald-900"
-                                        >
+                                                   text-white transition group-hover:bg-emerald-900">
                                             <svg
                                                 class="h-5 w-5"
                                                 viewBox="0 0 24 24"
                                                 fill="none"
                                                 stroke="currentColor"
-                                                stroke-width="1.8"
-                                            >
-                                                <path d="M3 21h18"/>
-                                                <path d="M5 21V8l7-4 7 4v13"/>
-                                                <path d="M9 12h2v3H9zM13 12h2v3h-2z"/>
+                                                stroke-width="1.8">
+                                                <path d="M3 21h18" />
+                                                <path d="M5 21V8l7-4 7 4v13" />
+                                                <path d="M9 12h2v3H9zM13 12h2v3h-2z" />
                                             </svg>
                                         </span>
 
@@ -265,23 +249,20 @@
                                     <a
                                         href="{{ url('/institucion/convenios') }}"
                                         class="group flex items-start gap-3 rounded-2xl px-4 py-3
-                                               transition hover:bg-emerald-50"
-                                    >
+                                               transition hover:bg-emerald-50">
                                         <span
                                             class="flex h-10 w-10 shrink-0 items-center justify-center
                                                    rounded-xl border border-amber-200 bg-emerald-950
-                                                   text-white transition group-hover:bg-emerald-900"
-                                        >
+                                                   text-white transition group-hover:bg-emerald-900">
                                             <svg
                                                 class="h-5 w-5"
                                                 viewBox="0 0 24 24"
                                                 fill="none"
                                                 stroke="currentColor"
-                                                stroke-width="1.8"
-                                            >
-                                                <path d="M8 12 11 15 16 10"/>
-                                                <path d="M3 7h4l3 3M21 7h-4l-3 3"/>
-                                                <path d="M5 17h4l3-3 3 3h4"/>
+                                                stroke-width="1.8">
+                                                <path d="M8 12 11 15 16 10" />
+                                                <path d="M3 7h4l3 3M21 7h-4l-3 3" />
+                                                <path d="M5 17h4l3-3 3 3h4" />
                                             </svg>
                                         </span>
 
@@ -298,25 +279,22 @@
                                     <a
                                         href="{{ url('/institucion/comunidad-educativa') }}"
                                         class="group flex items-start gap-3 rounded-2xl px-4 py-3
-                                               transition hover:bg-emerald-50"
-                                    >
+                                               transition hover:bg-emerald-50">
                                         <span
                                             class="flex h-10 w-10 shrink-0 items-center justify-center
                                                    rounded-xl border border-amber-200 bg-emerald-950
-                                                   text-white transition group-hover:bg-emerald-900"
-                                        >
+                                                   text-white transition group-hover:bg-emerald-900">
                                             <svg
                                                 class="h-5 w-5"
                                                 viewBox="0 0 24 24"
                                                 fill="none"
                                                 stroke="currentColor"
-                                                stroke-width="1.8"
-                                            >
-                                                <circle cx="8" cy="8" r="3"/>
-                                                <circle cx="17" cy="8" r="3"/>
-                                                <path d="M3 20v-2a5 5 0 0 1 5-5"/>
-                                                <path d="M21 20v-2a5 5 0 0 0-5-5"/>
-                                                <path d="M10 20v-2a4 4 0 0 1 8 0v2"/>
+                                                stroke-width="1.8">
+                                                <circle cx="8" cy="8" r="3" />
+                                                <circle cx="17" cy="8" r="3" />
+                                                <path d="M3 20v-2a5 5 0 0 1 5-5" />
+                                                <path d="M21 20v-2a5 5 0 0 0-5-5" />
+                                                <path d="M10 20v-2a4 4 0 0 1 8 0v2" />
                                             </svg>
                                         </span>
 
@@ -333,22 +311,19 @@
                                     <a
                                         href="{{ url('/institucion/nuestra-forma-de-ensenar') }}"
                                         class="group flex items-start gap-3 rounded-2xl px-4 py-3
-                                               transition hover:bg-emerald-50"
-                                    >
+                                               transition hover:bg-emerald-50">
                                         <span
                                             class="flex h-10 w-10 shrink-0 items-center justify-center
                                                    rounded-xl border border-amber-200 bg-emerald-950
-                                                   text-white transition group-hover:bg-emerald-900"
-                                        >
+                                                   text-white transition group-hover:bg-emerald-900">
                                             <svg
                                                 class="h-5 w-5"
                                                 viewBox="0 0 24 24"
                                                 fill="none"
                                                 stroke="currentColor"
-                                                stroke-width="1.8"
-                                            >
-                                                <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v16H6.5A2.5 2.5 0 0 0 4 21.5z"/>
-                                                <path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H13v16h4.5a2.5 2.5 0 0 1 2.5 2.5z"/>
+                                                stroke-width="1.8">
+                                                <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v16H6.5A2.5 2.5 0 0 0 4 21.5z" />
+                                                <path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H13v16h4.5a2.5 2.5 0 0 1 2.5 2.5z" />
                                             </svg>
                                         </span>
 
@@ -421,7 +396,7 @@
                                         <small class="text-gray-500">Presenta solicitudes y documentos.</small>
                                     </a>
 
-                                  <a href="{{ route('documentos.index') }}" class="block rounded-2xl px-4 py-3 hover:bg-emerald-50">
+                                    <a href="{{ route('documentos.index') }}" class="block rounded-2xl px-4 py-3 hover:bg-emerald-50">
                                         <strong class="block text-sm text-emerald-950">Documentos y descargas</strong>
                                         <small class="text-gray-500">Reglamentos, planes y formatos.</small>
                                     </a>
@@ -573,21 +548,53 @@
                                 x-transition
                                 class="absolute right-0 top-full mt-3 w-72 rounded-3xl border border-amber-200 bg-white p-2 shadow-2xl shadow-emerald-950/15">
 
-                                <a href="{{ url('/convocatorias') }}" class="block rounded-2xl px-4 py-3 text-sm font-bold text-gray-700 hover:bg-emerald-50">
-                                    Convocatorias vigentes
-                                </a>
+                                <div class="rounded-2xl bg-emerald-950 px-4 py-3 text-white">
+                                    <p class="text-xs font-extrabold uppercase tracking-[0.16em] text-amber-300">
+                                        Convocatorias
+                                    </p>
 
-                                <a href="{{ url('/convocatorias/resultados') }}" class="block rounded-2xl px-4 py-3 text-sm font-bold text-gray-700 hover:bg-emerald-50">
-                                    Resultados
-                                </a>
+                                    <p class="mt-1 text-xs leading-5 text-emerald-100">
+                                        Consulta procesos, postula y revisa resultados.
+                                    </p>
+                                </div>
 
-                                <a href="{{ url('/postular') }}" class="block rounded-2xl px-4 py-3 text-sm font-bold text-gray-700 hover:bg-emerald-50">
-                                    Postular
-                                </a>
+                                <div class="mt-2 space-y-1">
+                                    <a
+                                        href="{{ route('convocatorias.index') }}"
+                                        class="block rounded-2xl px-4 py-3 transition hover:bg-emerald-50">
+                                        <strong class="block text-sm text-emerald-950">
+                                            Convocatorias vigentes
+                                        </strong>
 
-                                <a href="{{ url('/postulaciones/seguimiento') }}" class="block rounded-2xl px-4 py-3 text-sm font-bold text-gray-700 hover:bg-emerald-50">
-                                    Consultar postulación
-                                </a>
+                                        <small class="text-gray-500">
+                                            Revisa los procesos disponibles y postula.
+                                        </small>
+                                    </a>
+
+                                    <a
+                                        href="{{ route('postulaciones.seguimiento') }}"
+                                        class="block rounded-2xl px-4 py-3 transition hover:bg-emerald-50">
+                                        <strong class="block text-sm text-emerald-950">
+                                            Consultar postulación
+                                        </strong>
+
+                                        <small class="text-gray-500">
+                                            Consulta tu estado con código y DNI o correo.
+                                        </small>
+                                    </a>
+
+                                    <a
+                                        href="{{ route('postulaciones.resultados') }}"
+                                        class="block rounded-2xl px-4 py-3 transition hover:bg-emerald-50">
+                                        <strong class="block text-sm text-emerald-950">
+                                            Resultados
+                                        </strong>
+
+                                        <small class="text-gray-500">
+                                            Revisa postulantes aptos y seleccionados.
+                                        </small>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </nav>
@@ -671,43 +678,37 @@
                             <div class="border-t border-gray-100 p-2">
                                 <a
                                     href="{{ url('/institucion/resena-historica') }}"
-                                    class="block rounded-xl px-3 py-2.5 text-sm hover:bg-emerald-50"
-                                >
+                                    class="block rounded-xl px-3 py-2.5 text-sm hover:bg-emerald-50">
                                     Reseña histórica
                                 </a>
 
                                 <a
                                     href="{{ url('/institucion/mision-vision-valores') }}"
-                                    class="block rounded-xl px-3 py-2.5 text-sm hover:bg-emerald-50"
-                                >
+                                    class="block rounded-xl px-3 py-2.5 text-sm hover:bg-emerald-50">
                                     Misión, visión y valores
                                 </a>
 
                                 <a
                                     href="{{ url('/institucion/infraestructura') }}"
-                                    class="block rounded-xl px-3 py-2.5 text-sm hover:bg-emerald-50"
-                                >
+                                    class="block rounded-xl px-3 py-2.5 text-sm hover:bg-emerald-50">
                                     Infraestructura
                                 </a>
 
                                 <a
                                     href="{{ url('/institucion/convenios') }}"
-                                    class="block rounded-xl px-3 py-2.5 text-sm hover:bg-emerald-50"
-                                >
+                                    class="block rounded-xl px-3 py-2.5 text-sm hover:bg-emerald-50">
                                     Convenios
                                 </a>
 
                                 <a
                                     href="{{ url('/institucion/comunidad-educativa') }}"
-                                    class="block rounded-xl px-3 py-2.5 text-sm hover:bg-emerald-50"
-                                >
+                                    class="block rounded-xl px-3 py-2.5 text-sm hover:bg-emerald-50">
                                     Comunidad educativa
                                 </a>
 
                                 <a
                                     href="{{ url('/institucion/nuestra-forma-de-ensenar') }}"
-                                    class="block rounded-xl px-3 py-2.5 text-sm hover:bg-emerald-50"
-                                >
+                                    class="block rounded-xl px-3 py-2.5 text-sm hover:bg-emerald-50">
                                     Nuestra forma de enseñar
                                 </a>
                             </div>
@@ -743,12 +744,28 @@
                         </details>
 
                         <details class="rounded-2xl border border-gray-100 bg-white">
-                            <summary class="cursor-pointer px-4 py-3 font-bold text-gray-800">Convocatorias</summary>
+                            <summary class="cursor-pointer px-4 py-3 font-bold text-gray-800">
+                                Convocatorias
+                            </summary>
+
                             <div class="border-t border-gray-100 p-2">
-                                <a href="{{ url('/convocatorias') }}" class="block rounded-xl px-3 py-2.5 text-sm hover:bg-emerald-50">Convocatorias vigentes</a>
-                                <a href="{{ url('/convocatorias/resultados') }}" class="block rounded-xl px-3 py-2.5 text-sm hover:bg-emerald-50">Resultados</a>
-                                <a href="{{ url('/postular') }}" class="block rounded-xl px-3 py-2.5 text-sm hover:bg-emerald-50">Postular</a>
-                                <a href="{{ url('/postulaciones/seguimiento') }}" class="block rounded-xl px-3 py-2.5 text-sm hover:bg-emerald-50">Consultar postulación</a>
+                                <a
+                                    href="{{ route('convocatorias.index') }}"
+                                    class="block rounded-xl px-3 py-2.5 text-sm hover:bg-emerald-50">
+                                    Convocatorias vigentes
+                                </a>
+
+                                <a
+                                    href="{{ route('postulaciones.seguimiento') }}"
+                                    class="block rounded-xl px-3 py-2.5 text-sm hover:bg-emerald-50">
+                                    Consultar postulación
+                                </a>
+
+                                <a
+                                    href="{{ route('postulaciones.resultados') }}"
+                                    class="block rounded-xl px-3 py-2.5 text-sm hover:bg-emerald-50">
+                                    Resultados
+                                </a>
                             </div>
                         </details>
 
@@ -828,7 +845,26 @@
                     <a href="{{ route('inicio') }}#resena-historica" class="hover:text-white">Institución</a>
                     <a href="{{ route('consultas.crear') }}" class="hover:text-white">Servicios</a>
                     <a href="{{ route('publicaciones.index') }}" class="hover:text-white">Noticias</a>
-                    <a href="{{ url('/convocatorias') }}" class="hover:text-white">Convocatorias</a>
+                    <a
+    href="{{ route('convocatorias.index') }}"
+    class="hover:text-white"
+>
+    Convocatorias
+</a>
+
+<a
+    href="{{ route('postulaciones.seguimiento') }}"
+    class="hover:text-white"
+>
+    Consultar postulación
+</a>
+
+<a
+    href="{{ route('postulaciones.resultados') }}"
+    class="hover:text-white"
+>
+    Resultados de convocatorias
+</a>
                 </div>
             </div>
 
