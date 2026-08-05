@@ -22,6 +22,8 @@ use App\Http\Controllers\PostulacionController;
 use App\Http\Controllers\Admin\PostulacionController as AdminPostulacionController;
 use App\Http\Controllers\Admin\GaleriaController as AdminGaleriaController;
 use App\Http\Controllers\GaleriaController;
+use App\Http\Controllers\Admin\VideoController as AdminVideoController;
+use App\Http\Controllers\VideoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -143,6 +145,23 @@ Route::get('/logros/{id}', [HomeController::class, 'mostrarLogro'])
     ->whereNumber('id')
     ->name('logros.mostrar');
 
+
+/*
+|--------------------------------------------------------------------------
+| VIDEOS INSTITUCIONALES - PORTAL PÚBLICO
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/videos',
+    [VideoController::class, 'index']
+)->name('videos.index');
+
+Route::get(
+    '/videos/{video}',
+    [VideoController::class, 'mostrar']
+)->whereNumber('video')
+    ->name('videos.mostrar');
 /*
 |--------------------------------------------------------------------------
 | SERVICIOS COMPLEMENTARIOS
@@ -417,6 +436,46 @@ Route::middleware('auth')->group(function () {
     )->whereNumber('galeria')
         ->name('admin.galerias.eliminar');
 
+
+
+    /*
+|--------------------------------------------------------------------------
+| VIDEOS INSTITUCIONALES - ADMINISTRACIÓN
+|--------------------------------------------------------------------------
+*/
+
+    Route::get(
+        '/admin/videos',
+        [AdminVideoController::class, 'index']
+    )->name('admin.videos.index');
+
+    Route::get(
+        '/admin/videos/crear',
+        [AdminVideoController::class, 'crear']
+    )->name('admin.videos.crear');
+
+    Route::post(
+        '/admin/videos',
+        [AdminVideoController::class, 'guardar']
+    )->name('admin.videos.guardar');
+
+    Route::get(
+        '/admin/videos/{video}/editar',
+        [AdminVideoController::class, 'editar']
+    )->whereNumber('video')
+        ->name('admin.videos.editar');
+
+    Route::put(
+        '/admin/videos/{video}',
+        [AdminVideoController::class, 'actualizar']
+    )->whereNumber('video')
+        ->name('admin.videos.actualizar');
+
+    Route::delete(
+        '/admin/videos/{video}',
+        [AdminVideoController::class, 'eliminar']
+    )->whereNumber('video')
+        ->name('admin.videos.eliminar');
     /*
 |--------------------------------------------------------------------------
 | ADMINISTRACIÓN DE CONVOCATORIAS

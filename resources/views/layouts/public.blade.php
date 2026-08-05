@@ -506,7 +506,7 @@
                                     Galería institucional
                                 </a>
 
-                                <a href="{{ url('/videos') }}" class="block rounded-2xl px-4 py-3 text-sm font-bold text-gray-700 hover:bg-emerald-50">
+                                <a href="{{ route('videos.index') }}" class="block rounded-2xl px-4 py-3 text-sm font-bold text-gray-700 hover:bg-emerald-50">
                                     Videos institucionales
                                 </a>
 
@@ -738,7 +738,7 @@
                             <summary class="cursor-pointer px-4 py-3 font-bold text-gray-800">Multimedia</summary>
                             <div class="border-t border-gray-100 p-2">
                                 <a href="{{ url('/galeria') }}" class="block rounded-xl px-3 py-2.5 text-sm hover:bg-emerald-50">Galería</a>
-                                <a href="{{ url('/videos') }}" class="block rounded-xl px-3 py-2.5 text-sm hover:bg-emerald-50">Videos</a>
+                                <a href="{{ route('videos.index') }}" class="block rounded-xl px-3 py-2.5 text-sm hover:bg-emerald-50">Videos</a>
                                 <a href="{{ url('/promociones') }}" class="block rounded-xl px-3 py-2.5 text-sm hover:bg-emerald-50">Promociones escolares</a>
                             </div>
                         </details>
