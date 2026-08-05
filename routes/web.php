@@ -12,8 +12,6 @@ use App\Http\Controllers\ServicioComplementarioController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CalendarioController;
 use App\Http\Controllers\Admin\ConsultaController as AdminConsultaController;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use App\Http\Controllers\Admin\TramiteController as AdminTramiteController;
 use App\Http\Controllers\Admin\EventoController as AdminEventoController;
 use App\Http\Controllers\Admin\ConvocatoriaController as AdminConvocatoriaController;
@@ -29,6 +27,7 @@ use App\Http\Controllers\PromocionController;
 use App\Http\Controllers\Admin\DocumentoController as AdminDocumentoController;
 use App\Http\Controllers\Admin\PublicacionController as AdminPublicacionController;
 use App\Http\Controllers\Admin\CategoriaPublicacionController;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -363,46 +362,11 @@ Route::get(
     [PostulacionController::class, 'resultados']
 )->name('postulaciones.resultados');
 
-Route::get('/dashboard', function () {
-    $usuario = auth()->user();
-
-    $estadisticas = [
-        'usuarios' => Schema::hasTable('users')
-            ? DB::table('users')->count()
-            : 0,
-
-        'publicaciones' => Schema::hasTable('publicaciones')
-            ? DB::table('publicaciones')->count()
-            : 0,
-
-        'consultas' => Schema::hasTable('consultas')
-            ? DB::table('consultas')->count()
-            : 0,
-
-        'solicitudes' => Schema::hasTable('tramites')
-            ? DB::table('tramites')->count()
-            : 0,
-
-        'convocatorias' => Schema::hasTable('convocatorias')
-            ? DB::table('convocatorias')->count()
-            : 0,
-
-        'postulaciones' => Schema::hasTable('postulaciones')
-            ? DB::table('postulaciones')->count()
-            : 0,
-    ];
-
-    $rol = $usuario->rol
-        ?? $usuario->role
-        ?? 'Administrador';
-
-    return view('dashboard', [
-        'usuario' => $usuario,
-        'rol' => ucfirst($rol),
-        'estadisticas' => $estadisticas,
-    ]);
-})
-    ->middleware(['auth'])
+Route::get(
+    '/dashboard',
+    [DashboardController::class, 'index']
+)
+    ->middleware('auth')
     ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
