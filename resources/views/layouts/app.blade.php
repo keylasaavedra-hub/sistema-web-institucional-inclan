@@ -224,6 +224,28 @@
                     </a>
 
                     <a
+                        href="{{ route('admin.categorias-publicacion.index') }}"
+                        class="flex items-center gap-3 rounded-2xl
+           px-4 py-3 text-sm font-bold transition
+           {{ request()->routeIs('admin.categorias-publicacion.*')
+                ? 'bg-white text-emerald-950 shadow-lg'
+                : 'text-emerald-50 hover:bg-white/10 hover:text-white' }}">
+                        <svg
+                            class="h-5 w-5 shrink-0"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.9">
+                            <path d="M4 6h16" />
+                            <path d="M4 12h16" />
+                            <path d="M4 18h10" />
+                            <circle cx="18" cy="18" r="2" />
+                        </svg>
+
+                        <span>Categorías de publicaciones</span>
+                    </a>
+
+                    <a
                         href="{{ route('admin.convocatorias.index') }}"
                         class="flex items-center gap-3 rounded-2xl
            px-4 py-3 text-sm font-bold transition
