@@ -21,6 +21,7 @@ use App\Http\Controllers\ConvocatoriaController;
 use App\Http\Controllers\PostulacionController;
 use App\Http\Controllers\Admin\PostulacionController as AdminPostulacionController;
 use App\Http\Controllers\Admin\GaleriaController as AdminGaleriaController;
+use App\Http\Controllers\GaleriaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -264,6 +265,22 @@ Route::get(
     ->whereNumber('convocatoria')
     ->name('convocatorias.mostrar');
 
+/*
+|--------------------------------------------------------------------------
+| GALERÍA INSTITUCIONAL - PORTAL PÚBLICO
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/galeria',
+    [GaleriaController::class, 'index']
+)->name('galerias.index');
+
+Route::get(
+    '/galeria/{galeria}',
+    [GaleriaController::class, 'mostrar']
+)->whereNumber('galeria')
+    ->name('galerias.mostrar');
 /*
 |--------------------------------------------------------------------------
 | POSTULACIONES PÚBLICAS
