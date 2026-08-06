@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Permiso;
 use App\Models\Rol;
+use App\Services\AuditoriaService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -42,14 +43,40 @@ class RolController extends Controller
     {
         $datos = $this->validar($request);
 
-        DB::transaction(function () use ($datos) {
+        $permisosSeleccionados = $this->normalizarPermisos(
+            $datos['permisos'] ?? []
+        );
+
+        DB::transaction(function () use (
+            $datos,
+            $permisosSeleccionados
+        ) {
             $rol = Rol::create([
                 'nombre' => $datos['nombre'],
                 'descripcion' => $datos['descripcion'] ?? null,
                 'estado' => true,
             ]);
 
-            $rol->permisos()->sync($datos['permisos'] ?? []);
+            $rol->permisos()->sync($permisosSeleccionados);
+
+            $permisosNuevos = $this->obtenerDatosPermisos(
+                $permisosSeleccionados
+            );
+
+            AuditoriaService::registrar(
+                modulo: 'Roles y permisos',
+                accion: 'crear',
+                modelo: $rol,
+                valoresNuevos: [
+                    'rol' => $rol->getAttributes(),
+                    'permisos' => $permisosNuevos,
+                ],
+                descripcion: sprintf(
+                    'Se registró el rol %s con %d permiso(s).',
+                    $rol->nombre,
+                    count($permisosSeleccionados)
+                )
+            );
         });
 
         return redirect()
@@ -73,6 +100,7 @@ class RolController extends Controller
 
         $permisosAsignados = $rol->permisos
             ->pluck('id')
+            ->map(fn ($id) => (int) $id)
             ->all();
 
         return view('admin.roles.editar', compact(
@@ -88,12 +116,37 @@ class RolController extends Controller
     ): RedirectResponse {
         $datos = $this->validar($request, $rol);
 
+        $esAdministrador = $rol->nombre === 'Administrador';
+
+        $permisosSeleccionados = $this->normalizarPermisos(
+            $datos['permisos'] ?? []
+        );
+
+        $permisoSeguridadId = (int) Permiso::query()
+            ->where('codigo', 'seguridad.administrar')
+            ->value('id');
+
         if (
-            $rol->nombre === 'Administrador' &&
-            ! in_array(
-                Permiso::where('codigo', 'seguridad.administrar')->value('id'),
-                $datos['permisos'] ?? [],
-                true
+            $esAdministrador &&
+            $datos['nombre'] !== 'Administrador'
+        ) {
+            return back()
+                ->withInput()
+                ->with(
+                    'error',
+                    'El nombre del rol Administrador no puede modificarse.'
+                );
+        }
+
+        if (
+            $esAdministrador &&
+            (
+                $permisoSeguridadId <= 0 ||
+                ! in_array(
+                    $permisoSeguridadId,
+                    $permisosSeleccionados,
+                    true
+                )
             )
         ) {
             return back()
@@ -104,13 +157,56 @@ class RolController extends Controller
                 );
         }
 
-        DB::transaction(function () use ($rol, $datos) {
+        DB::transaction(function () use (
+            $rol,
+            $datos,
+            $esAdministrador,
+            $permisosSeleccionados
+        ) {
+            $rol->load('permisos');
+
+            $valoresAnteriores = [
+                'rol' => $rol->getAttributes(),
+                'permisos' => $rol->permisos
+                    ->map(fn (Permiso $permiso) => [
+                        'id' => $permiso->id,
+                        'codigo' => $permiso->codigo,
+                        'nombre' => $permiso->nombre,
+                        'modulo' => $permiso->modulo,
+                    ])
+                    ->values()
+                    ->all(),
+            ];
+
             $rol->update([
-                'nombre' => $datos['nombre'],
+                'nombre' => $esAdministrador
+                    ? 'Administrador'
+                    : $datos['nombre'],
                 'descripcion' => $datos['descripcion'] ?? null,
             ]);
 
-            $rol->permisos()->sync($datos['permisos'] ?? []);
+            $rol->permisos()->sync($permisosSeleccionados);
+
+            $rol->refresh();
+
+            $valoresNuevos = [
+                'rol' => $rol->getAttributes(),
+                'permisos' => $this->obtenerDatosPermisos(
+                    $permisosSeleccionados
+                ),
+            ];
+
+            AuditoriaService::registrar(
+                modulo: 'Roles y permisos',
+                accion: 'actualizar',
+                modelo: $rol,
+                valoresAnteriores: $valoresAnteriores,
+                valoresNuevos: $valoresNuevos,
+                descripcion: sprintf(
+                    'Se actualizó el rol %s y sus permisos.',
+                    $rol->nombre
+                )
+            );
         });
 
         return redirect()
@@ -121,8 +217,9 @@ class RolController extends Controller
             );
     }
 
-    public function cambiarEstado(Rol $rol): RedirectResponse
-    {
+    public function cambiarEstado(
+        Rol $rol
+    ): RedirectResponse {
         if ($rol->nombre === 'Administrador') {
             return redirect()
                 ->route('admin.roles.index')
@@ -132,7 +229,12 @@ class RolController extends Controller
                 );
         }
 
-        if ($rol->estado && $rol->usuarios()->where('estado', true)->exists()) {
+        if (
+            $rol->estado &&
+            $rol->usuarios()
+                ->where('estado', true)
+                ->exists()
+        ) {
             return redirect()
                 ->route('admin.roles.index')
                 ->with(
@@ -141,9 +243,37 @@ class RolController extends Controller
                 );
         }
 
-        $rol->update([
-            'estado' => ! $rol->estado,
-        ]);
+        DB::transaction(function () use ($rol) {
+            $estadoAnterior = (bool) $rol->estado;
+            $estadoNuevo = ! $estadoAnterior;
+
+            $rol->update([
+                'estado' => $estadoNuevo,
+            ]);
+
+            $rol->refresh();
+
+            AuditoriaService::registrar(
+                modulo: 'Roles y permisos',
+                accion: $estadoNuevo
+                    ? 'activar'
+                    : 'desactivar',
+                modelo: $rol,
+                valoresAnteriores: [
+                    'estado' => $estadoAnterior,
+                ],
+                valoresNuevos: [
+                    'estado' => $estadoNuevo,
+                ],
+                descripcion: sprintf(
+                    'Se %s el rol %s.',
+                    $estadoNuevo
+                        ? 'activó'
+                        : 'desactivó',
+                    $rol->nombre
+                )
+            );
+        });
 
         return redirect()
             ->route('admin.roles.index')
@@ -176,6 +306,36 @@ class RolController extends Controller
         }
 
         DB::transaction(function () use ($rol) {
+            $rol->load('permisos');
+
+            $valoresAnteriores = [
+                'rol' => $rol->getAttributes(),
+                'permisos' => $rol->permisos
+                    ->map(fn (Permiso $permiso) => [
+                        'id' => $permiso->id,
+                        'codigo' => $permiso->codigo,
+                        'nombre' => $permiso->nombre,
+                        'modulo' => $permiso->modulo,
+                    ])
+                    ->values()
+                    ->all(),
+            ];
+
+            $nombreRol = $rol->nombre;
+            $cantidadPermisos = $rol->permisos->count();
+
+            AuditoriaService::registrar(
+                modulo: 'Roles y permisos',
+                accion: 'eliminar',
+                modelo: $rol,
+                valoresAnteriores: $valoresAnteriores,
+                descripcion: sprintf(
+                    'Se eliminó el rol %s, que tenía %d permiso(s).',
+                    $nombreRol,
+                    $cantidadPermisos
+                )
+            );
+
             $rol->permisos()->detach();
             $rol->delete();
         });
@@ -213,7 +373,10 @@ class RolController extends Controller
                 'integer',
                 Rule::exists('permisos', 'id')
                     ->where(
-                        fn ($query) => $query->where('estado', true)
+                        fn ($query) => $query->where(
+                            'estado',
+                            true
+                        )
                     ),
             ],
         ], [
@@ -222,7 +385,48 @@ class RolController extends Controller
             'nombre.max' => 'El nombre no debe superar los 100 caracteres.',
             'descripcion.max' => 'La descripción no debe superar los 200 caracteres.',
             'permisos.array' => 'La selección de permisos no es válida.',
+            'permisos.*.integer' => 'Uno de los permisos seleccionados no es válido.',
             'permisos.*.exists' => 'Uno de los permisos seleccionados no es válido.',
         ]);
+    }
+
+    private function normalizarPermisos(
+        array $permisos
+    ): array {
+        return array_values(
+            array_unique(
+                array_map(
+                    'intval',
+                    $permisos
+                )
+            )
+        );
+    }
+
+    private function obtenerDatosPermisos(
+        array $permisosIds
+    ): array {
+        if (empty($permisosIds)) {
+            return [];
+        }
+
+        return Permiso::query()
+            ->whereIn('id', $permisosIds)
+            ->orderBy('modulo')
+            ->orderBy('nombre')
+            ->get([
+                'id',
+                'codigo',
+                'nombre',
+                'modulo',
+            ])
+            ->map(fn (Permiso $permiso) => [
+                'id' => $permiso->id,
+                'codigo' => $permiso->codigo,
+                'nombre' => $permiso->nombre,
+                'modulo' => $permiso->modulo,
+            ])
+            ->values()
+            ->all();
     }
 }

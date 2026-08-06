@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Rol;
 use App\Models\User;
+use App\Services\AuditoriaService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
@@ -76,17 +78,39 @@ class UsuarioController extends Controller
     {
         $datos = $this->validarCreacion($request);
 
-        User::create([
-            'dni' => $datos['dni'],
-            'name' => $datos['name'],
-            'apellidos' => $datos['apellidos'],
-            'email' => strtolower($datos['email']),
-            'telefono' => $datos['telefono'] ?? null,
-            'password' => Hash::make($datos['password']),
-            'rol_id' => $datos['rol_id'],
-            'estado' => $request->boolean('estado'),
-            'email_verified_at' => now(),
-        ]);
+        DB::transaction(function () use ($datos, $request) {
+            $usuario = User::create([
+                'dni' => $datos['dni'],
+                'name' => $datos['name'],
+                'apellidos' => $datos['apellidos'],
+                'email' => strtolower($datos['email']),
+                'telefono' => $datos['telefono'] ?? null,
+                'password' => Hash::make($datos['password']),
+                'rol_id' => $datos['rol_id'],
+                'estado' => $request->boolean('estado'),
+            ]);
+
+            /*
+             * Se utiliza forceFill porque email_verified_at
+             * puede no encontrarse dentro de $fillable.
+             */
+            $usuario->forceFill([
+                'email_verified_at' => now(),
+            ])->save();
+
+            AuditoriaService::registrar(
+                modulo: 'Usuarios',
+                accion: 'crear',
+                modelo: $usuario,
+                valoresNuevos: $usuario->getAttributes(),
+                descripcion: sprintf(
+                    'Se registró al usuario %s %s con DNI %s.',
+                    $usuario->name,
+                    $usuario->apellidos,
+                    $usuario->dni
+                )
+            );
+        });
 
         return redirect()
             ->route('admin.usuarios.index')
@@ -140,10 +164,34 @@ class UsuarioController extends Controller
         ];
 
         if (! empty($datos['password'])) {
-            $actualizacion['password'] = Hash::make($datos['password']);
+            $actualizacion['password'] = Hash::make(
+                $datos['password']
+            );
         }
 
-        $usuario->update($actualizacion);
+        DB::transaction(function () use (
+            $usuario,
+            $actualizacion
+        ) {
+            $valoresAnteriores = $usuario->getOriginal();
+
+            $usuario->update($actualizacion);
+            $usuario->refresh();
+
+            AuditoriaService::registrar(
+                modulo: 'Usuarios',
+                accion: 'actualizar',
+                modelo: $usuario,
+                valoresAnteriores: $valoresAnteriores,
+                valoresNuevos: $usuario->getAttributes(),
+                descripcion: sprintf(
+                    'Se actualizó al usuario %s %s con DNI %s.',
+                    $usuario->name,
+                    $usuario->apellidos,
+                    $usuario->dni
+                )
+            );
+        });
 
         return redirect()
             ->route('admin.usuarios.editar', $usuario)
@@ -153,8 +201,9 @@ class UsuarioController extends Controller
             );
     }
 
-    public function cambiarEstado(User $usuario): RedirectResponse
-    {
+    public function cambiarEstado(
+        User $usuario
+    ): RedirectResponse {
         if ($usuario->is(auth()->user())) {
             return redirect()
                 ->route('admin.usuarios.index')
@@ -164,9 +213,39 @@ class UsuarioController extends Controller
                 );
         }
 
-        $usuario->update([
-            'estado' => ! $usuario->estado,
-        ]);
+        DB::transaction(function () use ($usuario) {
+            $estadoAnterior = (bool) $usuario->estado;
+            $estadoNuevo = ! $estadoAnterior;
+
+            $usuario->update([
+                'estado' => $estadoNuevo,
+            ]);
+
+            $usuario->refresh();
+
+            AuditoriaService::registrar(
+                modulo: 'Usuarios',
+                accion: $estadoNuevo
+                    ? 'activar'
+                    : 'desactivar',
+                modelo: $usuario,
+                valoresAnteriores: [
+                    'estado' => $estadoAnterior,
+                ],
+                valoresNuevos: [
+                    'estado' => $estadoNuevo,
+                ],
+                descripcion: sprintf(
+                    'Se %s al usuario %s %s con DNI %s.',
+                    $estadoNuevo
+                        ? 'activó'
+                        : 'desactivó',
+                    $usuario->name,
+                    $usuario->apellidos,
+                    $usuario->dni
+                )
+            );
+        });
 
         return redirect()
             ->route('admin.usuarios.index')
@@ -193,7 +272,10 @@ class UsuarioController extends Controller
             $administradoresActivos = User::query()
                 ->where('estado', true)
                 ->whereHas('rol', function ($query) {
-                    $query->where('nombre', 'Administrador');
+                    $query->where(
+                        'nombre',
+                        'Administrador'
+                    );
                 })
                 ->count();
 
@@ -207,7 +289,35 @@ class UsuarioController extends Controller
             }
         }
 
-        $usuario->delete();
+        DB::transaction(function () use ($usuario) {
+            $valoresAnteriores = $usuario->getAttributes();
+
+            $nombreCompleto = trim(
+                "{$usuario->name} {$usuario->apellidos}"
+            );
+
+            $dni = $usuario->dni;
+
+            /*
+             * La auditoría se registra antes de eliminar para
+             * conservar la tabla y el ID del registro afectado.
+             * La transacción evita que quede una auditoría falsa
+             * cuando la eliminación falla.
+             */
+            AuditoriaService::registrar(
+                modulo: 'Usuarios',
+                accion: 'eliminar',
+                modelo: $usuario,
+                valoresAnteriores: $valoresAnteriores,
+                descripcion: sprintf(
+                    'Se eliminó al usuario %s con DNI %s.',
+                    $nombreCompleto,
+                    $dni
+                )
+            );
+
+            $usuario->delete();
+        });
 
         return redirect()
             ->route('admin.usuarios.index')
@@ -217,8 +327,9 @@ class UsuarioController extends Controller
             );
     }
 
-    private function validarCreacion(Request $request): array
-    {
+    private function validarCreacion(
+        Request $request
+    ): array {
         return $request->validate([
             'dni' => [
                 'required',
@@ -250,7 +361,12 @@ class UsuarioController extends Controller
                 'required',
                 'integer',
                 Rule::exists('roles', 'id')
-                    ->where(fn ($query) => $query->where('estado', true)),
+                    ->where(
+                        fn ($query) => $query->where(
+                            'estado',
+                            true
+                        )
+                    ),
             ],
             'password' => [
                 'required',
@@ -276,7 +392,8 @@ class UsuarioController extends Controller
             'dni' => [
                 'required',
                 'digits:8',
-                Rule::unique('users', 'dni')->ignore($usuario->id),
+                Rule::unique('users', 'dni')
+                    ->ignore($usuario->id),
             ],
             'name' => [
                 'required',
@@ -292,7 +409,8 @@ class UsuarioController extends Controller
                 'required',
                 'email',
                 'max:255',
-                Rule::unique('users', 'email')->ignore($usuario->id),
+                Rule::unique('users', 'email')
+                    ->ignore($usuario->id),
             ],
             'telefono' => [
                 'nullable',
@@ -303,7 +421,12 @@ class UsuarioController extends Controller
                 'required',
                 'integer',
                 Rule::exists('roles', 'id')
-                    ->where(fn ($query) => $query->where('estado', true)),
+                    ->where(
+                        fn ($query) => $query->where(
+                            'estado',
+                            true
+                        )
+                    ),
             ],
             'password' => [
                 'nullable',
