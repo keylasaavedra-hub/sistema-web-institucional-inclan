@@ -30,6 +30,7 @@ use App\Http\Controllers\PublicacionController;
 use App\Http\Controllers\ServicioComplementarioController;
 use App\Http\Controllers\VideoController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\AuditoriaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -727,7 +728,24 @@ Route::middleware('auth')->group(function () {
                 ->middleware('permiso:consultas.atender')
                 ->name('actualizar');
         });
+    /*
+|--------------------------------------------------------------------------
+| AUDITORÍA
+|--------------------------------------------------------------------------
+*/
 
+    Route::prefix('admin/auditorias')
+        ->name('admin.auditorias.')
+        ->controller(AuditoriaController::class)
+        ->middleware('permiso:auditoria.ver')
+        ->group(function () {
+            Route::get('/', 'index')
+                ->name('index');
+
+            Route::get('/{auditoria}', 'mostrar')
+                ->whereNumber('auditoria')
+                ->name('mostrar');
+        });
     /*
     |--------------------------------------------------------------------------
     | PERFIL
@@ -750,4 +768,4 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

@@ -516,6 +516,7 @@
                 @if (
                 $puede('usuarios.ver')
                 || $puede('seguridad.administrar')
+                || $puede('auditoria.ver')
                 )
                 <p
                     class="mt-8 px-3 text-[11px] font-extrabold uppercase
@@ -524,6 +525,7 @@
                 </p>
 
                 <div class="mt-3 space-y-2">
+                    {{-- USUARIOS --}}
                     @if ($puede('usuarios.ver'))
                     <a
                         href="{{ route('admin.usuarios.index') }}"
@@ -548,6 +550,7 @@
                     </a>
                     @endif
 
+                    {{-- ROLES Y PERMISOS --}}
                     @if ($puede('seguridad.administrar'))
                     <a
                         href="{{ route('admin.roles.index') }}"
@@ -568,6 +571,30 @@
                         </svg>
 
                         <span>Roles y permisos</span>
+                    </a>
+                    @endif
+
+                    {{-- AUDITORÍA --}}
+                    @if ($puede('auditoria.ver'))
+                    <a
+                        href="{{ route('admin.auditorias.index') }}"
+                        class="flex items-center gap-3 rounded-2xl
+                       px-4 py-3 text-sm font-bold transition
+                       {{ request()->routeIs('admin.auditorias.*')
+                            ? 'bg-white text-emerald-950 shadow-lg'
+                            : 'text-emerald-50 hover:bg-white/10 hover:text-white' }}">
+                        <svg
+                            class="h-5 w-5 shrink-0"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.9">
+                            <path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z" />
+                            <path d="M9 12h6" />
+                            <path d="M12 9v6" />
+                        </svg>
+
+                        <span>Auditoría</span>
                     </a>
                     @endif
                 </div>
