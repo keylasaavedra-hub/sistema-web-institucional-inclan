@@ -118,6 +118,26 @@ class PostulacionController extends Controller
             ]
         );
 
+        $yaPostulo = Postulacion::query()
+            ->where(
+                'convocatoria_id',
+                $convocatoria->id
+            )
+            ->where(
+                'dni',
+                $datos['dni']
+            )
+            ->exists();
+
+        if ($yaPostulo) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'dni' =>
+                    'Este DNI ya registró una postulación en esta convocatoria.',
+                ]);
+        }
+
         $datos['convocatoria_id'] = $convocatoria->id;
         $datos['codigo'] = $this->generarCodigo();
         $datos['estado'] = 'recibida';
@@ -137,23 +157,27 @@ class PostulacionController extends Controller
         }
 
         return redirect()
-            ->route('postulaciones.exito', $postulacion)
-            ->with('postulacion_registrada', true);
+            ->route('postulaciones.exito', $postulacion->id)
+            ->with('postulacion_registrada_id', $postulacion->id);
     }
 
     public function exito(
         Postulacion $postulacion
     ): View {
         abort_unless(
-            session('postulacion_registrada'),
+            (int) session('postulacion_registrada_id')
+                === (int) $postulacion->id,
             404
         );
 
         $postulacion->load('convocatoria');
 
-        return view('postulaciones.exito', [
-            'postulacion' => $postulacion,
-        ]);
+        return view(
+            'postulaciones.exito',
+            [
+                'postulacion' => $postulacion,
+            ]
+        );
     }
 
     public function seguimiento(): View
@@ -187,7 +211,7 @@ class PostulacionController extends Controller
 
         $postulacion = Postulacion::query()
             ->with('convocatoria')
-            ->where('codigo', trim($datos['codigo']))
+            ->where('codigo', Str::upper(trim($datos['codigo'])))
             ->where(function ($query) use ($identificador) {
                 $query
                     ->where('dni', $identificador)
@@ -206,6 +230,7 @@ class PostulacionController extends Controller
     ): View {
         $convocatorias = Convocatoria::query()
             ->whereIn('estado', ['publicada', 'cerrada'])
+            ->where('resultados_publicados', true)
             ->whereHas(
                 'postulaciones',
                 fn($query) => $query->whereIn(
@@ -215,7 +240,10 @@ class PostulacionController extends Controller
             )
             ->with([
                 'postulaciones' => fn($query) => $query
-                    ->whereIn('estado', ['apta', 'seleccionada'])
+                    ->whereIn(
+                        'estado',
+                        ['apta', 'seleccionada']
+                    )
                     ->orderBy('apellidos')
                     ->orderBy('nombres'),
             ])
@@ -226,7 +254,7 @@ class PostulacionController extends Controller
                     $request->convocatoria
                 )
             )
-            ->latest('fecha_cierre')
+            ->latest('fecha_publicacion_resultados')
             ->get();
 
         return view('postulaciones.resultados', [

@@ -228,6 +228,11 @@ class ConvocatoriaController extends Controller
         DB::beginTransaction();
 
         try {
+            if ($datos['estado'] === 'anulada') {
+                $datos['resultados_publicados'] = false;
+                $datos['fecha_publicacion_resultados'] = null;
+            }
+            
             $convocatoria->update($datos);
 
             $convocatoria->refresh();
@@ -286,6 +291,145 @@ class ConvocatoriaController extends Controller
                     'error',
                     'No se pudo actualizar la convocatoria.'
                 );
+        }
+    }
+
+    public function publicarResultados(
+        Convocatoria $convocatoria
+    ): RedirectResponse {
+        if ($convocatoria->resultados_publicados) {
+            return back()->with(
+                'error',
+                'Los resultados de esta convocatoria ya están publicados.'
+            );
+        }
+
+        if (now()->lt($convocatoria->fecha_cierre)) {
+            return back()->with(
+                'error',
+                'No se pueden publicar resultados antes del cierre de la convocatoria.'
+            );
+        }
+
+        $tieneResultados = $convocatoria
+            ->postulaciones()
+            ->whereIn(
+                'estado',
+                [
+                    'apta',
+                    'seleccionada',
+                ]
+            )
+            ->exists();
+
+        if (! $tieneResultados) {
+            return back()->with(
+                'error',
+                'No existen postulaciones aptas o seleccionadas para publicar.'
+            );
+        }
+
+        $valoresAnteriores = $this->datosAuditoria(
+            $convocatoria
+        );
+
+        DB::beginTransaction();
+
+        try {
+            $convocatoria->update([
+                'resultados_publicados' => true,
+                'fecha_publicacion_resultados' => now(),
+            ]);
+
+            $convocatoria->refresh();
+
+            AuditoriaService::registrar(
+                modulo: 'Convocatorias',
+                accion: 'publicar_resultados',
+                modelo: $convocatoria,
+                valoresAnteriores: $valoresAnteriores,
+                valoresNuevos: $this->datosAuditoria(
+                    $convocatoria
+                ),
+                descripcion: sprintf(
+                    'Se publicaron los resultados de la convocatoria %s: "%s".',
+                    $convocatoria->codigo,
+                    $convocatoria->titulo
+                )
+            );
+
+            DB::commit();
+
+            return back()->with(
+                'mensaje',
+                'Los resultados fueron publicados correctamente.'
+            );
+        } catch (Throwable $error) {
+            DB::rollBack();
+
+            report($error);
+
+            return back()->with(
+                'error',
+                'No se pudieron publicar los resultados.'
+            );
+        }
+    }
+
+    public function retirarResultados(
+        Convocatoria $convocatoria
+    ): RedirectResponse {
+        if (! $convocatoria->resultados_publicados) {
+            return back()->with(
+                'error',
+                'Los resultados de esta convocatoria no están publicados.'
+            );
+        }
+
+        $valoresAnteriores = $this->datosAuditoria(
+            $convocatoria
+        );
+
+        DB::beginTransaction();
+
+        try {
+            $convocatoria->update([
+                'resultados_publicados' => false,
+                'fecha_publicacion_resultados' => null,
+            ]);
+
+            $convocatoria->refresh();
+
+            AuditoriaService::registrar(
+                modulo: 'Convocatorias',
+                accion: 'retirar_resultados',
+                modelo: $convocatoria,
+                valoresAnteriores: $valoresAnteriores,
+                valoresNuevos: $this->datosAuditoria(
+                    $convocatoria
+                ),
+                descripcion: sprintf(
+                    'Se retiraron del portal los resultados de la convocatoria %s: "%s".',
+                    $convocatoria->codigo,
+                    $convocatoria->titulo
+                )
+            );
+
+            DB::commit();
+
+            return back()->with(
+                'mensaje',
+                'Los resultados fueron retirados del portal público.'
+            );
+        } catch (Throwable $error) {
+            DB::rollBack();
+
+            report($error);
+
+            return back()->with(
+                'error',
+                'No se pudieron retirar los resultados.'
+            );
         }
     }
 
@@ -527,6 +671,12 @@ class ConvocatoriaController extends Controller
 
             'destacada' =>
             (bool) $convocatoria->destacada,
+
+            'resultados_publicados' =>
+            (bool) $convocatoria->resultados_publicados,
+
+            'fecha_publicacion_resultados' =>
+            $convocatoria->fecha_publicacion_resultados,
 
             'estado' =>
             $convocatoria->estado,

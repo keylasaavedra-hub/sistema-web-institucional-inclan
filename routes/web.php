@@ -627,6 +627,19 @@ Route::middleware('auth')->group(function () {
             Route::delete('/{convocatoria}', 'destroy')
                 ->whereNumber('convocatoria')
                 ->name('destroy');
+            Route::patch(
+                '/{convocatoria}/publicar-resultados',
+                'publicarResultados'
+            )
+                ->whereNumber('convocatoria')
+                ->name('publicar-resultados');
+
+            Route::patch(
+                '/{convocatoria}/retirar-resultados',
+                'retirarResultados'
+            )
+                ->whereNumber('convocatoria')
+                ->name('retirar-resultados');
         });
 
     /*

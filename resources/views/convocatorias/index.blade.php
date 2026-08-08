@@ -13,7 +13,7 @@
                 </h1>
 
                 <p class="mx-auto mt-4 max-w-2xl leading-7 text-gray-600">
-                    Consulta los procesos vigentes publicados por la institución.
+                    Consulta los procesos publicados por la institución y revisa sus fechas de postulación.
                 </p>
 
                 <div class="mt-7 flex flex-col justify-center gap-3 sm:flex-row">

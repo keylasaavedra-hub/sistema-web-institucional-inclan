@@ -25,6 +25,8 @@ class Convocatoria extends Model
         'fecha_publicacion',
         'estado',
         'destacada',
+        'resultados_publicados',
+        'fecha_publicacion_resultados',
     ];
 
     protected function casts(): array
@@ -35,6 +37,8 @@ class Convocatoria extends Model
             'fecha_cierre' => 'datetime',
             'fecha_publicacion' => 'datetime',
             'destacada' => 'boolean',
+            'resultados_publicados' => 'boolean',
+            'fecha_publicacion_resultados' => 'datetime',
         ];
     }
 
@@ -58,7 +62,7 @@ class Convocatoria extends Model
             'usuario_id'
         );
     }
-    
+
     public function postulaciones(): HasMany
     {
         return $this->hasMany(Postulacion::class);

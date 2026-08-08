@@ -37,6 +37,14 @@
             </div>
             @endif
 
+            @if (session('error'))
+            <div class="mb-7 rounded-2xl border border-red-200 bg-red-50 p-5">
+                <p class="font-extrabold text-red-800">
+                    {{ session('error') }}
+                </p>
+            </div>
+            @endif
+
             @if ($errors->any())
             <div class="mb-7 rounded-2xl border border-red-200 bg-red-50 p-5">
                 <p class="font-extrabold text-red-800">
@@ -425,8 +433,8 @@
                                 name="destacada"
                                 value="1"
                                 @checked(old('destacada', $convocatoria->destacada))
-                                class="mt-1 rounded border-gray-300
-                                       text-amber-600 focus:ring-amber-500">
+                            class="mt-1 rounded border-gray-300
+                            text-amber-600 focus:ring-amber-500">
 
                             <span>
                                 <span class="block font-extrabold text-emerald-950">
@@ -463,6 +471,93 @@
                     </div>
                 </div>
             </form>
+            <section
+                class="mt-8 rounded-[28px] border border-violet-200
+           bg-white p-6
+           shadow-[0_18px_50px_rgba(15,23,42,0.06)]
+           sm:p-8">
+                <p
+                    class="text-xs font-extrabold uppercase
+               tracking-[0.16em] text-violet-600">
+                    Resultados
+                </p>
+
+                <div
+                    class="mt-3 flex flex-col gap-5
+               lg:flex-row lg:items-center lg:justify-between">
+                    <div>
+                        <h3 class="text-xl font-extrabold text-emerald-950">
+                            Publicación de resultados
+                        </h3>
+
+                        @if ($convocatoria->resultados_publicados)
+                        <p class="mt-2 text-sm leading-6 text-gray-600">
+                            Los resultados están visibles actualmente
+                            en el portal institucional.
+                        </p>
+
+                        @if ($convocatoria->fecha_publicacion_resultados)
+                        <p class="mt-1 text-xs font-bold text-violet-700">
+                            Publicados el
+                            {{ $convocatoria->fecha_publicacion_resultados->format('d/m/Y H:i') }}
+                        </p>
+                        @endif
+                        @else
+                        <p class="mt-2 text-sm leading-6 text-gray-600">
+                            Las postulaciones aptas o seleccionadas
+                            todavía no son visibles públicamente.
+                        </p>
+                        @endif
+                    </div>
+
+                    @if ($convocatoria->resultados_publicados)
+
+                    <form
+                        method="POST"
+                        action="{{ route(
+                    'admin.convocatorias.retirar-resultados',
+                    $convocatoria->id
+                ) }}"
+                        onsubmit="return confirm('¿Deseas retirar los resultados del portal público?');">
+                        @csrf
+                        @method('PATCH')
+
+                        <button
+                            type="submit"
+                            class="inline-flex items-center justify-center
+                           rounded-xl border border-amber-200
+                           bg-amber-50 px-6 py-3
+                           font-extrabold text-amber-800
+                           transition hover:bg-amber-100">
+                            Retirar resultados
+                        </button>
+                    </form>
+
+                    @else
+
+                    <form
+                        method="POST"
+                        action="{{ route(
+                    'admin.convocatorias.publicar-resultados',
+                    $convocatoria->id
+                ) }}"
+                        onsubmit="return confirm('¿Confirmas la publicación de los resultados en el portal público?');">
+                        @csrf
+                        @method('PATCH')
+
+                        <button
+                            type="submit"
+                            class="inline-flex items-center justify-center
+                           rounded-xl bg-violet-700 px-6 py-3
+                           font-extrabold text-white
+                           transition hover:bg-violet-800">
+                            Publicar resultados
+                        </button>
+                    </form>
+
+                    @endif
+                </div>
+            </section>
         </div>
     </div>
 
