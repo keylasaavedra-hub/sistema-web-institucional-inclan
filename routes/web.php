@@ -465,29 +465,34 @@ Route::middleware('auth')->group(function () {
         });
 
     /*
-    |--------------------------------------------------------------------------
-    | PUBLICACIONES
-    |--------------------------------------------------------------------------
-    */
+|--------------------------------------------------------------------------
+| PUBLICACIONES
+|--------------------------------------------------------------------------
+*/
 
     Route::prefix('admin/publicaciones')
         ->name('admin.publicaciones.')
         ->controller(AdminPublicacionController::class)
         ->middleware('permiso:publicaciones.gestionar')
         ->group(function () {
-            Route::get('/', 'index')->name('index');
-            Route::get('/crear', 'crear')->name('crear');
-            Route::post('/', 'guardar')->name('guardar');
+            Route::get('/', 'index')
+                ->name('index');
 
-            Route::get('/{publicacion}/editar', 'editar')
+            Route::get('/crear', 'crear')
+                ->name('crear');
+
+            Route::post('/', 'guardar')
+                ->name('guardar');
+
+            Route::get('/{publicacion:id}/editar', 'editar')
                 ->whereNumber('publicacion')
                 ->name('editar');
 
-            Route::put('/{publicacion}', 'actualizar')
+            Route::put('/{publicacion:id}', 'actualizar')
                 ->whereNumber('publicacion')
                 ->name('actualizar');
 
-            Route::delete('/{publicacion}', 'eliminar')
+            Route::delete('/{publicacion:id}', 'eliminar')
                 ->whereNumber('publicacion')
                 ->name('eliminar');
         });

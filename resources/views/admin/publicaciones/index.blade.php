@@ -311,14 +311,14 @@
 
                             <div class="mt-6 grid gap-3 sm:grid-cols-2">
                                 <a
-                                    href="{{ route('admin.publicaciones.editar', $publicacion) }}"
+                                    href="{{ route('admin.publicaciones.editar', $publicacion->id) }}"
                                     class="inline-flex items-center justify-center rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm font-extrabold text-emerald-800 transition hover:bg-amber-100"
                                 >
                                     Editar
                                 </a>
 
                                 <form
-                                    action="{{ route('admin.publicaciones.eliminar', $publicacion) }}"
+                                    action="{{ route('admin.publicaciones.eliminar', $publicacion->id) }}"
                                     method="POST"
                                     onsubmit="return confirm('¿Seguro que deseas eliminar esta publicación?')"
                                 >

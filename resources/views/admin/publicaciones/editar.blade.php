@@ -98,7 +98,7 @@
             @endif
 
             <form
-                action="{{ route('admin.publicaciones.actualizar', $publicacion) }}"
+                action="{{ route('admin.publicaciones.actualizar', $publicacion->id) }}"
                 method="POST"
                 enctype="multipart/form-data"
                 x-data="{
