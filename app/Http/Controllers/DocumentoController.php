@@ -20,6 +20,15 @@ class DocumentoController extends Controller
             ])
             ->where('es_publico', true)
             ->where('estado', 'activo')
+            ->where(function ($query) {
+                $query
+                    ->whereNull('fecha_publicacion')
+                    ->orWhereDate(
+                        'fecha_publicacion',
+                        '<=',
+                        today()
+                    );
+            })
             ->when(
                 $request->filled('buscar'),
                 function ($consulta) use ($request) {
@@ -61,21 +70,31 @@ class DocumentoController extends Controller
         ]);
     }
 
-    public function descargar(Documento $documento): StreamedResponse
-    {
+    public function descargar(
+        Documento $documento
+    ): StreamedResponse {
+        $publicacionDisponible =
+            $documento->fecha_publicacion === null
+            || $documento->fecha_publicacion->lte(
+                today()
+            );
+
         abort_unless(
             $documento->es_publico
-                && $documento->estado === 'activo',
+                && $documento->estado === 'activo'
+                && $publicacionDisponible,
             404
         );
 
         abort_unless(
-            Storage::disk('public')->exists($documento->archivo),
+            Storage::disk('local')->exists(
+                $documento->archivo
+            ),
             404,
             'El archivo solicitado no fue encontrado.'
         );
 
-        return Storage::disk('public')->download(
+        return Storage::disk('local')->download(
             $documento->archivo,
             $documento->nombre_original
         );

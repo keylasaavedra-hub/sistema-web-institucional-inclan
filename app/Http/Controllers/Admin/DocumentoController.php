@@ -46,14 +46,14 @@ class DocumentoController extends Controller
             })
             ->when(
                 $categoriaId > 0,
-                fn ($query) => $query->where(
+                fn($query) => $query->where(
                     'categoria_documento_id',
                     $categoriaId
                 )
             )
             ->when(
                 $areaId > 0,
-                fn ($query) => $query->where(
+                fn($query) => $query->where(
                     'area_id',
                     $areaId
                 )
@@ -64,7 +64,7 @@ class DocumentoController extends Controller
                     ['activo', 'inactivo'],
                     true
                 ),
-                fn ($query) => $query->where(
+                fn($query) => $query->where(
                     'estado',
                     $estado
                 )
@@ -75,7 +75,7 @@ class DocumentoController extends Controller
                     ['publico', 'interno'],
                     true
                 ),
-                fn ($query) => $query->where(
+                fn($query) => $query->where(
                     'es_publico',
                     $visibilidad === 'publico'
                 )
@@ -142,74 +142,74 @@ class DocumentoController extends Controller
 
             $rutaGuardada = $archivo->store(
                 'documentos',
-                'public'
+                'local'
             );
 
             $documento = Documento::create([
                 'categoria_documento_id' =>
-                    $datos['categoria_documento_id'],
+                $datos['categoria_documento_id'],
 
                 'area_id' =>
-                    $datos['area_id'] ?? null,
+                $datos['area_id'] ?? null,
 
                 'usuario_id' =>
-                    auth()->id(),
+                auth()->id(),
 
                 'titulo' =>
-                    $datos['titulo'],
+                $datos['titulo'],
 
                 'descripcion' =>
-                    $datos['descripcion'] ?? null,
+                $datos['descripcion'] ?? null,
 
                 'archivo' =>
-                    $rutaGuardada,
+                $rutaGuardada,
 
                 'nombre_original' =>
-                    $archivo->getClientOriginalName(),
+                $archivo->getClientOriginalName(),
 
                 'tipo_archivo' =>
-                    $archivo->getMimeType(),
+                $archivo->getMimeType(),
 
                 'tamano_bytes' =>
-                    $archivo->getSize(),
+                $archivo->getSize(),
 
                 'version' =>
-                    $datos['version'],
+                $datos['version'],
 
                 'fecha_publicacion' =>
-                    $datos['fecha_publicacion']
+                $datos['fecha_publicacion']
                     ?? now()->toDateString(),
 
                 'es_publico' =>
-                    $request->boolean('es_publico'),
+                $request->boolean('es_publico'),
 
                 'estado' =>
-                    $datos['estado'],
+                $datos['estado'],
             ]);
 
             $versionInicial = $documento
                 ->versiones()
                 ->create([
                     'usuario_id' =>
-                        auth()->id(),
+                    auth()->id(),
 
                     'version' =>
-                        $datos['version'],
+                    $datos['version'],
 
                     'archivo' =>
-                        $rutaGuardada,
+                    $rutaGuardada,
 
                     'nombre_original' =>
-                        $archivo->getClientOriginalName(),
+                    $archivo->getClientOriginalName(),
 
                     'tipo_archivo' =>
-                        $archivo->getMimeType(),
+                    $archivo->getMimeType(),
 
                     'tamano_bytes' =>
-                        $archivo->getSize(),
+                    $archivo->getSize(),
 
                     'descripcion_cambio' =>
-                        'Versión inicial del documento.',
+                    'Versión inicial del documento.',
                 ]);
 
             AuditoriaService::registrar(
@@ -219,14 +219,14 @@ class DocumentoController extends Controller
                 valoresAnteriores: null,
                 valoresNuevos: [
                     'documento' =>
-                        $this->datosAuditoriaDocumento(
-                            $documento
-                        ),
+                    $this->datosAuditoriaDocumento(
+                        $documento
+                    ),
 
                     'version_inicial' =>
-                        $this->datosAuditoriaVersion(
-                            $versionInicial
-                        ),
+                    $this->datosAuditoriaVersion(
+                        $versionInicial
+                    ),
                 ],
                 descripcion: sprintf(
                     'Se creó el documento "%s" con la versión %s.',
@@ -247,7 +247,7 @@ class DocumentoController extends Controller
             DB::rollBack();
 
             if ($rutaGuardada) {
-                Storage::disk('public')
+                Storage::disk('local')
                     ->delete($rutaGuardada);
             }
 
@@ -263,7 +263,7 @@ class DocumentoController extends Controller
             DB::rollBack();
 
             if ($rutaGuardada) {
-                Storage::disk('public')
+                Storage::disk('local')
                     ->delete($rutaGuardada);
             }
 
@@ -328,25 +328,25 @@ class DocumentoController extends Controller
         try {
             $documento->update([
                 'categoria_documento_id' =>
-                    $datos['categoria_documento_id'],
+                $datos['categoria_documento_id'],
 
                 'area_id' =>
-                    $datos['area_id'] ?? null,
+                $datos['area_id'] ?? null,
 
                 'titulo' =>
-                    $datos['titulo'],
+                $datos['titulo'],
 
                 'descripcion' =>
-                    $datos['descripcion'] ?? null,
+                $datos['descripcion'] ?? null,
 
                 'fecha_publicacion' =>
-                    $datos['fecha_publicacion'] ?? null,
+                $datos['fecha_publicacion'] ?? null,
 
                 'es_publico' =>
-                    $request->boolean('es_publico'),
+                $request->boolean('es_publico'),
 
                 'estado' =>
-                    $datos['estado'],
+                $datos['estado'],
             ]);
 
             $documento->refresh();
@@ -395,12 +395,10 @@ class DocumentoController extends Controller
                 modulo: 'Documentos',
                 accion: $accion,
                 modelo: $documento,
-                valoresAnteriores:
-                    $valoresAnteriores,
-                valoresNuevos:
-                    $this->datosAuditoriaDocumento(
-                        $documento
-                    ),
+                valoresAnteriores: $valoresAnteriores,
+                valoresNuevos: $this->datosAuditoriaDocumento(
+                    $documento
+                ),
                 descripcion: $descripcion
             );
 
@@ -443,11 +441,11 @@ class DocumentoController extends Controller
                     'versiones_documento',
                     'version'
                 )->where(
-                    fn ($query) =>
-                        $query->where(
-                            'documento_id',
-                            $documento->id
-                        )
+                    fn($query) =>
+                    $query->where(
+                        'documento_id',
+                        $documento->id
+                    )
                 ),
             ],
 
@@ -465,19 +463,19 @@ class DocumentoController extends Controller
             ],
         ], [
             'version.required' =>
-                'La versión es obligatoria.',
+            'La versión es obligatoria.',
 
             'version.unique' =>
-                'Esa versión ya existe para este documento.',
+            'Esa versión ya existe para este documento.',
 
             'archivo_version.required' =>
-                'Selecciona el archivo de la nueva versión.',
+            'Selecciona el archivo de la nueva versión.',
 
             'archivo_version.mimes' =>
-                'El archivo debe ser PDF, Word, Excel, PowerPoint, TXT o ZIP.',
+            'El archivo debe ser PDF, Word, Excel, PowerPoint, TXT o ZIP.',
 
             'archivo_version.max' =>
-                'El archivo no debe superar los 20 MB.',
+            'El archivo no debe superar los 20 MB.',
         ]);
 
         $archivo = $request->file(
@@ -496,53 +494,53 @@ class DocumentoController extends Controller
         try {
             $rutaNueva = $archivo->store(
                 "documentos/{$documento->id}/versiones",
-                'public'
+                'local'
             );
 
             $version = VersionDocumento::create([
                 'documento_id' =>
-                    $documento->id,
+                $documento->id,
 
                 'usuario_id' =>
-                    auth()->id(),
+                auth()->id(),
 
                 'version' =>
-                    $datos['version'],
+                $datos['version'],
 
                 'archivo' =>
-                    $rutaNueva,
+                $rutaNueva,
 
                 'nombre_original' =>
-                    $archivo->getClientOriginalName(),
+                $archivo->getClientOriginalName(),
 
                 'tipo_archivo' =>
-                    $archivo->getMimeType(),
+                $archivo->getMimeType(),
 
                 'tamano_bytes' =>
-                    $archivo->getSize(),
+                $archivo->getSize(),
 
                 'descripcion_cambio' =>
-                    $datos['descripcion_cambio'] ?? null,
+                $datos['descripcion_cambio'] ?? null,
             ]);
 
             $documento->update([
                 'archivo' =>
-                    $rutaNueva,
+                $rutaNueva,
 
                 'nombre_original' =>
-                    $archivo->getClientOriginalName(),
+                $archivo->getClientOriginalName(),
 
                 'tipo_archivo' =>
-                    $archivo->getMimeType(),
+                $archivo->getMimeType(),
 
                 'tamano_bytes' =>
-                    $archivo->getSize(),
+                $archivo->getSize(),
 
                 'version' =>
-                    $datos['version'],
+                $datos['version'],
 
                 'usuario_id' =>
-                    auth()->id(),
+                auth()->id(),
             ]);
 
             $documento->refresh();
@@ -553,18 +551,18 @@ class DocumentoController extends Controller
                 modelo: $documento,
                 valoresAnteriores: [
                     'documento' =>
-                        $valoresAnteriores,
+                    $valoresAnteriores,
                 ],
                 valoresNuevos: [
                     'documento' =>
-                        $this->datosAuditoriaDocumento(
-                            $documento
-                        ),
+                    $this->datosAuditoriaDocumento(
+                        $documento
+                    ),
 
                     'nueva_version' =>
-                        $this->datosAuditoriaVersion(
-                            $version
-                        ),
+                    $this->datosAuditoriaVersion(
+                        $version
+                    ),
                 ],
                 descripcion: sprintf(
                     'Se registró la versión %s del documento "%s".',
@@ -588,7 +586,7 @@ class DocumentoController extends Controller
             DB::rollBack();
 
             if ($rutaNueva) {
-                Storage::disk('public')
+                Storage::disk('local')
                     ->delete($rutaNueva);
             }
 
@@ -607,13 +605,13 @@ class DocumentoController extends Controller
         Documento $documento
     ): StreamedResponse {
         abort_unless(
-            Storage::disk('public')
+            Storage::disk('local')
                 ->exists($documento->archivo),
             404,
             'El archivo actual no fue encontrado.'
         );
 
-        return Storage::disk('public')
+        return Storage::disk('local')
             ->download(
                 $documento->archivo,
                 $documento->nombre_original
@@ -624,13 +622,13 @@ class DocumentoController extends Controller
         VersionDocumento $version
     ): StreamedResponse {
         abort_unless(
-            Storage::disk('public')
+            Storage::disk('local')
                 ->exists($version->archivo),
             404,
             'El archivo de esta versión no fue encontrado.'
         );
 
-        return Storage::disk('public')
+        return Storage::disk('local')
             ->download(
                 $version->archivo,
                 $version->nombre_original
@@ -651,20 +649,20 @@ class DocumentoController extends Controller
 
         $valoresAnteriores = [
             'documento' =>
-                $this->datosAuditoriaDocumento(
-                    $documento
-                ),
+            $this->datosAuditoriaDocumento(
+                $documento
+            ),
 
             'versiones' =>
-                $documento->versiones
-                    ->map(
-                        fn (VersionDocumento $version) =>
-                            $this->datosAuditoriaVersion(
-                                $version
-                            )
+            $documento->versiones
+                ->map(
+                    fn(VersionDocumento $version) =>
+                    $this->datosAuditoriaVersion(
+                        $version
                     )
-                    ->values()
-                    ->all(),
+                )
+                ->values()
+                ->all(),
         ];
 
         $titulo = $documento->titulo;
@@ -680,8 +678,7 @@ class DocumentoController extends Controller
                     modulo: 'Documentos',
                     accion: 'eliminar',
                     modelo: $documento,
-                    valoresAnteriores:
-                        $valoresAnteriores,
+                    valoresAnteriores: $valoresAnteriores,
                     valoresNuevos: null,
                     descripcion: sprintf(
                         'Se eliminó el documento "%s" y su historial de versiones.',
@@ -693,11 +690,11 @@ class DocumentoController extends Controller
             });
 
             foreach ($rutas as $ruta) {
-                Storage::disk('public')
+                Storage::disk('local')
                     ->delete($ruta);
             }
 
-            Storage::disk('public')
+            Storage::disk('local')
                 ->deleteDirectory(
                     "documentos/{$documentoId}"
                 );
@@ -731,11 +728,11 @@ class DocumentoController extends Controller
                     'categorias_documento',
                     'id'
                 )->where(
-                    fn ($query) =>
-                        $query->where(
-                            'estado',
-                            true
-                        )
+                    fn($query) =>
+                    $query->where(
+                        'estado',
+                        true
+                    )
                 ),
             ],
 
@@ -747,11 +744,11 @@ class DocumentoController extends Controller
                     'areas_institucionales',
                     'id'
                 )->where(
-                    fn ($query) =>
-                        $query->where(
-                            'estado',
-                            true
-                        )
+                    fn($query) =>
+                    $query->where(
+                        'estado',
+                        true
+                    )
                 ),
             ],
 
@@ -804,37 +801,37 @@ class DocumentoController extends Controller
             ],
         ], [
             'categoria_documento_id.required' =>
-                'Selecciona una categoría.',
+            'Selecciona una categoría.',
 
             'categoria_documento_id.exists' =>
-                'La categoría seleccionada no es válida.',
+            'La categoría seleccionada no es válida.',
 
             'area_id.exists' =>
-                'El área seleccionada no es válida.',
+            'El área seleccionada no es válida.',
 
             'titulo.required' =>
-                'El título es obligatorio.',
+            'El título es obligatorio.',
 
             'titulo.max' =>
-                'El título no debe superar los 200 caracteres.',
+            'El título no debe superar los 200 caracteres.',
 
             'version.required' =>
-                'La versión inicial es obligatoria.',
+            'La versión inicial es obligatoria.',
 
             'estado.required' =>
-                'Selecciona un estado.',
+            'Selecciona un estado.',
 
             'estado.in' =>
-                'El estado seleccionado no es válido.',
+            'El estado seleccionado no es válido.',
 
             'archivo.required' =>
-                'Selecciona el archivo del documento.',
+            'Selecciona el archivo del documento.',
 
             'archivo.mimes' =>
-                'El archivo debe ser PDF, Word, Excel, PowerPoint, TXT o ZIP.',
+            'El archivo debe ser PDF, Word, Excel, PowerPoint, TXT o ZIP.',
 
             'archivo.max' =>
-                'El archivo no debe superar los 20 MB.',
+            'El archivo no debe superar los 20 MB.',
         ]);
     }
 
@@ -843,52 +840,52 @@ class DocumentoController extends Controller
     ): array {
         return [
             'id' =>
-                $documento->id,
+            $documento->id,
 
             'categoria_documento_id' =>
-                $documento->categoria_documento_id,
+            $documento->categoria_documento_id,
 
             'area_id' =>
-                $documento->area_id,
+            $documento->area_id,
 
             'usuario_id' =>
-                $documento->usuario_id,
+            $documento->usuario_id,
 
             'titulo' =>
-                $documento->titulo,
+            $documento->titulo,
 
             'descripcion' =>
-                $documento->descripcion,
+            $documento->descripcion,
 
             'archivo' =>
-                $documento->archivo,
+            $documento->archivo,
 
             'nombre_original' =>
-                $documento->nombre_original,
+            $documento->nombre_original,
 
             'tipo_archivo' =>
-                $documento->tipo_archivo,
+            $documento->tipo_archivo,
 
             'tamano_bytes' =>
-                $documento->tamano_bytes,
+            $documento->tamano_bytes,
 
             'version' =>
-                $documento->version,
+            $documento->version,
 
             'fecha_publicacion' =>
-                $documento->fecha_publicacion,
+            $documento->fecha_publicacion,
 
             'es_publico' =>
-                (bool) $documento->es_publico,
+            (bool) $documento->es_publico,
 
             'estado' =>
-                $documento->estado,
+            $documento->estado,
 
             'created_at' =>
-                $documento->created_at,
+            $documento->created_at,
 
             'updated_at' =>
-                $documento->updated_at,
+            $documento->updated_at,
         ];
     }
 
@@ -897,37 +894,37 @@ class DocumentoController extends Controller
     ): array {
         return [
             'id' =>
-                $version->id,
+            $version->id,
 
             'documento_id' =>
-                $version->documento_id,
+            $version->documento_id,
 
             'usuario_id' =>
-                $version->usuario_id,
+            $version->usuario_id,
 
             'version' =>
-                $version->version,
+            $version->version,
 
             'archivo' =>
-                $version->archivo,
+            $version->archivo,
 
             'nombre_original' =>
-                $version->nombre_original,
+            $version->nombre_original,
 
             'tipo_archivo' =>
-                $version->tipo_archivo,
+            $version->tipo_archivo,
 
             'tamano_bytes' =>
-                $version->tamano_bytes,
+            $version->tamano_bytes,
 
             'descripcion_cambio' =>
-                $version->descripcion_cambio,
+            $version->descripcion_cambio,
 
             'created_at' =>
-                $version->created_at,
+            $version->created_at,
 
             'updated_at' =>
-                $version->updated_at,
+            $version->updated_at,
         ];
     }
 }

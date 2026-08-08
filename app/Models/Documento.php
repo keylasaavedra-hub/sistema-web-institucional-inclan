@@ -81,6 +81,15 @@ class Documento extends Model
     {
         return $query
             ->where('es_publico', true)
-            ->where('estado', 'activo');
+            ->where('estado', 'activo')
+            ->where(function ($query) {
+                $query
+                    ->whereNull('fecha_publicacion')
+                    ->orWhereDate(
+                        'fecha_publicacion',
+                        '<=',
+                        today()
+                    );
+            });
     }
 }
