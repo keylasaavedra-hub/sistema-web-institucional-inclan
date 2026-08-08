@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Illuminate\Validation\ValidationException;
 
 class MesaPartesController extends Controller
 {
@@ -115,7 +116,7 @@ class MesaPartesController extends Controller
                     'required',
                     'file',
                     'mimes:pdf',
-                    'max:51200',
+                    'max:10240',
                 ],
             ],
             [
@@ -158,23 +159,58 @@ class MesaPartesController extends Controller
                 'archivo.required' => 'Adjunta el documento en formato PDF.',
                 'archivo.file' => 'El archivo adjunto no es válido.',
                 'archivo.mimes' => 'El documento debe estar en formato PDF.',
-                'archivo.max' => 'El documento no puede superar los 100 MB.',
+                'archivo.max' => 'El documento no puede superar los 10 MB.',
             ]
         );
+
+        $numeroDocumento = trim(
+            (string) $datos['numero_documento']
+        );
+
+        if (
+            $datos['tipo_documento_identidad'] === 'dni'
+            && ! preg_match('/^\d{8}$/', $numeroDocumento)
+        ) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'numero_documento' =>
+                    'El DNI debe contener exactamente 8 dígitos.',
+                ]);
+        }
+
+        if (
+            $datos['tipo_documento_identidad'] === 'ruc'
+            && ! preg_match('/^\d{11}$/', $numeroDocumento)
+        ) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'numero_documento' =>
+                    'El RUC debe contener exactamente 11 dígitos.',
+                ]);
+        }
+
+        $datos['numero_documento'] = $numeroDocumento;
 
         $archivo = $request->file('archivo');
         $codigo = $this->generarCodigo();
 
+        $nombreBase = Str::slug(
+            pathinfo(
+                $archivo->getClientOriginalName(),
+                PATHINFO_FILENAME
+            )
+        );
+
+        $nombreBase = $nombreBase !== ''
+            ? $nombreBase
+            : 'documento';
+
         $nombreArchivo = $codigo
             . '-'
-            . Str::slug(
-                pathinfo(
-                    $archivo->getClientOriginalName(),
-                    PATHINFO_FILENAME
-                )
-            )
-            . '.'
-            . $archivo->getClientOriginalExtension();
+            . $nombreBase
+            . '.pdf';
 
         $rutaArchivo = $archivo->storeAs(
             'mesa-partes',
