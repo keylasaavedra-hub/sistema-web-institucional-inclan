@@ -16,7 +16,7 @@ class VideoController extends Controller
             ->publicados()
             ->when(
                 $categoria !== '',
-                fn ($query) => $query->where('categoria', $categoria)
+                fn($query) => $query->where('categoria', $categoria)
             )
             ->orderByDesc('destacado')
             ->orderBy('orden')
@@ -41,8 +41,19 @@ class VideoController extends Controller
 
     public function mostrar(Video $video): View
     {
-        abort_unless($video->estado, 404);
+        $publicacionDisponible =
+            $video->fecha_publicacion === null
+            || $video->fecha_publicacion->lte(today());
 
-        return view('videos.mostrar', compact('video'));
+        abort_unless(
+            $video->estado
+                && $publicacionDisponible,
+            404
+        );
+
+        return view(
+            'videos.mostrar',
+            compact('video')
+        );
     }
 }

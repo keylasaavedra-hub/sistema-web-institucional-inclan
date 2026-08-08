@@ -37,7 +37,7 @@ class GaleriaController extends Controller
             })
             ->when(
                 in_array($estado, ['activo', 'inactivo'], true),
-                fn ($query) => $query->where(
+                fn($query) => $query->where(
                     'estado',
                     $estado === 'activo'
                 )
@@ -394,13 +394,55 @@ class GaleriaController extends Controller
     public function cambiarEstadoArchivo(
         ArchivoGaleria $archivo
     ): RedirectResponse {
-        $archivo->update([
-            'estado' => !$archivo->estado,
-        ]);
+        $galeria = $archivo->galeria;
+
+        $nuevoEstado = ! $archivo->estado;
+
+        DB::transaction(function () use (
+            $archivo,
+            $galeria,
+            $nuevoEstado
+        ) {
+            $archivo->update([
+                'estado' => $nuevoEstado,
+            ]);
+
+            /*
+         * Si se oculta la fotografía utilizada como portada,
+         * seleccionamos automáticamente otra fotografía activa.
+         */
+            if (
+                ! $nuevoEstado
+                && $galeria->imagen_portada === $archivo->ruta
+            ) {
+                $nuevaPortada = $galeria
+                    ->archivosActivos()
+                    ->first();
+
+                $galeria->update([
+                    'imagen_portada' =>
+                    $nuevaPortada?->ruta,
+                ]);
+            }
+
+            /*
+         * Si se vuelve a habilitar una fotografía y la galería
+         * no tiene portada, la utilizamos automáticamente.
+         */
+            if (
+                $nuevoEstado
+                && ! $galeria->imagen_portada
+            ) {
+                $galeria->update([
+                    'imagen_portada' =>
+                    $archivo->ruta,
+                ]);
+            }
+        });
 
         return back()->with(
             'success',
-            $archivo->estado
+            $nuevoEstado
                 ? 'La fotografía fue habilitada.'
                 : 'La fotografía fue ocultada.'
         );

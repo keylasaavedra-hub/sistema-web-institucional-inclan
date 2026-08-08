@@ -43,13 +43,23 @@ class Video extends Model
 
     public function scopePublicados($query)
     {
-        return $query->where('estado', true);
+        return $query
+            ->where('estado', true)
+            ->where(function ($query) {
+                $query
+                    ->whereNull('fecha_publicacion')
+                    ->orWhereDate(
+                        'fecha_publicacion',
+                        '<=',
+                        today()
+                    );
+            });
     }
 
     public function scopeDestacados($query)
     {
         return $query
-            ->where('estado', true)
+            ->publicados()
             ->where('destacado', true);
     }
 
