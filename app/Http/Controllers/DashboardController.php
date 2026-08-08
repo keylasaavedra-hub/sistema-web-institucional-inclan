@@ -14,7 +14,7 @@ class DashboardController extends Controller
         $usuario = auth()->user();
 
         $usuario->load([
-            'rol.permisos' => fn ($query) => $query
+            'rol.permisos' => fn($query) => $query
                 ->where('permisos.estado', true),
         ]);
 
@@ -136,8 +136,8 @@ class DashboardController extends Controller
             )
                 ->whereIn('estado', [
                     'recibida',
-                    'asignada',
-                    'en_atencion',
+                    'en_revision',
+                    'derivada',
                 ])
                 ->count();
 
@@ -272,10 +272,10 @@ class DashboardController extends Controller
 
         $ultimasAuditorias = $puede('auditoria.ver')
             ? Auditoria::query()
-                ->with('usuario:id,name,apellidos,dni')
-                ->latest()
-                ->limit(6)
-                ->get()
+            ->with('usuario:id,name,apellidos,dni')
+            ->latest()
+            ->limit(6)
+            ->get()
             : collect();
 
         $indicadores = $this->construirIndicadores(
