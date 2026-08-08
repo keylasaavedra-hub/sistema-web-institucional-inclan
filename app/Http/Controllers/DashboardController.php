@@ -186,8 +186,8 @@ class DashboardController extends Controller
             )
                 ->whereIn('estado', [
                     'recibida',
-                    'pendiente',
                     'en_revision',
+                    'observada',
                 ])
                 ->count();
         }
@@ -484,6 +484,17 @@ class DashboardController extends Controller
                 'detalle' => sprintf(
                     '%d convocatoria(s) registrada(s)',
                     $estadisticas['convocatorias_total']
+                ),
+            ];
+        }
+
+        if ($puede('postulaciones.revisar')) {
+            $indicadores[] = [
+                'titulo' => 'Postulaciones',
+                'valor' => $estadisticas['postulaciones_total'],
+                'detalle' => sprintf(
+                    '%d postulación(es) pendiente(s) de revisión',
+                    $estadisticas['postulaciones_pendientes']
                 ),
             ];
         }
