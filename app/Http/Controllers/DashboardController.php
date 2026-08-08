@@ -161,6 +161,7 @@ class DashboardController extends Controller
                 ->whereIn('estado', [
                     'recibido',
                     'en_revision',
+                    'derivado',
                     'observado',
                 ])
                 ->count();
@@ -170,7 +171,6 @@ class DashboardController extends Controller
             )
                 ->whereIn('estado', [
                     'atendido',
-                    'finalizado',
                     'cerrado',
                 ])
                 ->count();
