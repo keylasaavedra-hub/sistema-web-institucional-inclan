@@ -1,5 +1,4 @@
 <x-app-layout>
-
     <x-slot name="header">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -21,7 +20,8 @@
                 class="inline-flex w-fit items-center justify-center gap-2
                        rounded-xl border border-gray-300 bg-white
                        px-4 py-3 text-sm font-extrabold text-gray-700
-                       transition hover:bg-gray-50">
+                       transition hover:bg-gray-50"
+            >
                 ← Volver al listado
             </a>
         </div>
@@ -31,17 +31,25 @@
         <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
 
             @if ($errors->any())
-            <div class="mb-7 rounded-2xl border border-red-200 bg-red-50 p-5">
-                <p class="font-extrabold text-red-800">
-                    Revisa la información ingresada
-                </p>
+                <div class="mb-7 rounded-2xl border border-red-200 bg-red-50 p-5">
+                    <p class="font-extrabold text-red-800">
+                        Revisa la información ingresada
+                    </p>
 
-                <ul class="mt-3 space-y-1 text-sm text-red-700">
-                    @foreach ($errors->all() as $error)
-                    <li>• {{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
+                    <ul class="mt-3 space-y-1 text-sm text-red-700">
+                        @foreach ($errors->all() as $error)
+                            <li>• {{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            @if (session('error'))
+                <div class="mb-7 rounded-2xl border border-red-200 bg-red-50 p-5">
+                    <p class="font-extrabold text-red-800">
+                        {{ session('error') }}
+                    </p>
+                </div>
             @endif
 
             <form
@@ -49,7 +57,8 @@
                 action="{{ route('admin.convocatorias.store') }}"
                 class="overflow-hidden rounded-[28px]
                        border border-gray-200 bg-white
-                       shadow-[0_18px_50px_rgba(15,23,42,0.06)]">
+                       shadow-[0_18px_50px_rgba(15,23,42,0.06)]"
+            >
                 @csrf
 
                 <div class="bg-emerald-950 p-7 text-white sm:p-8">
@@ -68,9 +77,13 @@
 
                 <div class="space-y-8 p-6 sm:p-8">
 
+                    {{-- TIPO Y VACANTES --}}
                     <div class="grid gap-6 md:grid-cols-2">
                         <div>
-                            <label for="tipo" class="text-sm font-extrabold text-emerald-950">
+                            <label
+                                for="tipo"
+                                class="text-sm font-extrabold text-emerald-950"
+                            >
                                 Tipo de convocatoria
                                 <span class="text-red-500">*</span>
                             </label>
@@ -82,48 +95,59 @@
                                 class="mt-2 w-full rounded-xl border-gray-300
                                        px-4 py-3 shadow-sm
                                        focus:border-emerald-700
-                                       focus:ring-emerald-700">
+                                       focus:ring-emerald-700"
+                            >
                                 <option value="">Selecciona una opción</option>
-                                <option value="practicas"
-                                    @selected(old('tipo', $convocatoria->tipo) === 'practicas')
-                                    >
+
+                                <option
+                                    value="practicas"
+                                    {{ old('tipo') === 'practicas' ? 'selected' : '' }}
+                                >
                                     Prácticas
                                 </option>
 
-                                <option value="laboral"
-                                    @selected(old('tipo', $convocatoria->tipo) === 'laboral')
-                                    >
+                                <option
+                                    value="laboral"
+                                    {{ old('tipo') === 'laboral' ? 'selected' : '' }}
+                                >
                                     Laboral
                                 </option>
 
-                                <option value="cas"
-                                    @selected(old('tipo', $convocatoria->tipo) === 'cas')
-                                    >
+                                <option
+                                    value="cas"
+                                    {{ old('tipo') === 'cas' ? 'selected' : '' }}
+                                >
                                     CAS
                                 </option>
 
-                                <option value="servicios"
-                                    @selected(old('tipo', $convocatoria->tipo) === 'servicios')
-                                    >
+                                <option
+                                    value="servicios"
+                                    {{ old('tipo') === 'servicios' ? 'selected' : '' }}
+                                >
                                     Servicios
                                 </option>
 
-                                <option value="voluntariado"
-                                    @selected(old('tipo', $convocatoria->tipo) === 'voluntariado')
-                                    >
+                                <option
+                                    value="voluntariado"
+                                    {{ old('tipo') === 'voluntariado' ? 'selected' : '' }}
+                                >
                                     Voluntariado
                                 </option>
 
-                                <option value="otro"
-                                    @selected(old('tipo', $convocatoria->tipo) === 'otro')
-                                    >
+                                <option
+                                    value="otro"
+                                    {{ old('tipo') === 'otro' ? 'selected' : '' }}
+                                >
                                     Otro
                                 </option>
                             </select>
                         </div>
 
                         <div>
-                            <label for="vacantes" class="text-sm font-extrabold text-emerald-950">
+                            <label
+                                for="vacantes"
+                                class="text-sm font-extrabold text-emerald-950"
+                            >
                                 Número de vacantes
                                 <span class="text-red-500">*</span>
                             </label>
@@ -139,12 +163,17 @@
                                 class="mt-2 w-full rounded-xl border-gray-300
                                        px-4 py-3 shadow-sm
                                        focus:border-emerald-700
-                                       focus:ring-emerald-700">
+                                       focus:ring-emerald-700"
+                            >
                         </div>
                     </div>
 
+                    {{-- TÍTULO --}}
                     <div>
-                        <label for="titulo" class="text-sm font-extrabold text-emerald-950">
+                        <label
+                            for="titulo"
+                            class="text-sm font-extrabold text-emerald-950"
+                        >
                             Título
                             <span class="text-red-500">*</span>
                         </label>
@@ -160,12 +189,17 @@
                             class="mt-2 w-full rounded-xl border-gray-300
                                    px-4 py-3 shadow-sm
                                    focus:border-emerald-700
-                                   focus:ring-emerald-700">
+                                   focus:ring-emerald-700"
+                        >
                     </div>
 
+                    {{-- ÁREA Y CARGO --}}
                     <div class="grid gap-6 md:grid-cols-2">
                         <div>
-                            <label for="area_id" class="text-sm font-extrabold text-emerald-950">
+                            <label
+                                for="area_id"
+                                class="text-sm font-extrabold text-emerald-950"
+                            >
                                 Área institucional
                             </label>
 
@@ -175,25 +209,28 @@
                                 class="mt-2 w-full rounded-xl border-gray-300
                                        px-4 py-3 shadow-sm
                                        focus:border-emerald-700
-                                       focus:ring-emerald-700">
-                                <option value="">Sin área específica</option>
+                                       focus:ring-emerald-700"
+                            >
+                                <option value="">
+                                    Sin área específica
+                                </option>
 
                                 @foreach ($areas as $area)
-                                <option
-                                    value="{{ $area->id }}"
-                                    @selected(
-                                    (string) old('area_id', $convocatoria->area_id)
-                                    === (string) $area->id
-                                    )
+                                    <option
+                                        value="{{ $area->id }}"
+                                        {{ (string) old('area_id') === (string) $area->id ? 'selected' : '' }}
                                     >
-                                    {{ $area->nombre }}
-                                </option>
+                                        {{ $area->nombre }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
 
                         <div>
-                            <label for="cargo_id" class="text-sm font-extrabold text-emerald-950">
+                            <label
+                                for="cargo_id"
+                                class="text-sm font-extrabold text-emerald-950"
+                            >
                                 Cargo
                             </label>
 
@@ -203,32 +240,36 @@
                                 class="mt-2 w-full rounded-xl border-gray-300
                                        px-4 py-3 shadow-sm
                                        focus:border-emerald-700
-                                       focus:ring-emerald-700">
-                                <option value="">Sin cargo específico</option>
+                                       focus:ring-emerald-700"
+                            >
+                                <option value="">
+                                    Sin cargo específico
+                                </option>
 
                                 @foreach ($cargos as $cargo)
-                                <option
-                                    value="{{ $cargo->id }}"
-                                    @selected(
-                                    (string) old('cargo_id', $convocatoria->cargo_id)
-                                    === (string) $cargo->id
-                                    )
+                                    <option
+                                        value="{{ $cargo->id }}"
+                                        {{ (string) old('cargo_id') === (string) $cargo->id ? 'selected' : '' }}
                                     >
-                                    {{ $cargo->nombre }}
-                                </option>
+                                        {{ $cargo->nombre }}
+                                    </option>
                                 @endforeach
                             </select>
 
                             @if ($cargos->isEmpty())
-                            <p class="mt-2 text-xs text-amber-700">
-                                No hay cargos registrados todavía.
-                            </p>
+                                <p class="mt-2 text-xs text-amber-700">
+                                    No hay cargos registrados todavía.
+                                </p>
                             @endif
                         </div>
                     </div>
 
+                    {{-- DESCRIPCIÓN --}}
                     <div>
-                        <label for="descripcion" class="text-sm font-extrabold text-emerald-950">
+                        <label
+                            for="descripcion"
+                            class="text-sm font-extrabold text-emerald-950"
+                        >
                             Descripción
                             <span class="text-red-500">*</span>
                         </label>
@@ -243,11 +284,16 @@
                             class="mt-2 w-full resize-y rounded-xl
                                    border-gray-300 px-4 py-3 shadow-sm
                                    focus:border-emerald-700
-                                   focus:ring-emerald-700">{{ old('descripcion') }}</textarea>
+                                   focus:ring-emerald-700"
+                        >{{ old('descripcion') }}</textarea>
                     </div>
 
+                    {{-- PERFIL --}}
                     <div>
-                        <label for="perfil" class="text-sm font-extrabold text-emerald-950">
+                        <label
+                            for="perfil"
+                            class="text-sm font-extrabold text-emerald-950"
+                        >
                             Perfil solicitado
                         </label>
 
@@ -260,11 +306,16 @@
                             class="mt-2 w-full resize-y rounded-xl
                                    border-gray-300 px-4 py-3 shadow-sm
                                    focus:border-emerald-700
-                                   focus:ring-emerald-700">{{ old('perfil') }}</textarea>
+                                   focus:ring-emerald-700"
+                        >{{ old('perfil') }}</textarea>
                     </div>
 
+                    {{-- REQUISITOS --}}
                     <div>
-                        <label for="requisitos" class="text-sm font-extrabold text-emerald-950">
+                        <label
+                            for="requisitos"
+                            class="text-sm font-extrabold text-emerald-950"
+                        >
                             Requisitos
                         </label>
 
@@ -277,11 +328,16 @@
                             class="mt-2 w-full resize-y rounded-xl
                                    border-gray-300 px-4 py-3 shadow-sm
                                    focus:border-emerald-700
-                                   focus:ring-emerald-700">{{ old('requisitos') }}</textarea>
+                                   focus:ring-emerald-700"
+                        >{{ old('requisitos') }}</textarea>
                     </div>
 
+                    {{-- CRONOGRAMA --}}
                     <div>
-                        <label for="cronograma" class="text-sm font-extrabold text-emerald-950">
+                        <label
+                            for="cronograma"
+                            class="text-sm font-extrabold text-emerald-950"
+                        >
                             Cronograma
                         </label>
 
@@ -294,12 +350,17 @@
                             class="mt-2 w-full resize-y rounded-xl
                                    border-gray-300 px-4 py-3 shadow-sm
                                    focus:border-emerald-700
-                                   focus:ring-emerald-700">{{ old('cronograma') }}</textarea>
+                                   focus:ring-emerald-700"
+                        >{{ old('cronograma') }}</textarea>
                     </div>
 
+                    {{-- FECHAS --}}
                     <div class="grid gap-6 md:grid-cols-3">
                         <div>
-                            <label for="fecha_inicio" class="text-sm font-extrabold text-emerald-950">
+                            <label
+                                for="fecha_inicio"
+                                class="text-sm font-extrabold text-emerald-950"
+                            >
                                 Fecha de inicio
                                 <span class="text-red-500">*</span>
                             </label>
@@ -313,11 +374,15 @@
                                 class="mt-2 w-full rounded-xl border-gray-300
                                        px-4 py-3 shadow-sm
                                        focus:border-emerald-700
-                                       focus:ring-emerald-700">
+                                       focus:ring-emerald-700"
+                            >
                         </div>
 
                         <div>
-                            <label for="fecha_cierre" class="text-sm font-extrabold text-emerald-950">
+                            <label
+                                for="fecha_cierre"
+                                class="text-sm font-extrabold text-emerald-950"
+                            >
                                 Fecha de cierre
                                 <span class="text-red-500">*</span>
                             </label>
@@ -331,11 +396,15 @@
                                 class="mt-2 w-full rounded-xl border-gray-300
                                        px-4 py-3 shadow-sm
                                        focus:border-emerald-700
-                                       focus:ring-emerald-700">
+                                       focus:ring-emerald-700"
+                            >
                         </div>
 
                         <div>
-                            <label for="fecha_publicacion" class="text-sm font-extrabold text-emerald-950">
+                            <label
+                                for="fecha_publicacion"
+                                class="text-sm font-extrabold text-emerald-950"
+                            >
                                 Fecha de publicación
                             </label>
 
@@ -347,7 +416,8 @@
                                 class="mt-2 w-full rounded-xl border-gray-300
                                        px-4 py-3 shadow-sm
                                        focus:border-emerald-700
-                                       focus:ring-emerald-700">
+                                       focus:ring-emerald-700"
+                            >
 
                             <p class="mt-2 text-xs text-gray-500">
                                 Si publicas sin fecha, se usará la fecha actual.
@@ -355,9 +425,13 @@
                         </div>
                     </div>
 
+                    {{-- ESTADO Y DESTACADA --}}
                     <div class="grid gap-6 md:grid-cols-2">
                         <div>
-                            <label for="estado" class="text-sm font-extrabold text-emerald-950">
+                            <label
+                                for="estado"
+                                class="text-sm font-extrabold text-emerald-950"
+                            >
                                 Estado
                                 <span class="text-red-500">*</span>
                             </label>
@@ -369,32 +443,33 @@
                                 class="mt-2 w-full rounded-xl border-gray-300
                                        px-4 py-3 shadow-sm
                                        focus:border-emerald-700
-                                       focus:ring-emerald-700">
+                                       focus:ring-emerald-700"
+                            >
                                 <option
                                     value="borrador"
-                                    @selected(old('estado', $convocatoria->estado) === 'borrador')
-                                    >
+                                    {{ old('estado', 'borrador') === 'borrador' ? 'selected' : '' }}
+                                >
                                     Borrador
                                 </option>
 
                                 <option
                                     value="publicada"
-                                    @selected(old('estado', $convocatoria->estado) === 'publicada')
-                                    >
+                                    {{ old('estado', 'borrador') === 'publicada' ? 'selected' : '' }}
+                                >
                                     Publicada
                                 </option>
 
                                 <option
                                     value="cerrada"
-                                    @selected(old('estado', $convocatoria->estado) === 'cerrada')
-                                    >
+                                    {{ old('estado', 'borrador') === 'cerrada' ? 'selected' : '' }}
+                                >
                                     Cerrada
                                 </option>
 
                                 <option
                                     value="anulada"
-                                    @selected(old('estado', $convocatoria->estado) === 'anulada')
-                                    >
+                                    {{ old('estado', 'borrador') === 'anulada' ? 'selected' : '' }}
+                                >
                                     Anulada
                                 </option>
                             </select>
@@ -404,14 +479,16 @@
                             class="flex cursor-pointer items-start gap-4
                                    rounded-2xl border border-gray-200
                                    bg-gray-50 p-5 transition
-                                   hover:border-amber-200 hover:bg-amber-50">
+                                   hover:border-amber-200 hover:bg-amber-50"
+                        >
                             <input
                                 type="checkbox"
                                 name="destacada"
                                 value="1"
-                               @checked(old('destacada', $convocatoria->destacada))
+                                {{ old('destacada') ? 'checked' : '' }}
                                 class="mt-1 rounded border-gray-300
-                                       text-amber-600 focus:ring-amber-500">
+                                       text-amber-600 focus:ring-amber-500"
+                            >
 
                             <span>
                                 <span class="block font-extrabold text-emerald-950">
@@ -425,13 +502,19 @@
                         </label>
                     </div>
 
-                    <div class="flex flex-col-reverse gap-3 border-t border-gray-100 pt-7 sm:flex-row sm:justify-end">
+                    {{-- BOTONES --}}
+                    <div
+                        class="flex flex-col-reverse gap-3
+                               border-t border-gray-100 pt-7
+                               sm:flex-row sm:justify-end"
+                    >
                         <a
                             href="{{ route('admin.convocatorias.index') }}"
                             class="inline-flex items-center justify-center
                                    rounded-xl border border-gray-300
                                    bg-white px-6 py-3 font-extrabold
-                                   text-gray-700 transition hover:bg-gray-50">
+                                   text-gray-700 transition hover:bg-gray-50"
+                        >
                             Cancelar
                         </a>
 
@@ -442,7 +525,8 @@
                                    font-extrabold text-white transition
                                    hover:bg-emerald-900
                                    focus:outline-none focus:ring-4
-                                   focus:ring-emerald-200">
+                                   focus:ring-emerald-200"
+                        >
                             Registrar convocatoria
                         </button>
                     </div>
@@ -450,5 +534,4 @@
             </form>
         </div>
     </div>
-
 </x-app-layout>

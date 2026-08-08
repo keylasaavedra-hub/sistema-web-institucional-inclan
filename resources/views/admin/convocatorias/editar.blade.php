@@ -53,7 +53,7 @@
 
             <form
                 method="POST"
-                action="{{ route('admin.convocatorias.update', $convocatoria) }}"
+                action="{{ route('admin.convocatorias.update', $convocatoria->id) }}"
                 class="overflow-hidden rounded-[28px]
                        border border-gray-200 bg-white
                        shadow-[0_18px_50px_rgba(15,23,42,0.06)]">
@@ -92,22 +92,46 @@
                                        focus:border-emerald-700
                                        focus:ring-emerald-700">
                                 <option value="">Selecciona una opción</option>
-                                <option value="practicas" @selected(old('tipo', $convocatoria->tipo) === 'practicas')>
+
+                                <option
+                                    value="practicas"
+                                    @selected(old('tipo', $convocatoria->tipo) === 'practicas')
+                                    >
                                     Prácticas
                                 </option>
-                                <option value="laboral" @selected(old('tipo')==='laboral' )>
+
+                                <option
+                                    value="laboral"
+                                    @selected(old('tipo', $convocatoria->tipo) === 'laboral')
+                                    >
                                     Laboral
                                 </option>
-                                <option value="cas" @selected(old('tipo')==='cas' )>
+
+                                <option
+                                    value="cas"
+                                    @selected(old('tipo', $convocatoria->tipo) === 'cas')
+                                    >
                                     CAS
                                 </option>
-                                <option value="servicios" @selected(old('tipo')==='servicios' )>
+
+                                <option
+                                    value="servicios"
+                                    @selected(old('tipo', $convocatoria->tipo) === 'servicios')
+                                    >
                                     Servicios
                                 </option>
-                                <option value="voluntariado" @selected(old('tipo')==='voluntariado' )>
+
+                                <option
+                                    value="voluntariado"
+                                    @selected(old('tipo', $convocatoria->tipo) === 'voluntariado')
+                                    >
                                     Voluntariado
                                 </option>
-                                <option value="otro" @selected(old('tipo')==='otro' )>
+
+                                <option
+                                    value="otro"
+                                    @selected(old('tipo', $convocatoria->tipo) === 'otro')
+                                    >
                                     Otro
                                 </option>
                             </select>
@@ -172,7 +196,10 @@
                                 @foreach ($areas as $area)
                                 <option
                                     value="{{ $area->id }}"
-                                    @selected((string) old('area_id')===(string) $area->id)
+                                    @selected(
+                                    (string) old('area_id', $convocatoria->area_id)
+                                    === (string) $area->id
+                                    )
                                     >
                                     {{ $area->nombre }}
                                 </option>
@@ -197,7 +224,10 @@
                                 @foreach ($cargos as $cargo)
                                 <option
                                     value="{{ $cargo->id }}"
-                                    @selected((string) old('cargo_id')===(string) $cargo->id)
+                                    @selected(
+                                    (string) old('cargo_id', $convocatoria->cargo_id)
+                                    === (string) $cargo->id
+                                    )
                                     >
                                     {{ $cargo->nombre }}
                                 </option>
@@ -355,19 +385,31 @@
                                        px-4 py-3 shadow-sm
                                        focus:border-emerald-700
                                        focus:ring-emerald-700">
-                                <option value="borrador" @selected(old('estado', 'borrador' )==='borrador' )>
+                                <option
+                                    value="borrador"
+                                    @selected(old('estado', $convocatoria->estado) === 'borrador')
+                                    >
                                     Borrador
                                 </option>
 
-                                <option value="publicada" @selected(old('estado')==='publicada' )>
+                                <option
+                                    value="publicada"
+                                    @selected(old('estado', $convocatoria->estado) === 'publicada')
+                                    >
                                     Publicada
                                 </option>
 
-                                <option value="cerrada" @selected(old('estado')==='cerrada' )>
+                                <option
+                                    value="cerrada"
+                                    @selected(old('estado', $convocatoria->estado) === 'cerrada')
+                                    >
                                     Cerrada
                                 </option>
 
-                                <option value="anulada" @selected(old('estado')==='anulada' )>
+                                <option
+                                    value="anulada"
+                                    @selected(old('estado', $convocatoria->estado) === 'anulada')
+                                    >
                                     Anulada
                                 </option>
                             </select>
@@ -382,7 +424,7 @@
                                 type="checkbox"
                                 name="destacada"
                                 value="1"
-                                @checked(old('destacada'))
+                                @checked(old('destacada', $convocatoria->destacada))
                                 class="mt-1 rounded border-gray-300
                                        text-amber-600 focus:ring-amber-500">
 
