@@ -14,6 +14,66 @@ class HomeController extends Controller
     {
         $ahora = now();
 
+        $inicioMes = $ahora->copy()->startOfMonth()->startOfDay();
+        $finMes = $ahora->copy()->endOfMonth()->endOfDay();
+
+        $nombresTiposEvento = [
+            'institucional' => 'Institucional',
+            'academico' => 'Académico',
+            'civico' => 'Cívico',
+            'deportivo' => 'Deportivo',
+            'cultural' => 'Cultural',
+            'reunion' => 'Reunión',
+            'otro' => 'Otro',
+        ];
+
+        $eventosInicio = DB::table('eventos')
+            ->where('activo', true)
+            ->where('es_publico', true)
+            ->whereBetween('fecha_inicio', [
+                $inicioMes,
+                $finMes,
+            ])
+            ->orderBy('fecha_inicio')
+            ->get()
+            ->map(function ($evento) use ($nombresTiposEvento) {
+                $fechaInicio = \Illuminate\Support\Carbon::parse(
+                    $evento->fecha_inicio
+                );
+
+                $fechaFin = $evento->fecha_fin
+                    ? \Illuminate\Support\Carbon::parse(
+                        $evento->fecha_fin
+                    )
+                    : null;
+
+                return [
+                    'id' => $evento->id,
+                    'dia' => $fechaInicio->day,
+                    'mes' => $fechaInicio->month,
+                    'anio' => $fechaInicio->year,
+
+                    'titulo' => $evento->titulo,
+
+                    'tipo' =>
+                    $nombresTiposEvento[$evento->tipo]
+                        ?? 'Otro',
+
+                    'descripcion' =>
+                    $evento->descripcion
+                        ?: 'Actividad institucional programada.',
+
+                    'hora' => $fechaInicio->format('H:i'),
+
+                    'hora_fin' => $fechaFin
+                        ? $fechaFin->format('H:i')
+                        : null,
+
+                    'lugar' => $evento->lugar,
+                ];
+            })
+            ->values();
+
         $configuracion = DB::table('configuracion_sitio')
             ->first();
 
@@ -228,6 +288,15 @@ class HomeController extends Controller
             ])
             ->where('documentos.estado', 'activo')
             ->where('documentos.es_publico', true)
+            ->where(function ($query) use ($ahora) {
+                $query
+                    ->whereNull('documentos.fecha_publicacion')
+                    ->orWhereDate(
+                        'documentos.fecha_publicacion',
+                        '<=',
+                        $ahora->toDateString()
+                    );
+            })
             ->orderByDesc('documentos.fecha_publicacion')
             ->limit(6)
             ->get();
@@ -243,7 +312,8 @@ class HomeController extends Controller
             'infraestructura',
             'comunidadEducativa',
             'promociones',
-            'documentosPublicos'
+            'documentosPublicos',
+            'eventosInicio'
         ));
     }
 

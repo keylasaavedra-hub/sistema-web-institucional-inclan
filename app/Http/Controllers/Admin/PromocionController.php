@@ -40,21 +40,21 @@ class PromocionController extends Controller
             })
             ->when(
                 in_array($estado, ['publicada', 'oculta'], true),
-                fn ($query) => $query->where(
+                fn($query) => $query->where(
                     'estado',
                     $estado === 'publicada'
                 )
             )
             ->when(
                 $nivelId > 0,
-                fn ($query) => $query->where(
+                fn($query) => $query->where(
                     'nivel_educativo_id',
                     $nivelId
                 )
             )
             ->when(
                 $anio > 0,
-                fn ($query) => $query->where('anio', $anio)
+                fn($query) => $query->where('anio', $anio)
             )
             ->orderByDesc('anio')
             ->orderBy('nivel_educativo_id')
@@ -339,13 +339,55 @@ class PromocionController extends Controller
     public function cambiarEstadoImagen(
         ImagenPromocion $imagen
     ): RedirectResponse {
-        $imagen->update([
-            'estado' => !$imagen->estado,
-        ]);
+        $promocion = $imagen->promocion;
+
+        $nuevoEstado = ! $imagen->estado;
+
+        DB::transaction(function () use (
+            $imagen,
+            $promocion,
+            $nuevoEstado
+        ) {
+            $imagen->update([
+                'estado' => $nuevoEstado,
+            ]);
+
+            /*
+         * Si se oculta la imagen que funciona como portada,
+         * seleccionamos automáticamente otra imagen activa.
+         */
+            if (
+                ! $nuevoEstado
+                && $promocion->imagen_portada === $imagen->ruta
+            ) {
+                $nuevaPortada = $promocion
+                    ->imagenesActivas()
+                    ->first();
+
+                $promocion->update([
+                    'imagen_portada' =>
+                    $nuevaPortada?->ruta,
+                ]);
+            }
+
+            /*
+         * Si se habilita una imagen y la promoción
+         * no tiene portada, esta pasa a ser la portada.
+         */
+            if (
+                $nuevoEstado
+                && ! $promocion->imagen_portada
+            ) {
+                $promocion->update([
+                    'imagen_portada' =>
+                    $imagen->ruta,
+                ]);
+            }
+        });
 
         return back()->with(
             'success',
-            $imagen->estado
+            $nuevoEstado
                 ? 'La imagen fue habilitada.'
                 : 'La imagen fue ocultada.'
         );
@@ -425,7 +467,7 @@ class PromocionController extends Controller
                 'required',
                 'integer',
                 Rule::exists('niveles_educativos', 'id')
-                    ->where(fn ($query) => $query->where('estado', true)),
+                    ->where(fn($query) => $query->where('estado', true)),
             ],
             'nombre' => [
                 'required',

@@ -879,36 +879,12 @@
 
         /*
         |--------------------------------------------------------------------------
-        | ACTIVIDADES INTERNAS DE LA INSTITUCIÓN
+        | ACTIVIDADES REGISTRADAS EN EL SISTEMA
         |--------------------------------------------------------------------------
-        |
-        | Posteriormente estas actividades podrán venir desde la base de datos.
-        |
         */
 
-        $actividadesInstitucionales = collect([
-        [
-        'dia' => 3,
-        'mes' => $fechaCalendario->month,
-        'titulo' => 'Jornada académica',
-        'tipo' => 'Académico',
-        'descripcion' => 'Actividad de planificación y fortalecimiento pedagógico.',
-        ],
-        [
-        'dia' => 24,
-        'mes' => $fechaCalendario->month,
-        'titulo' => 'Actividad institucional',
-        'tipo' => 'Institucional',
-        'descripcion' => 'Actividad organizada por la comunidad educativa.',
-        ],
-        [
-        'dia' => 29,
-        'mes' => $fechaCalendario->month,
-        'titulo' => 'Reunión con padres de familia',
-        'tipo' => 'Reunión',
-        'descripcion' => 'Reunión informativa con madres, padres y apoderados.',
-        ],
-        ]);
+        $actividadesInstitucionales =
+        $eventosInicio ?? collect();
 
         /*
         |--------------------------------------------------------------------------
@@ -1077,11 +1053,39 @@
         'icono' => 'bg-sky-100 text-sky-900',
         ],
 
+        'Cívico' => [
+        'punto' => 'bg-red-500',
+        'etiqueta' => 'bg-red-50 text-red-800 border-red-100',
+        'agenda' => 'bg-red-400',
+        'icono' => 'bg-red-100 text-red-900',
+        ],
+
+        'Deportivo' => [
+        'punto' => 'bg-lime-600',
+        'etiqueta' => 'bg-lime-50 text-lime-800 border-lime-100',
+        'agenda' => 'bg-lime-500',
+        'icono' => 'bg-lime-100 text-lime-900',
+        ],
+
+        'Cultural' => [
+        'punto' => 'bg-fuchsia-500',
+        'etiqueta' => 'bg-fuchsia-50 text-fuchsia-800 border-fuchsia-100',
+        'agenda' => 'bg-fuchsia-400',
+        'icono' => 'bg-fuchsia-100 text-fuchsia-900',
+        ],
+
         'Reunión' => [
         'punto' => 'bg-violet-500',
         'etiqueta' => 'bg-violet-50 text-violet-800 border-violet-100',
         'agenda' => 'bg-violet-400',
         'icono' => 'bg-violet-100 text-violet-900',
+        ],
+
+        'Otro' => [
+        'punto' => 'bg-slate-500',
+        'etiqueta' => 'bg-slate-50 text-slate-800 border-slate-200',
+        'agenda' => 'bg-slate-400',
+        'icono' => 'bg-slate-200 text-slate-900',
         ],
 
         'Celebración' => [
@@ -1159,7 +1163,16 @@
             {{-- Leyenda --}}
             <div class="mt-8 flex flex-wrap gap-3">
 
-                @foreach (['Institucional', 'Académico', 'Reunión', 'Celebración', 'Efeméride'] as $tipoEvento)
+                @foreach ([
+                'Institucional',
+                'Académico',
+                'Cívico',
+                'Deportivo',
+                'Cultural',
+                'Reunión',
+                'Celebración',
+                'Efeméride',
+                ] as $tipoEvento)
 
                 <div
                     class="inline-flex items-center gap-2 rounded-full border border-gray-200
