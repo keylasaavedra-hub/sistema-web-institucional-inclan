@@ -11,6 +11,7 @@ class BusquedaController extends Controller
     public function index(Request $request): View
     {
         $termino = trim((string) $request->query('q', ''));
+        $ahora = now();
 
         $publicaciones = collect();
         $documentos = collect();
@@ -18,6 +19,19 @@ class BusquedaController extends Controller
         $informacionInstitucional = collect();
 
         if (mb_strlen($termino) >= 2) {
+
+            /*
+            |--------------------------------------------------------------------------
+            | PUBLICACIONES
+            |--------------------------------------------------------------------------
+            |
+            | Solo publicaciones realmente visibles en el portal:
+            | - estado publicado
+            | - fecha de publicación alcanzada
+            | - no vencidas
+            |
+            */
+
             $publicaciones = DB::table('publicaciones')
                 ->leftJoin(
                     'categorias_publicacion',
@@ -34,14 +48,52 @@ class BusquedaController extends Controller
                     'categorias_publicacion.nombre as categoria',
                 ])
                 ->where('publicaciones.estado', 'publicado')
+                ->where(function ($query) use ($ahora) {
+                    $query
+                        ->whereNull('publicaciones.fecha_publicacion')
+                        ->orWhere(
+                            'publicaciones.fecha_publicacion',
+                            '<=',
+                            $ahora
+                        );
+                })
+                ->where(function ($query) use ($ahora) {
+                    $query
+                        ->whereNull('publicaciones.fecha_vencimiento')
+                        ->orWhere(
+                            'publicaciones.fecha_vencimiento',
+                            '>=',
+                            $ahora
+                        );
+                })
                 ->where(function ($query) use ($termino) {
                     $query
-                        ->where('publicaciones.titulo', 'like', "%{$termino}%")
-                        ->orWhere('publicaciones.contenido', 'like', "%{$termino}%");
+                        ->where(
+                            'publicaciones.titulo',
+                            'like',
+                            "%{$termino}%"
+                        )
+                        ->orWhere(
+                            'publicaciones.contenido',
+                            'like',
+                            "%{$termino}%"
+                        );
                 })
                 ->orderByDesc('publicaciones.fecha_publicacion')
                 ->limit(10)
                 ->get();
+
+            /*
+            |--------------------------------------------------------------------------
+            | DOCUMENTOS
+            |--------------------------------------------------------------------------
+            |
+            | Solo documentos:
+            | - activos
+            | - públicos
+            | - cuya fecha de publicación ya llegó
+            |
+            */
 
             $documentos = DB::table('documentos')
                 ->join(
@@ -54,20 +106,45 @@ class BusquedaController extends Controller
                     'documentos.id',
                     'documentos.titulo',
                     'documentos.descripcion',
-                    'documentos.archivo',
                     'documentos.fecha_publicacion',
                     'categorias_documento.nombre as categoria',
                 ])
                 ->where('documentos.estado', 'activo')
                 ->where('documentos.es_publico', true)
+                ->where(function ($query) use ($ahora) {
+                    $query
+                        ->whereNull('documentos.fecha_publicacion')
+                        ->orWhereDate(
+                            'documentos.fecha_publicacion',
+                            '<=',
+                            $ahora->toDateString()
+                        );
+                })
                 ->where(function ($query) use ($termino) {
                     $query
-                        ->where('documentos.titulo', 'like', "%{$termino}%")
-                        ->orWhere('documentos.descripcion', 'like', "%{$termino}%");
+                        ->where(
+                            'documentos.titulo',
+                            'like',
+                            "%{$termino}%"
+                        )
+                        ->orWhere(
+                            'documentos.descripcion',
+                            'like',
+                            "%{$termino}%"
+                        );
                 })
                 ->orderByDesc('documentos.fecha_publicacion')
                 ->limit(10)
                 ->get();
+
+            /*
+            |--------------------------------------------------------------------------
+            | CONVOCATORIAS
+            |--------------------------------------------------------------------------
+            |
+            | Solo convocatorias publicadas y dentro de su periodo vigente.
+            |
+            */
 
             $convocatorias = DB::table('convocatorias')
                 ->leftJoin(
@@ -86,18 +163,52 @@ class BusquedaController extends Controller
                     'areas_institucionales.nombre as area',
                 ])
                 ->where('convocatorias.estado', 'publicada')
+                ->where(
+                    'convocatorias.fecha_inicio',
+                    '<=',
+                    $ahora
+                )
+                ->where(
+                    'convocatorias.fecha_cierre',
+                    '>=',
+                    $ahora
+                )
                 ->where(function ($query) use ($termino) {
                     $query
-                        ->where('convocatorias.titulo', 'like', "%{$termino}%")
-                        ->orWhere('convocatorias.descripcion', 'like', "%{$termino}%")
-                        ->orWhere('convocatorias.codigo', 'like', "%{$termino}%")
-                        ->orWhere('convocatorias.tipo', 'like', "%{$termino}%");
+                        ->where(
+                            'convocatorias.titulo',
+                            'like',
+                            "%{$termino}%"
+                        )
+                        ->orWhere(
+                            'convocatorias.descripcion',
+                            'like',
+                            "%{$termino}%"
+                        )
+                        ->orWhere(
+                            'convocatorias.codigo',
+                            'like',
+                            "%{$termino}%"
+                        )
+                        ->orWhere(
+                            'convocatorias.tipo',
+                            'like',
+                            "%{$termino}%"
+                        );
                 })
-                ->orderByDesc('convocatorias.fecha_publicacion')
+                ->orderBy('convocatorias.fecha_cierre')
                 ->limit(10)
                 ->get();
 
-            $informacionInstitucional = DB::table('informacion_institucional')
+            /*
+            |--------------------------------------------------------------------------
+            | INFORMACIÓN INSTITUCIONAL
+            |--------------------------------------------------------------------------
+            */
+
+            $informacionInstitucional = DB::table(
+                'informacion_institucional'
+            )
                 ->select([
                     'id',
                     'tipo',
@@ -108,9 +219,21 @@ class BusquedaController extends Controller
                 ->where('estado', true)
                 ->where(function ($query) use ($termino) {
                     $query
-                        ->where('titulo', 'like', "%{$termino}%")
-                        ->orWhere('contenido', 'like', "%{$termino}%")
-                        ->orWhere('tipo', 'like', "%{$termino}%");
+                        ->where(
+                            'titulo',
+                            'like',
+                            "%{$termino}%"
+                        )
+                        ->orWhere(
+                            'contenido',
+                            'like',
+                            "%{$termino}%"
+                        )
+                        ->orWhere(
+                            'tipo',
+                            'like',
+                            "%{$termino}%"
+                        );
                 })
                 ->orderBy('orden')
                 ->limit(10)

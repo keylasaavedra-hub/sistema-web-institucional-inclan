@@ -18,8 +18,7 @@
             <form
                 action="{{ route('buscar') }}"
                 method="GET"
-                class="mt-8 flex max-w-3xl flex-col gap-3 rounded-2xl bg-white p-3 shadow-2xl sm:flex-row"
-            >
+                class="mt-8 flex max-w-3xl flex-col gap-3 rounded-2xl bg-white p-3 shadow-2xl sm:flex-row">
                 <label for="q" class="sr-only">
                     Buscar en el portal
                 </label>
@@ -32,13 +31,11 @@
                     minlength="2"
                     required
                     placeholder="Buscar noticias, documentos o convocatorias..."
-                    class="min-w-0 flex-1 rounded-xl border-0 px-4 py-3 text-gray-900 outline-none ring-0 focus:ring-2 focus:ring-amber-400"
-                >
+                    class="min-w-0 flex-1 rounded-xl border-0 px-4 py-3 text-gray-900 outline-none ring-0 focus:ring-2 focus:ring-amber-400">
 
                 <button
                     type="submit"
-                    class="rounded-xl bg-amber-400 px-7 py-3 font-extrabold text-emerald-950 transition hover:bg-amber-300"
-                >
+                    class="rounded-xl bg-amber-400 px-7 py-3 font-extrabold text-emerald-950 transition hover:bg-amber-300">
                     Buscar
                 </button>
             </form>
@@ -53,301 +50,302 @@
             @if (mb_strlen($termino) < 2)
 
                 <div class="rounded-3xl border border-amber-200 bg-amber-50 p-8 text-center">
-                    <h2 class="text-xl font-extrabold text-emerald-950">
-                        Escribe al menos dos caracteres
-                    </h2>
+                <h2 class="text-xl font-extrabold text-emerald-950">
+                    Escribe al menos dos caracteres
+                </h2>
 
-                    <p class="mt-2 text-gray-600">
-                        Puedes buscar palabras como matrícula, reglamento, convocatoria o ciencia.
-                    </p>
-                </div>
+                <p class="mt-2 text-gray-600">
+                    Puedes buscar palabras como matrícula, reglamento, convocatoria o ciencia.
+                </p>
+        </div>
 
-            @elseif ($totalResultados === 0)
+        @elseif ($totalResultados === 0)
 
-                <div class="rounded-3xl border border-dashed border-emerald-200 bg-white p-12 text-center">
+        <div class="rounded-3xl border border-dashed border-emerald-200 bg-white p-12 text-center">
 
-                    <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-800">
-                        <svg
-                            class="h-8 w-8"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <circle cx="11" cy="11" r="7"/>
-                            <path d="m20 20-4-4"/>
-                        </svg>
-                    </div>
+            <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-800">
+                <svg
+                    class="h-8 w-8"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2">
+                    <circle cx="11" cy="11" r="7" />
+                    <path d="m20 20-4-4" />
+                </svg>
+            </div>
 
-                    <h2 class="mt-5 text-2xl font-extrabold text-emerald-950">
-                        No encontramos resultados
-                    </h2>
+            <h2 class="mt-5 text-2xl font-extrabold text-emerald-950">
+                No encontramos resultados
+            </h2>
 
-                    <p class="mt-3 text-gray-600">
-                        No existen coincidencias para
-                        <strong>“{{ $termino }}”</strong>.
-                    </p>
+            <p class="mt-3 text-gray-600">
+                No existen coincidencias para
+                <strong>“{{ $termino }}”</strong>.
+            </p>
 
-                </div>
+        </div>
 
-            @else
+        @else
 
-                <div class="mb-10 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div class="mb-10 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+            <div>
+                <p class="text-sm font-bold uppercase tracking-wider text-amber-600">
+                    Búsqueda realizada
+                </p>
+
+                <h2 class="mt-1 text-3xl font-extrabold text-emerald-950">
+                    {{ $totalResultados }}
+                    {{ $totalResultados === 1 ? 'resultado' : 'resultados' }}
+                    para “{{ $termino }}”
+                </h2>
+            </div>
+
+            <a
+                href="{{ route('inicio') }}"
+                class="font-bold text-emerald-700 hover:text-emerald-900">
+                ← Volver al inicio
+            </a>
+
+        </div>
+
+        <div class="space-y-14">
+
+            @if ($publicaciones->isNotEmpty())
+
+            <section>
+                <div class="mb-6 flex items-center gap-3">
+                    <div class="h-10 w-2 rounded-full bg-amber-400"></div>
 
                     <div>
                         <p class="text-sm font-bold uppercase tracking-wider text-amber-600">
-                            Búsqueda realizada
+                            Contenido informativo
                         </p>
 
-                        <h2 class="mt-1 text-3xl font-extrabold text-emerald-950">
-                            {{ $totalResultados }}
-                            {{ $totalResultados === 1 ? 'resultado' : 'resultados' }}
-                            para “{{ $termino }}”
-                        </h2>
+                        <h3 class="text-2xl font-extrabold text-emerald-950">
+                            Noticias y publicaciones
+                        </h3>
                     </div>
-
-                    <a
-                        href="{{ route('inicio') }}"
-                        class="font-bold text-emerald-700 hover:text-emerald-900"
-                    >
-                        ← Volver al inicio
-                    </a>
-
                 </div>
 
-                <div class="space-y-14">
+                <div class="grid gap-5 md:grid-cols-2">
 
-                    @if ($publicaciones->isNotEmpty())
+                    @foreach ($publicaciones as $publicacion)
 
-                        <section>
-                            <div class="mb-6 flex items-center gap-3">
-                                <div class="h-10 w-2 rounded-full bg-amber-400"></div>
+                    <article class="rounded-3xl border border-gray-100 bg-white p-7 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
 
-                                <div>
-                                    <p class="text-sm font-bold uppercase tracking-wider text-amber-600">
-                                        Contenido informativo
-                                    </p>
+                        <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">
+                            {{ $publicacion->categoria ?? 'Publicación' }}
+                        </span>
 
-                                    <h3 class="text-2xl font-extrabold text-emerald-950">
-                                        Noticias y publicaciones
-                                    </h3>
-                                </div>
-                            </div>
+                        <h4 class="mt-4 text-xl font-extrabold text-emerald-950">
+                            {{ $publicacion->titulo }}
+                        </h4>
 
-                            <div class="grid gap-5 md:grid-cols-2">
-
-                                @foreach ($publicaciones as $publicacion)
-
-                                    <article class="rounded-3xl border border-gray-100 bg-white p-7 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
-
-                                        <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">
-                                            {{ $publicacion->categoria ?? 'Publicación' }}
-                                        </span>
-
-                                        <h4 class="mt-4 text-xl font-extrabold text-emerald-950">
-                                            {{ $publicacion->titulo }}
-                                        </h4>
-
-                                        <p class="mt-3 text-sm leading-6 text-gray-600">
-                                            {{ \Illuminate\Support\Str::limit(
+                        <p class="mt-3 text-sm leading-6 text-gray-600">
+                            {{ \Illuminate\Support\Str::limit(
                                                 strip_tags($publicacion->contenido),
                                                 180
                                             ) }}
-                                        </p>
+                        </p>
 
-                                        <p class="mt-5 text-xs font-semibold text-gray-500">
-                                            {{ $publicacion->fecha_publicacion
+                        <p class="mt-5 text-xs font-semibold text-gray-500">
+                            {{ $publicacion->fecha_publicacion
                                                 ? \Illuminate\Support\Carbon::parse(
                                                     $publicacion->fecha_publicacion
                                                 )->format('d/m/Y')
                                                 : 'Sin fecha' }}
-                                        </p>
+                        </p>
 
-                                    </article>
+                    </article>
 
-                                @endforeach
+                    @endforeach
 
-                            </div>
-                        </section>
+                </div>
+            </section>
 
-                    @endif
+            @endif
 
-                    @if ($documentos->isNotEmpty())
+            @if ($documentos->isNotEmpty())
 
-                        <section>
-                            <div class="mb-6 flex items-center gap-3">
-                                <div class="h-10 w-2 rounded-full bg-emerald-700"></div>
+            <section>
+                <div class="mb-6 flex items-center gap-3">
+                    <div class="h-10 w-2 rounded-full bg-emerald-700"></div>
 
-                                <div>
-                                    <p class="text-sm font-bold uppercase tracking-wider text-amber-600">
-                                        Centro de descargas
-                                    </p>
+                    <div>
+                        <p class="text-sm font-bold uppercase tracking-wider text-amber-600">
+                            Centro de descargas
+                        </p>
 
-                                    <h3 class="text-2xl font-extrabold text-emerald-950">
-                                        Documentos
-                                    </h3>
-                                </div>
-                            </div>
+                        <h3 class="text-2xl font-extrabold text-emerald-950">
+                            Documentos
+                        </h3>
+                    </div>
+                </div>
 
-                            <div class="grid gap-5 md:grid-cols-2">
+                <div class="grid gap-5 md:grid-cols-2">
 
-                                @foreach ($documentos as $documento)
+                    @foreach ($documentos as $documento)
 
-                                    @php
-                                        $archivoDisponible = $documento->archivo
-                                            && file_exists(public_path($documento->archivo));
-                                    @endphp
 
-                                    <article class="rounded-3xl border border-gray-100 bg-white p-7 shadow-sm transition hover:shadow-lg">
 
-                                        <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">
-                                            {{ $documento->categoria }}
-                                        </span>
+                    <article class="rounded-3xl border border-gray-100 bg-white p-7 shadow-sm transition hover:shadow-lg">
 
-                                        <h4 class="mt-4 text-xl font-extrabold text-emerald-950">
-                                            {{ $documento->titulo }}
-                                        </h4>
+                        <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">
+                            {{ $documento->categoria }}
+                        </span>
 
-                                        <p class="mt-3 text-sm leading-6 text-gray-600">
-                                            {{ \Illuminate\Support\Str::limit(
+                        <h4 class="mt-4 text-xl font-extrabold text-emerald-950">
+                            {{ $documento->titulo }}
+                        </h4>
+
+                        <p class="mt-3 text-sm leading-6 text-gray-600">
+                            {{ \Illuminate\Support\Str::limit(
                                                 $documento->descripcion ?? '',
                                                 160
                                             ) }}
-                                        </p>
+                        </p>
 
-                                        @if ($archivoDisponible)
-                                            <a
-                                                href="{{ asset($documento->archivo) }}"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                class="mt-5 inline-flex items-center gap-2 font-bold text-emerald-700 hover:text-emerald-900"
-                                            >
-                                                Abrir documento →
-                                            </a>
-                                        @endif
+                        <a
+                            href="{{ route('documentos.descargar', ['documento' => $documento->id]) }}"
+                            class="mt-5 inline-flex items-center gap-2 font-bold text-emerald-700 transition hover:text-emerald-900">
+                            Descargar documento →
 
-                                    </article>
+                            <svg
+                                class="h-4 w-4"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M12 3v12" />
+                                <path d="m7 10 5 5 5-5" />
+                                <path d="M5 21h14" />
+                            </svg>
+                        </a>
 
-                                @endforeach
+                    </article>
 
-                            </div>
-                        </section>
+                    @endforeach
 
-                    @endif
+                </div>
+            </section>
 
-                    @if ($convocatorias->isNotEmpty())
+            @endif
 
-                        <section>
-                            <div class="mb-6 flex items-center gap-3">
-                                <div class="h-10 w-2 rounded-full bg-amber-400"></div>
+            @if ($convocatorias->isNotEmpty())
 
-                                <div>
-                                    <p class="text-sm font-bold uppercase tracking-wider text-amber-600">
-                                        Oportunidades
-                                    </p>
+            <section>
+                <div class="mb-6 flex items-center gap-3">
+                    <div class="h-10 w-2 rounded-full bg-amber-400"></div>
 
-                                    <h3 class="text-2xl font-extrabold text-emerald-950">
-                                        Convocatorias
-                                    </h3>
-                                </div>
-                            </div>
+                    <div>
+                        <p class="text-sm font-bold uppercase tracking-wider text-amber-600">
+                            Oportunidades
+                        </p>
 
-                            <div class="grid gap-5 md:grid-cols-2">
+                        <h3 class="text-2xl font-extrabold text-emerald-950">
+                            Convocatorias
+                        </h3>
+                    </div>
+                </div>
 
-                                @foreach ($convocatorias as $convocatoria)
+                <div class="grid gap-5 md:grid-cols-2">
 
-                                    <article class="rounded-3xl border border-gray-100 bg-white p-7 shadow-sm transition hover:shadow-lg">
+                    @foreach ($convocatorias as $convocatoria)
 
-                                        <div class="flex flex-wrap items-center gap-2">
+                    <article class="rounded-3xl border border-gray-100 bg-white p-7 shadow-sm transition hover:shadow-lg">
 
-                                            <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold capitalize text-emerald-800">
-                                                {{ $convocatoria->tipo }}
-                                            </span>
+                        <div class="flex flex-wrap items-center gap-2">
 
-                                            @if ($convocatoria->codigo)
-                                                <span class="text-xs font-bold text-gray-500">
-                                                    {{ $convocatoria->codigo }}
-                                                </span>
-                                            @endif
+                            <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold capitalize text-emerald-800">
+                                {{ $convocatoria->tipo }}
+                            </span>
 
-                                        </div>
+                            @if ($convocatoria->codigo)
+                            <span class="text-xs font-bold text-gray-500">
+                                {{ $convocatoria->codigo }}
+                            </span>
+                            @endif
 
-                                        <h4 class="mt-4 text-xl font-extrabold text-emerald-950">
-                                            {{ $convocatoria->titulo }}
-                                        </h4>
+                        </div>
 
-                                        <p class="mt-3 text-sm leading-6 text-gray-600">
-                                            {{ \Illuminate\Support\Str::limit(
+                        <h4 class="mt-4 text-xl font-extrabold text-emerald-950">
+                            {{ $convocatoria->titulo }}
+                        </h4>
+
+                        <p class="mt-3 text-sm leading-6 text-gray-600">
+                            {{ \Illuminate\Support\Str::limit(
                                                 $convocatoria->descripcion ?? '',
                                                 160
                                             ) }}
-                                        </p>
+                        </p>
 
-                                        @if ($convocatoria->area)
-                                            <p class="mt-4 text-sm font-bold text-amber-700">
-                                                Área: {{ $convocatoria->area }}
-                                            </p>
-                                        @endif
+                        @if ($convocatoria->area)
+                        <p class="mt-4 text-sm font-bold text-amber-700">
+                            Área: {{ $convocatoria->area }}
+                        </p>
+                        @endif
 
-                                    </article>
+                    </article>
 
-                                @endforeach
+                    @endforeach
 
-                            </div>
-                        </section>
+                </div>
+            </section>
 
-                    @endif
+            @endif
 
-                    @if ($informacionInstitucional->isNotEmpty())
+            @if ($informacionInstitucional->isNotEmpty())
 
-                        <section>
-                            <div class="mb-6 flex items-center gap-3">
-                                <div class="h-10 w-2 rounded-full bg-emerald-700"></div>
+            <section>
+                <div class="mb-6 flex items-center gap-3">
+                    <div class="h-10 w-2 rounded-full bg-emerald-700"></div>
 
-                                <div>
-                                    <p class="text-sm font-bold uppercase tracking-wider text-amber-600">
-                                        Nuestra institución
-                                    </p>
+                    <div>
+                        <p class="text-sm font-bold uppercase tracking-wider text-amber-600">
+                            Nuestra institución
+                        </p>
 
-                                    <h3 class="text-2xl font-extrabold text-emerald-950">
-                                        Información institucional
-                                    </h3>
-                                </div>
-                            </div>
+                        <h3 class="text-2xl font-extrabold text-emerald-950">
+                            Información institucional
+                        </h3>
+                    </div>
+                </div>
 
-                            <div class="grid gap-5 md:grid-cols-2">
+                <div class="grid gap-5 md:grid-cols-2">
 
-                                @foreach ($informacionInstitucional as $informacion)
+                    @foreach ($informacionInstitucional as $informacion)
 
-                                    <article class="rounded-3xl border border-gray-100 bg-white p-7 shadow-sm transition hover:shadow-lg">
+                    <article class="rounded-3xl border border-gray-100 bg-white p-7 shadow-sm transition hover:shadow-lg">
 
-                                        <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold capitalize text-amber-800">
-                                            {{ str_replace('_', ' ', $informacion->tipo) }}
-                                        </span>
+                        <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold capitalize text-amber-800">
+                            {{ str_replace('_', ' ', $informacion->tipo) }}
+                        </span>
 
-                                        <h4 class="mt-4 text-xl font-extrabold text-emerald-950">
-                                            {{ $informacion->titulo }}
-                                        </h4>
+                        <h4 class="mt-4 text-xl font-extrabold text-emerald-950">
+                            {{ $informacion->titulo }}
+                        </h4>
 
-                                        <p class="mt-3 text-sm leading-6 text-gray-600">
-                                            {{ \Illuminate\Support\Str::limit(
+                        <p class="mt-3 text-sm leading-6 text-gray-600">
+                            {{ \Illuminate\Support\Str::limit(
                                                 strip_tags($informacion->contenido),
                                                 180
                                             ) }}
-                                        </p>
+                        </p>
 
-                                    </article>
+                    </article>
 
-                                @endforeach
-
-                            </div>
-                        </section>
-
-                    @endif
+                    @endforeach
 
                 </div>
+            </section>
 
             @endif
+
+        </div>
+
+        @endif
 
         </div>
     </main>
