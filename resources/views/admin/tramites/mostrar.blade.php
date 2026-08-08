@@ -21,88 +21,95 @@
                 class="inline-flex w-fit items-center justify-center gap-2
                        rounded-xl border border-gray-300 bg-white
                        px-4 py-3 text-sm font-extrabold text-gray-700
-                       transition hover:bg-gray-50"
-            >
+                       transition hover:bg-gray-50">
                 ← Volver al listado
             </a>
         </div>
     </x-slot>
 
     @php
-        $estados = [
-            'recibido' => [
-                'texto' => 'Recibido',
-                'clase' => 'border-blue-200 bg-blue-50 text-blue-800',
-            ],
-            'en_revision' => [
-                'texto' => 'En revisión',
-                'clase' => 'border-amber-200 bg-amber-50 text-amber-800',
-            ],
-            'derivado' => [
-                'texto' => 'Derivado',
-                'clase' => 'border-violet-200 bg-violet-50 text-violet-800',
-            ],
-            'observado' => [
-                'texto' => 'Observado',
-                'clase' => 'border-red-200 bg-red-50 text-red-800',
-            ],
-            'atendido' => [
-                'texto' => 'Atendido',
-                'clase' => 'border-emerald-200 bg-emerald-50 text-emerald-800',
-            ],
-            'cerrado' => [
-                'texto' => 'Cerrado',
-                'clase' => 'border-gray-300 bg-gray-100 text-gray-800',
-            ],
-        ];
+    $estados = [
+    'recibido' => [
+    'texto' => 'Recibido',
+    'clase' => 'border-blue-200 bg-blue-50 text-blue-800',
+    ],
+    'en_revision' => [
+    'texto' => 'En revisión',
+    'clase' => 'border-amber-200 bg-amber-50 text-amber-800',
+    ],
+    'derivado' => [
+    'texto' => 'Derivado',
+    'clase' => 'border-violet-200 bg-violet-50 text-violet-800',
+    ],
+    'observado' => [
+    'texto' => 'Observado',
+    'clase' => 'border-red-200 bg-red-50 text-red-800',
+    ],
+    'atendido' => [
+    'texto' => 'Atendido',
+    'clase' => 'border-emerald-200 bg-emerald-50 text-emerald-800',
+    ],
+    'cerrado' => [
+    'texto' => 'Cerrado',
+    'clase' => 'border-gray-300 bg-gray-100 text-gray-800',
+    ],
+    ];
 
-        $detalleEstado = $estados[$tramite->estado] ?? [
-            'texto' => ucfirst(str_replace('_', ' ', $tramite->estado)),
-            'clase' => 'border-gray-200 bg-gray-50 text-gray-800',
-        ];
+    $detalleEstado = $estados[$tramite->estado] ?? [
+    'texto' => ucfirst(str_replace('_', ' ', $tramite->estado)),
+    'clase' => 'border-gray-200 bg-gray-50 text-gray-800',
+    ];
 
-        $solicitante = $tramite->tipo_persona === 'juridica'
-            ? ($tramite->razon_social ?: 'Persona jurídica')
-            : trim("{$tramite->nombres} {$tramite->apellidos}");
+    $solicitante = $tramite->tipo_persona === 'juridica'
+    ? ($tramite->razon_social ?: 'Persona jurídica')
+    : trim("{$tramite->nombres} {$tramite->apellidos}");
 
-        $tamanioArchivo = null;
+    $tamanioArchivo = null;
 
-        if ($tramite->archivo_tamanio) {
-            $tamanioArchivo = $tramite->archivo_tamanio >= 1048576
-                ? number_format($tramite->archivo_tamanio / 1048576, 2) . ' MB'
-                : number_format($tramite->archivo_tamanio / 1024, 2) . ' KB';
-        }
+    if ($tramite->archivo_tamanio) {
+    $tamanioArchivo = $tramite->archivo_tamanio >= 1048576
+    ? number_format($tramite->archivo_tamanio / 1048576, 2) . ' MB'
+    : number_format($tramite->archivo_tamanio / 1024, 2) . ' KB';
+    }
     @endphp
 
     <div class="py-10">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
             @if (session('mensaje'))
-                <div
-                    class="mb-7 rounded-2xl border border-emerald-200
-                           bg-emerald-50 p-5 text-emerald-800"
-                >
-                    <p class="font-extrabold">
-                        {{ session('mensaje') }}
-                    </p>
-                </div>
+            <div
+                class="mb-7 rounded-2xl border border-emerald-200
+                           bg-emerald-50 p-5 text-emerald-800">
+                <p class="font-extrabold">
+                    {{ session('mensaje') }}
+                </p>
+            </div>
+            @endif
+
+            @if (session('error'))
+            <div
+                class="mb-7 rounded-2xl border border-red-200
+               bg-red-50 p-5 text-red-800">
+                <p class="font-extrabold">
+                    {{ session('error') }}
+                </p>
+            </div>
             @endif
 
             @if ($errors->any())
-                <div
-                    class="mb-7 rounded-2xl border border-red-200
-                           bg-red-50 p-5"
-                >
-                    <p class="font-extrabold text-red-800">
-                        Revisa la información ingresada
-                    </p>
+            <div
+                class="mb-7 rounded-2xl border border-red-200
+                           bg-red-50 p-5">
+                <p class="font-extrabold text-red-800">
+                    Revisa la información ingresada
+                </p>
 
-                    <ul class="mt-3 space-y-1 text-sm text-red-700">
-                        @foreach ($errors->all() as $error)
-                            <li>• {{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
+                <ul class="mt-3 space-y-1 text-sm text-red-700">
+                    @foreach ($errors->all() as $error)
+                    <li>• {{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
             @endif
 
             <div class="grid gap-8 xl:grid-cols-[1.15fr_0.85fr]">
@@ -111,18 +118,15 @@
                 <section
                     class="overflow-hidden rounded-[28px]
                            border border-gray-200 bg-white
-                           shadow-[0_18px_50px_rgba(15,23,42,0.06)]"
-                >
+                           shadow-[0_18px_50px_rgba(15,23,42,0.06)]">
                     <div
                         class="flex flex-col gap-5 bg-emerald-950
                                p-6 text-white sm:flex-row
-                               sm:items-center sm:justify-between sm:p-8"
-                    >
+                               sm:items-center sm:justify-between sm:p-8">
                         <div>
                             <p
                                 class="text-xs font-extrabold uppercase
-                                       tracking-[0.16em] text-amber-300"
-                            >
+                                       tracking-[0.16em] text-amber-300">
                                 Código de seguimiento
                             </p>
 
@@ -134,8 +138,7 @@
                         <span
                             class="inline-flex w-fit rounded-full border
                                    px-4 py-2 text-sm font-extrabold
-                                   {{ $detalleEstado['clase'] }}"
-                        >
+                                   {{ $detalleEstado['clase'] }}">
                             {{ $detalleEstado['texto'] }}
                         </span>
                     </div>
@@ -151,12 +154,10 @@
                             <div class="mt-5 grid gap-5 sm:grid-cols-2">
                                 <div
                                     class="rounded-2xl border border-gray-200
-                                           bg-gray-50 p-5"
-                                >
+                                           bg-gray-50 p-5">
                                     <p
                                         class="text-xs font-extrabold uppercase
-                                               tracking-[0.14em] text-gray-500"
-                                    >
+                                               tracking-[0.14em] text-gray-500">
                                         Tipo de persona
                                     </p>
 
@@ -169,12 +170,10 @@
 
                                 <div
                                     class="rounded-2xl border border-gray-200
-                                           bg-gray-50 p-5"
-                                >
+                                           bg-gray-50 p-5">
                                     <p
                                         class="text-xs font-extrabold uppercase
-                                               tracking-[0.14em] text-gray-500"
-                                    >
+                                               tracking-[0.14em] text-gray-500">
                                         Solicitante
                                     </p>
 
@@ -188,8 +187,7 @@
                                 <div>
                                     <p
                                         class="text-xs font-extrabold uppercase
-                                               tracking-[0.14em] text-gray-500"
-                                    >
+                                               tracking-[0.14em] text-gray-500">
                                         Documento de identidad
                                     </p>
 
@@ -202,8 +200,7 @@
                                 <div>
                                     <p
                                         class="text-xs font-extrabold uppercase
-                                               tracking-[0.14em] text-gray-500"
-                                    >
+                                               tracking-[0.14em] text-gray-500">
                                         Correo electrónico
                                     </p>
 
@@ -217,8 +214,7 @@
                                 <div>
                                     <p
                                         class="text-xs font-extrabold uppercase
-                                               tracking-[0.14em] text-gray-500"
-                                    >
+                                               tracking-[0.14em] text-gray-500">
                                         Teléfono
                                     </p>
 
@@ -230,8 +226,7 @@
                                 <div>
                                     <p
                                         class="text-xs font-extrabold uppercase
-                                               tracking-[0.14em] text-gray-500"
-                                    >
+                                               tracking-[0.14em] text-gray-500">
                                         Dirección
                                     </p>
 
@@ -253,12 +248,10 @@
                             <div class="mt-5 grid gap-5 sm:grid-cols-2">
                                 <div
                                     class="rounded-2xl border border-gray-200
-                                           bg-gray-50 p-5"
-                                >
+                                           bg-gray-50 p-5">
                                     <p
                                         class="text-xs font-extrabold uppercase
-                                               tracking-[0.14em] text-gray-500"
-                                    >
+                                               tracking-[0.14em] text-gray-500">
                                         Tipo de documento
                                     </p>
 
@@ -269,12 +262,10 @@
 
                                 <div
                                     class="rounded-2xl border border-gray-200
-                                           bg-gray-50 p-5"
-                                >
+                                           bg-gray-50 p-5">
                                     <p
                                         class="text-xs font-extrabold uppercase
-                                               tracking-[0.14em] text-gray-500"
-                                    >
+                                               tracking-[0.14em] text-gray-500">
                                         Número del documento
                                     </p>
 
@@ -287,8 +278,7 @@
                             <div class="mt-5">
                                 <p
                                     class="text-xs font-extrabold uppercase
-                                           tracking-[0.14em] text-gray-500"
-                                >
+                                           tracking-[0.14em] text-gray-500">
                                     Asunto
                                 </p>
 
@@ -300,16 +290,14 @@
                             <div class="mt-5">
                                 <p
                                     class="text-xs font-extrabold uppercase
-                                           tracking-[0.14em] text-gray-500"
-                                >
+                                           tracking-[0.14em] text-gray-500">
                                     Descripción
                                 </p>
 
                                 <div
                                     class="mt-2 whitespace-pre-line rounded-2xl
                                            border border-gray-200 bg-gray-50
-                                           p-5 leading-7 text-gray-700"
-                                >
+                                           p-5 leading-7 text-gray-700">
                                     {{ $tramite->descripcion ?: 'Sin descripción registrada.' }}
                                 </div>
                             </div>
@@ -324,73 +312,67 @@
                             </h4>
 
                             @if ($tramite->archivo_ruta)
-                                <div
-                                    class="mt-5 flex flex-col gap-4 rounded-2xl
+                            <div
+                                class="mt-5 flex flex-col gap-4 rounded-2xl
                                            border border-emerald-200
                                            bg-emerald-50 p-5
                                            sm:flex-row sm:items-center
-                                           sm:justify-between"
-                                >
-                                    <div class="flex items-center gap-4">
-                                        <div
-                                            class="flex h-12 w-12 shrink-0
+                                           sm:justify-between">
+                                <div class="flex items-center gap-4">
+                                    <div
+                                        class="flex h-12 w-12 shrink-0
                                                    items-center justify-center
-                                                   rounded-xl bg-red-50 text-red-700"
-                                        >
-                                            <svg
-                                                class="h-6 w-6"
-                                                viewBox="0 0 24 24"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                stroke-width="1.8"
-                                            >
-                                                <path d="M6 3h9l3 3v15H6z"/>
-                                                <path d="M14 3v4h4"/>
-                                                <path d="M9 13h6M9 17h4"/>
-                                            </svg>
-                                        </div>
-
-                                        <div class="min-w-0">
-                                            <p class="break-all font-extrabold text-emerald-950">
-                                                {{ $tramite->archivo_original ?: 'Documento adjunto' }}
-                                            </p>
-
-                                            <p class="mt-1 text-sm text-emerald-700">
-                                                {{ $tamanioArchivo ?: 'Tamaño no disponible' }}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <a
-                                        href="{{ route('admin.tramites.descargar', $tramite) }}"
-                                        class="inline-flex shrink-0 items-center
-                                               justify-center gap-2 rounded-xl
-                                               bg-emerald-950 px-5 py-3
-                                               text-sm font-extrabold text-white
-                                               transition hover:bg-emerald-900"
-                                    >
+                                                   rounded-xl bg-red-50 text-red-700">
                                         <svg
-                                            class="h-5 w-5"
+                                            class="h-6 w-6"
                                             viewBox="0 0 24 24"
                                             fill="none"
                                             stroke="currentColor"
-                                            stroke-width="1.8"
-                                        >
-                                            <path d="M12 3v12"/>
-                                            <path d="m7 10 5 5 5-5"/>
-                                            <path d="M5 21h14"/>
+                                            stroke-width="1.8">
+                                            <path d="M6 3h9l3 3v15H6z" />
+                                            <path d="M14 3v4h4" />
+                                            <path d="M9 13h6M9 17h4" />
                                         </svg>
+                                    </div>
 
-                                        Descargar PDF
-                                    </a>
+                                    <div class="min-w-0">
+                                        <p class="break-all font-extrabold text-emerald-950">
+                                            {{ $tramite->archivo_original ?: 'Documento adjunto' }}
+                                        </p>
+
+                                        <p class="mt-1 text-sm text-emerald-700">
+                                            {{ $tamanioArchivo ?: 'Tamaño no disponible' }}
+                                        </p>
+                                    </div>
                                 </div>
+
+                                <a
+                                    href="{{ route('admin.tramites.descargar', $tramite->id) }}"
+                                    class="inline-flex shrink-0 items-center
+                                               justify-center gap-2 rounded-xl
+                                               bg-emerald-950 px-5 py-3
+                                               text-sm font-extrabold text-white
+                                               transition hover:bg-emerald-900">
+                                    <svg
+                                        class="h-5 w-5"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.8">
+                                        <path d="M12 3v12" />
+                                        <path d="m7 10 5 5 5-5" />
+                                        <path d="M5 21h14" />
+                                    </svg>
+
+                                    Descargar archivo
+                                </a>
+                            </div>
                             @else
-                                <div
-                                    class="mt-5 rounded-2xl border border-gray-200
-                                           bg-gray-50 p-5 text-gray-600"
-                                >
-                                    Este trámite no tiene un archivo adjunto.
-                                </div>
+                            <div
+                                class="mt-5 rounded-2xl border border-gray-200
+                                           bg-gray-50 p-5 text-gray-600">
+                                Este trámite no tiene un archivo adjunto.
+                            </div>
                             @endif
                         </div>
 
@@ -440,22 +422,20 @@
                         </div>
 
                         @if ($tramite->observacion)
-                            <div>
-                                <p
-                                    class="text-xs font-extrabold uppercase
-                                           tracking-[0.14em] text-amber-700"
-                                >
-                                    Observación administrativa actual
-                                </p>
+                        <div>
+                            <p
+                                class="text-xs font-extrabold uppercase
+                                           tracking-[0.14em] text-amber-700">
+                                Observación administrativa actual
+                            </p>
 
-                                <div
-                                    class="mt-2 whitespace-pre-line rounded-2xl
+                            <div
+                                class="mt-2 whitespace-pre-line rounded-2xl
                                            border border-amber-200 bg-amber-50
-                                           p-5 leading-7 text-amber-900"
-                                >
-                                    {{ $tramite->observacion }}
-                                </div>
+                                           p-5 leading-7 text-amber-900">
+                                {{ $tramite->observacion }}
                             </div>
+                        </div>
                         @endif
                     </div>
                 </section>
@@ -465,13 +445,11 @@
                     class="h-fit rounded-[28px] border border-amber-200
                            bg-white p-6
                            shadow-[0_18px_50px_rgba(6,78,59,0.08)]
-                           sm:p-8"
-                >
+                           sm:p-8">
                     <div class="border-b border-gray-100 pb-6">
                         <p
                             class="text-xs font-extrabold uppercase
-                                   tracking-[0.16em] text-amber-600"
-                        >
+                                   tracking-[0.16em] text-amber-600">
                             Atención administrativa
                         </p>
 
@@ -487,17 +465,15 @@
 
                     <form
                         method="POST"
-                        action="{{ route('admin.tramites.actualizar', $tramite) }}"
-                        class="mt-7 space-y-6"
-                    >
+                        action="{{ route('admin.tramites.actualizar', $tramite->id) }}"
+                        class="mt-7 space-y-6">
                         @csrf
                         @method('PATCH')
 
                         <div>
                             <label
                                 for="estado"
-                                class="text-sm font-extrabold text-emerald-950"
-                            >
+                                class="text-sm font-extrabold text-emerald-950">
                                 Estado del trámite
                                 <span class="text-red-500">*</span>
                             </label>
@@ -509,47 +485,46 @@
                                 class="mt-2 w-full rounded-xl border-gray-300
                                        px-4 py-3 shadow-sm
                                        focus:border-emerald-700
-                                       focus:ring-emerald-700"
-                            >
+                                       focus:ring-emerald-700">
                                 <option
                                     value="recibido"
                                     @selected(old('estado', $tramite->estado) === 'recibido')
-                                >
+                                    >
                                     Recibido
                                 </option>
 
                                 <option
                                     value="en_revision"
                                     @selected(old('estado', $tramite->estado) === 'en_revision')
-                                >
+                                    >
                                     En revisión
                                 </option>
 
                                 <option
                                     value="derivado"
                                     @selected(old('estado', $tramite->estado) === 'derivado')
-                                >
+                                    >
                                     Derivado
                                 </option>
 
                                 <option
                                     value="observado"
                                     @selected(old('estado', $tramite->estado) === 'observado')
-                                >
+                                    >
                                     Observado
                                 </option>
 
                                 <option
                                     value="atendido"
                                     @selected(old('estado', $tramite->estado) === 'atendido')
-                                >
+                                    >
                                     Atendido
                                 </option>
 
                                 <option
                                     value="cerrado"
                                     @selected(old('estado', $tramite->estado) === 'cerrado')
-                                >
+                                    >
                                     Cerrado
                                 </option>
                             </select>
@@ -558,8 +533,7 @@
                         <div>
                             <label
                                 for="observacion"
-                                class="text-sm font-extrabold text-emerald-950"
-                            >
+                                class="text-sm font-extrabold text-emerald-950">
                                 Observación administrativa
                             </label>
 
@@ -572,8 +546,7 @@
                                 class="mt-2 w-full resize-y rounded-xl
                                        border-gray-300 px-4 py-3 shadow-sm
                                        focus:border-emerald-700
-                                       focus:ring-emerald-700"
-                            >{{ old('observacion', $tramite->observacion) }}</textarea>
+                                       focus:ring-emerald-700">{{ old('observacion', $tramite->observacion) }}</textarea>
 
                             <p class="mt-2 text-xs text-gray-500">
                                 Máximo 3000 caracteres.
@@ -582,8 +555,7 @@
 
                         <div
                             class="rounded-2xl border border-amber-200
-                                   bg-amber-50 p-4"
-                        >
+                                   bg-amber-50 p-4">
                             <p class="text-sm font-extrabold text-amber-900">
                                 Consideraciones
                             </p>
@@ -602,8 +574,7 @@
                                    px-6 py-4 font-extrabold text-white
                                    transition hover:bg-emerald-900
                                    focus:outline-none focus:ring-4
-                                   focus:ring-emerald-200"
-                        >
+                                   focus:ring-emerald-200">
                             Guardar cambios
                         </button>
                     </form>

@@ -30,14 +30,16 @@ class TramiteController extends Controller
                             ->orWhere('apellidos', 'like', "%{$buscar}%")
                             ->orWhere('razon_social', 'like', "%{$buscar}%")
                             ->orWhere('numero_documento', 'like', "%{$buscar}%")
-                            ->orWhere('correo', 'like', "%{$buscar}%")
+                            ->orWhere('numero_documento_presentado', 'like', "%{$buscar}%")
+                            ->orWhere('correo',  'like', "%{$buscar}%")
+                            ->orWhere('telefono',  'like', "%{$buscar}%")
                             ->orWhere('asunto', 'like', "%{$buscar}%");
                     });
                 }
             )
             ->when(
                 $request->filled('estado'),
-                fn ($query) => $query->where(
+                fn($query) => $query->where(
                     'estado',
                     $request->estado
                 )
@@ -72,19 +74,23 @@ class TramiteController extends Controller
 
                 'observacion' => [
                     'nullable',
+                    'required_if:estado,observado',
                     'string',
                     'max:3000',
                 ],
             ],
             [
                 'estado.required' =>
-                    'Selecciona el estado del trámite.',
+                'Selecciona el estado del trámite.',
 
                 'estado.in' =>
-                    'El estado seleccionado no es válido.',
+                'El estado seleccionado no es válido.',
 
                 'observacion.max' =>
-                    'La observación no puede superar los 3000 caracteres.',
+                'La observación no puede superar los 3000 caracteres.',
+
+                'observacion.required_if' =>
+                'Debes registrar una observación cuando el trámite esté observado.',
             ]
         );
 
@@ -178,12 +184,10 @@ class TramiteController extends Controller
                 modulo: 'Trámites',
                 accion: $accion,
                 modelo: $tramite,
-                valoresAnteriores:
-                    $valoresAnteriores,
-                valoresNuevos:
-                    $this->datosAuditoria(
-                        $tramite
-                    ),
+                valoresAnteriores: $valoresAnteriores,
+                valoresNuevos: $this->datosAuditoria(
+                    $tramite
+                ),
                 descripcion: $descripcion
             );
 
@@ -243,61 +247,73 @@ class TramiteController extends Controller
     ): array {
         return [
             'id' =>
-                $tramite->id,
+            $tramite->id,
 
             'codigo' =>
-                $tramite->codigo,
+            $tramite->codigo,
 
             'tipo_persona' =>
-                $tramite->tipo_persona,
+            $tramite->tipo_persona,
 
-            'tipo_documento' =>
-                $tramite->tipo_documento,
+            'tipo_documento_identidad' =>
+            $tramite->tipo_documento_identidad,
 
             'numero_documento' =>
-                $tramite->numero_documento,
+            $tramite->numero_documento,
 
             'nombres' =>
-                $tramite->nombres,
+            $tramite->nombres,
 
             'apellidos' =>
-                $tramite->apellidos,
+            $tramite->apellidos,
 
             'razon_social' =>
-                $tramite->razon_social,
+            $tramite->razon_social,
 
             'correo' =>
-                $tramite->correo,
+            $tramite->correo,
 
             'telefono' =>
-                $tramite->telefono,
+            $tramite->telefono,
+
+            'direccion' =>
+            $tramite->direccion,
+
+            'tipo_documento' =>
+            $tramite->tipo_documento,
+
+            'numero_documento_presentado' =>
+            $tramite->numero_documento_presentado,
 
             'asunto' =>
-                $tramite->asunto,
+            $tramite->asunto,
 
             'descripcion' =>
-                $tramite->descripcion,
+            $tramite->descripcion,
 
             'archivo_original' =>
-                $tramite->archivo_original,
+            $tramite->archivo_original,
+
+            'archivo_tamanio' =>
+            $tramite->archivo_tamanio,
 
             'estado' =>
-                $tramite->estado,
+            $tramite->estado,
 
             'observacion' =>
-                $tramite->observacion,
+            $tramite->observacion,
 
             'fecha_atencion' =>
-                $tramite->fecha_atencion,
+            $tramite->fecha_atencion,
 
             'fecha_cierre' =>
-                $tramite->fecha_cierre,
+            $tramite->fecha_cierre,
 
             'created_at' =>
-                $tramite->created_at,
+            $tramite->created_at,
 
             'updated_at' =>
-                $tramite->updated_at,
+            $tramite->updated_at,
         ];
     }
 }

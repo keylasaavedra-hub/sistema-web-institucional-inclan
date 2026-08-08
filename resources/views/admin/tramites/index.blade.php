@@ -54,7 +54,7 @@
                             name="buscar"
                             type="text"
                             value="{{ request('buscar') }}"
-                            placeholder="Código, nombre, documento, correo o asunto..."
+                            placeholder="Código, nombre, documento, teléfono, correo o asunto..."
                             class="mt-2 w-full rounded-xl border-gray-300
                                    px-4 py-3 shadow-sm
                                    focus:border-emerald-700
@@ -257,7 +257,7 @@
 
                                         <td class="whitespace-nowrap px-6 py-5 text-right">
                                             <a
-                                                href="{{ route('admin.tramites.mostrar', $tramite) }}"
+                                                href="{{ route('admin.tramites.mostrar', $tramite->id) }}"
                                                 class="inline-flex items-center justify-center
                                                        rounded-xl bg-emerald-950
                                                        px-4 py-2 text-sm font-extrabold
