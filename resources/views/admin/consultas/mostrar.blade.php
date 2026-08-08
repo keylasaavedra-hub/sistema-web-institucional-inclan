@@ -269,6 +269,11 @@
                     </div>
                 </section>
 
+                @if (
+                auth()->user()->esAdministrador()
+                || auth()->user()->tienePermiso('consultas.atender')
+                )
+
                 {{-- FORMULARIO DE ATENCIÓN --}}
                 <aside
                     class="h-fit rounded-[28px] border border-amber-200
@@ -388,6 +393,29 @@
                         </button>
                     </form>
                 </aside>
+                @else
+                <aside
+                    class="h-fit rounded-[28px] border border-gray-200
+               bg-white p-6
+               shadow-[0_18px_50px_rgba(15,23,42,0.06)]
+               sm:p-8">
+                    <p
+                        class="text-xs font-extrabold uppercase
+                   tracking-[0.16em] text-gray-500">
+                        Modo consulta
+                    </p>
+
+                    <h3 class="mt-2 text-2xl font-extrabold text-emerald-950">
+                        Acceso de solo lectura
+                    </h3>
+
+                    <p class="mt-3 text-sm leading-7 text-gray-600">
+                        Puedes revisar la información y la respuesta de esta
+                        consulta, pero tu rol no tiene permiso para modificar
+                        su estado ni registrar respuestas.
+                    </p>
+                </aside>
+                @endif
             </div>
         </div>
     </div>

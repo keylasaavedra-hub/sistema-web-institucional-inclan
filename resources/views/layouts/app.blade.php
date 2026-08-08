@@ -35,6 +35,46 @@
 
     $puede = fn (string $codigo): bool =>
     $esAdministrador || $permisosUsuario->contains($codigo);
+    $rutaInicioPanel = match (true) {
+    $puede('dashboard.ver') =>
+    route('dashboard'),
+
+    $puede('consultas.ver') =>
+    route('admin.consultas.index'),
+
+    $puede('solicitudes.ver') =>
+    route('admin.tramites.index'),
+
+    $puede('documentos.gestionar') =>
+    route('admin.documentos.index'),
+
+    $puede('publicaciones.gestionar') =>
+    route('admin.publicaciones.index'),
+
+    $puede('convocatorias.gestionar') =>
+    route('admin.convocatorias.index'),
+
+    $puede('postulaciones.revisar') =>
+    route('admin.postulaciones.index'),
+
+    $puede('galerias.gestionar') =>
+    route('admin.galerias.index'),
+
+    $puede('promociones.gestionar') =>
+    route('admin.promociones.index'),
+
+    $puede('usuarios.ver') =>
+    route('admin.usuarios.index'),
+
+    $puede('seguridad.administrar') =>
+    route('admin.roles.index'),
+
+    $puede('auditoria.ver') =>
+    route('admin.auditorias.index'),
+
+    default =>
+    route('inicio'),
+    };
     @endphp
     <div class="min-h-screen bg-slate-50">
 
@@ -58,7 +98,7 @@
                 class="flex h-24 items-center justify-between
                        border-b border-white/10 px-6">
                 <a
-                    href="{{ route('dashboard') }}"
+                    href="{{ $rutaInicioPanel }}"
                     class="flex items-center gap-3">
                     <div
                         class="flex h-12 w-12 items-center justify-center
@@ -701,7 +741,7 @@
                             </p>
 
                             <p class="text-xs font-semibold text-gray-500">
-                                Administrador
+                                {{ auth()->user()->rol?->nombre ?? 'Usuario' }}
                             </p>
                         </div>
 
