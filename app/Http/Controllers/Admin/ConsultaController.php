@@ -19,16 +19,50 @@ class ConsultaController extends Controller
             ->when(
                 $request->filled('buscar'),
                 function ($query) use ($request) {
-                    $buscar = trim((string) $request->buscar);
+                    $buscar = trim(
+                        (string) $request->buscar
+                    );
 
-                    $query->where(function ($subquery) use ($buscar) {
-                        $subquery
-                            ->where('codigo', 'like', "%{$buscar}%")
-                            ->orWhere('nombres', 'like', "%{$buscar}%")
-                            ->orWhere('apellidos', 'like', "%{$buscar}%")
-                            ->orWhere('correo', 'like', "%{$buscar}%")
-                            ->orWhere('asunto', 'like', "%{$buscar}%");
-                    });
+                    $query->where(
+                        function ($subquery) use ($buscar) {
+                            $subquery
+                                ->where(
+                                    'codigo',
+                                    'like',
+                                    "%{$buscar}%"
+                                )
+                                ->orWhere(
+                                    'nombres',
+                                    'like',
+                                    "%{$buscar}%"
+                                )
+                                ->orWhere(
+                                    'apellidos',
+                                    'like',
+                                    "%{$buscar}%"
+                                )
+                                ->orWhere(
+                                    'dni',
+                                    'like',
+                                    "%{$buscar}%"
+                                )
+                                ->orWhere(
+                                    'correo',
+                                    'like',
+                                    "%{$buscar}%"
+                                )
+                                ->orWhere(
+                                    'telefono',
+                                    'like',
+                                    "%{$buscar}%"
+                                )
+                                ->orWhere(
+                                    'asunto',
+                                    'like',
+                                    "%{$buscar}%"
+                                );
+                        }
+                    );
                 }
             )
             ->when(
@@ -42,17 +76,23 @@ class ConsultaController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        return view('admin.consultas.index', [
-            'consultas' => $consultas,
-        ]);
+        return view(
+            'admin.consultas.index',
+            [
+                'consultas' => $consultas,
+            ]
+        );
     }
 
     public function mostrar(
         Consulta $consulta
     ): View {
-        return view('admin.consultas.mostrar', [
-            'consulta' => $consulta,
-        ]);
+        return view(
+            'admin.consultas.mostrar',
+            [
+                'consulta' => $consulta,
+            ]
+        );
     }
 
     public function actualizar(
@@ -84,46 +124,110 @@ class ConsultaController extends Controller
             ]
         );
 
-        $valoresAnteriores = $this->datosAuditoria(
-            $consulta
-        );
+        $respuestaNueva = isset($datos['respuesta'])
+            ? trim((string) $datos['respuesta'])
+            : null;
 
-        $estadoAnterior = $consulta->estado;
-        $respuestaAnterior = $consulta->respuesta;
+        $respuestaNueva = filled($respuestaNueva)
+            ? $respuestaNueva
+            : null;
+
+        /*
+         * Una consulta no debería quedar como respondida
+         * sin una respuesta institucional.
+         */
+        if (
+            $datos['estado'] === 'respondida'
+            && ! filled($respuestaNueva)
+        ) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'respuesta' =>
+                        'Debes registrar una respuesta antes de marcar la consulta como respondida.',
+                ]);
+        }
+
+        $valoresAnteriores =
+            $this->datosAuditoria(
+                $consulta
+            );
+
+        $estadoAnterior =
+            $consulta->estado;
+
+        $respuestaAnterior =
+            $consulta->respuesta;
 
         DB::beginTransaction();
 
         try {
-            $consulta->estado = $datos['estado'];
-            $consulta->respuesta = $datos['respuesta'] ?? null;
+            $respuestaCambio =
+                $respuestaAnterior !== $respuestaNueva;
 
-            $tieneRespuesta = filled(
-                $datos['respuesta'] ?? null
-            );
+            $consulta->estado =
+                $datos['estado'];
 
-            if ($tieneRespuesta) {
-                $consulta->respondido_en = now();
+            $consulta->respuesta =
+                $respuestaNueva;
 
-                if ($consulta->estado === 'recibida') {
-                    $consulta->estado = 'respondida';
-                }
+            /*
+             * Solo actualizamos la fecha cuando realmente
+             * se registra o modifica una respuesta.
+             */
+            if (
+                $respuestaCambio
+                && filled($respuestaNueva)
+            ) {
+                $consulta->respondido_en =
+                    now();
+            }
+
+            /*
+             * Si se elimina la respuesta,
+             * ya no debe conservar una fecha de respuesta.
+             */
+            if (! filled($respuestaNueva)) {
+                $consulta->respondido_en =
+                    null;
+            }
+
+            /*
+             * Si responde directamente una consulta
+             * que todavía figura como recibida,
+             * pasa automáticamente a respondida.
+             */
+            if (
+                filled($respuestaNueva)
+                && $consulta->estado === 'recibida'
+            ) {
+                $consulta->estado =
+                    'respondida';
             }
 
             $consulta->save();
             $consulta->refresh();
 
             $estadoCambio =
-                $estadoAnterior !== $consulta->estado;
-
-            $respuestaCambio =
-                $respuestaAnterior !== $consulta->respuesta;
+                $estadoAnterior
+                !== $consulta->estado;
 
             $accion = 'actualizar';
 
-            if ($respuestaCambio && $tieneRespuesta) {
+            if (
+                $respuestaCambio
+                && filled($respuestaNueva)
+            ) {
                 $accion = 'responder';
             } elseif ($estadoCambio) {
-                $accion = 'cambiar_estado';
+                $accion =
+                    'cambiar_estado';
+            } elseif (
+                $respuestaCambio
+                && ! filled($respuestaNueva)
+            ) {
+                $accion =
+                    'eliminar_respuesta';
             }
 
             $descripcion = sprintf(
@@ -131,9 +235,20 @@ class ConsultaController extends Controller
                 $consulta->codigo
             );
 
-            if ($respuestaCambio && $tieneRespuesta) {
+            if (
+                $respuestaCambio
+                && filled($respuestaNueva)
+            ) {
                 $descripcion = sprintf(
                     'Se registró o actualizó la respuesta de la consulta %s.',
+                    $consulta->codigo
+                );
+            } elseif (
+                $respuestaCambio
+                && ! filled($respuestaNueva)
+            ) {
+                $descripcion = sprintf(
+                    'Se eliminó la respuesta registrada de la consulta %s.',
                     $consulta->codigo
                 );
             } elseif ($estadoCambio) {
@@ -198,6 +313,9 @@ class ConsultaController extends Controller
 
             'apellidos' =>
                 $consulta->apellidos,
+
+            'dni' =>
+                $consulta->dni,
 
             'correo' =>
                 $consulta->correo,
