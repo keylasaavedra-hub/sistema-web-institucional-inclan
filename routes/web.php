@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\CategoriaPublicacionController;
 use App\Http\Controllers\Admin\ConsultaController as AdminConsultaController;
+use App\Http\Controllers\Admin\ContenidoInstitucionalController;
 use App\Http\Controllers\Admin\ConvocatoriaController as AdminConvocatoriaController;
 use App\Http\Controllers\Admin\DocumentoController as AdminDocumentoController;
 use App\Http\Controllers\Admin\EventoController as AdminEventoController;
@@ -764,6 +765,49 @@ Route::middleware('auth')->group(function () {
                 ->whereNumber('auditoria')
                 ->name('mostrar');
         });
+
+
+/*
+|--------------------------------------------------------------------------
+| CONTENIDO INSTITUCIONAL
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('admin/contenido-institucional')
+    ->name('admin.contenido-institucional.')
+    ->controller(ContenidoInstitucionalController::class)
+    ->middleware('permiso:publicaciones.gestionar')
+    ->group(function () {
+
+        /*
+        |--------------------------------------------------------------------------
+        | PÁGINA DE INICIO
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/inicio', 'inicio')
+            ->name('inicio');
+
+        Route::put('/inicio', 'actualizarInicio')
+            ->name('inicio.actualizar');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | LOGROS Y RECONOCIMIENTOS
+        |--------------------------------------------------------------------------
+        */
+
+        Route::post('/logros', 'guardarLogro')
+            ->name('logros.guardar');
+
+        Route::put('/logros/{id}', 'actualizarLogro')
+            ->name('logros.actualizar');
+
+        Route::patch('/logros/{id}/estado', 'cambiarEstadoLogro')
+            ->name('logros.estado');
+    });
+    
     /*
     |--------------------------------------------------------------------------
     | PERFIL

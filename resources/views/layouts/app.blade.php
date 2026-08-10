@@ -367,7 +367,50 @@
                     @endif
 
                 </div>
+                {{-- CONTENIDO INSTITUCIONAL --}}
+                @if ($puede('publicaciones.gestionar'))
 
+                    <p
+                        class="mt-8 px-3 text-[11px] font-extrabold uppercase
+                               tracking-[0.18em] text-emerald-300"
+                    >
+                        Contenido
+                    </p>
+
+                    <div class="mt-3 space-y-2">
+
+                        <a
+                            href="{{ route('admin.contenido-institucional.inicio') }}"
+                            class="flex items-center gap-3 rounded-2xl
+                                   px-4 py-3 text-sm font-bold transition
+                                   {{ request()->routeIs(
+                                        'admin.contenido-institucional.*'
+                                   )
+                                        ? 'bg-white text-emerald-950 shadow-lg'
+                                        : 'text-emerald-50 hover:bg-white/10 hover:text-white'
+                                   }}"
+                        >
+                            <svg
+                                class="h-5 w-5 shrink-0"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.9"
+                            >
+                                <path d="M3 21h18" />
+                                <path d="M5 21V9l7-4 7 4v12" />
+                                <path d="M9 13h2v3H9zM13 13h2v3h-2z" />
+                            </svg>
+
+                            <span>
+                                Contenido institucional
+                            </span>
+                        </a>
+
+                    </div>
+
+                @endif
+                
                 {{-- MULTIMEDIA --}}
                 <p
                     class="mt-8 px-3 text-[11px] font-extrabold uppercase
