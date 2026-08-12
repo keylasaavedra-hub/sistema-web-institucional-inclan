@@ -1,5 +1,86 @@
 <x-public-layout title="Inicio">
 
+    @php
+        $portadaInicio = $informacionInstitucional->get('portada_inicio');
+        $saludoDirector = $informacionInstitucional->get('saludo_director');
+        $misionInfo = $informacionInstitucional->get('mision');
+        $visionInfo = $informacionInstitucional->get('vision');
+        $valoresInfo = $informacionInstitucional->get('valores');
+        $enfoqueInfo = $informacionInstitucional->get('enfoque_inicio');
+        $serviciosInfo = $informacionInstitucional->get('servicios_inicio');
+        $logrosInfo = $informacionInstitucional->get('logros_inicio');
+
+        $portadaDatos = $portadaInicio?->datos ?? [];
+        $valoresDatos = $valoresInfo?->datos ?? [];
+        $serviciosDatos = $serviciosInfo?->datos ?? [];
+
+        $imagenContenido = function (?string $ruta, string $fallback): string {
+            if (!$ruta) {
+                return asset($fallback);
+            }
+
+            if (
+                str_starts_with($ruta, 'images/')
+                || str_starts_with($ruta, '/images/')
+            ) {
+                return asset(ltrim($ruta, '/'));
+            }
+
+            return asset('storage/' . ltrim($ruta, '/'));
+        };
+
+        $valoresInstitucionales = collect(
+            $valoresDatos['lista'] ?? [
+                'Vocación de servicio',
+                'Disciplina',
+                'Integridad',
+                'Compromiso',
+                'Responsabilidad',
+                'Excelencia',
+            ]
+        )->values();
+
+        $serviciosComplementarios = collect([
+            'topico' => [
+                'slug' => 'topico',
+                'imagen_fallback' => 'images/servicio-topico.jpeg',
+                'titulo_fallback' => 'Tópico',
+                'subtitulo_fallback' => 'Salud y primeros auxilios',
+                'descripcion_fallback' => 'Atención y cuidado básico de la salud para nuestra comunidad educativa.',
+            ],
+            'toece' => [
+                'slug' => 'toece',
+                'imagen_fallback' => 'images/servicio-toece.jpeg',
+                'titulo_fallback' => 'TOECE',
+                'subtitulo_fallback' => 'Tutoría y convivencia escolar',
+                'descripcion_fallback' => 'Orientación educativa, convivencia escolar y acompañamiento a estudiantes.',
+            ],
+            'psicologia' => [
+                'slug' => 'psicologia',
+                'imagen_fallback' => 'images/servicio-psicologia.jpeg',
+                'titulo_fallback' => 'Psicología',
+                'subtitulo_fallback' => 'Bienestar socioemocional',
+                'descripcion_fallback' => 'Acompañamiento emocional, familiar y personal para nuestra comunidad.',
+            ],
+        ])->map(function (array $base, string $clave) use (
+            $serviciosDatos,
+            $imagenContenido
+        ) {
+            $datos = $serviciosDatos[$clave] ?? [];
+
+            return [
+                'slug' => $base['slug'],
+                'titulo' => $datos['titulo'] ?? $base['titulo_fallback'],
+                'subtitulo' => $datos['subtitulo'] ?? $base['subtitulo_fallback'],
+                'descripcion' => $datos['descripcion'] ?? $base['descripcion_fallback'],
+                'imagen' => $imagenContenido(
+                    $datos['imagen'] ?? null,
+                    $base['imagen_fallback']
+                ),
+            ];
+        })->values();
+    @endphp
+
     {{-- ========================================================= --}}
     {{-- 1. PORTADA INSTITUCIONAL --}}
     {{-- ========================================================= --}}
@@ -31,18 +112,17 @@
                                 </svg>
                             </span>
 
-                            Portal institucional
+                            {{ $portadaInicio->subtitulo ?? 'Portal institucional' }}
                         </div>
 
                         <h1
                             id="titulo-portada"
                             class="mt-8 font-serif text-5xl font-semibold leading-[0.98] tracking-[-0.04em] text-emerald-950 sm:text-6xl lg:text-7xl xl:text-[92px]">
-                            Institución
-                            <span class="block">Educativa</span>
+                            {{ $portadaInicio->titulo ?? 'Institución Educativa' }}
                         </h1>
 
                         <p class="mt-5 font-serif text-3xl font-medium leading-tight text-amber-700 sm:text-4xl lg:text-5xl">
-                            Crl. José Joaquín Inclán
+                            {{ $portadaDatos['lema'] ?? 'Crl. José Joaquín Inclán' }}
                         </p>
 
                         <div class="mt-10 flex items-center gap-4">
@@ -52,9 +132,8 @@
                         </div>
 
                         <p class="mt-9 max-w-2xl text-lg leading-8 text-slate-600 sm:text-xl sm:leading-9">
-                            Información, comunicación, trámites y servicios digitales
-                            para estudiantes, padres de familia, docentes y toda nuestra
-                            comunidad educativa.
+                            {{ $portadaInicio->contenido
+                                ?? 'Información, comunicación, trámites y servicios digitales para estudiantes, padres de familia, docentes y toda nuestra comunidad educativa.' }}
                         </p>
                     </div>
                 </div>
@@ -62,7 +141,10 @@
                 {{-- Fotografía --}}
                 <div class="relative min-h-[520px] overflow-hidden lg:min-h-[680px]">
                     <img
-                        src="{{ asset('images/portada-institucion.jpg') }}"
+                        src="{{ $imagenContenido(
+                            $portadaInicio?->imagen,
+                            'images/portada-institucion.jpg'
+                        ) }}"
                         alt="Fachada de la IE Crl. José Joaquín Inclán"
                         class="absolute inset-0 h-full w-full object-cover object-center">
 
@@ -75,7 +157,7 @@
             {{-- Franja institucional --}}
             <div class="relative z-40 flex min-h-[86px] items-center justify-center border-t-4 border-amber-400 bg-emerald-950 px-6 text-center">
                 <p class="font-serif text-lg font-semibold uppercase tracking-[0.32em] text-amber-300 sm:text-xl lg:text-2xl">
-                    Dios · Patria · Cultura
+                    {{ $portadaDatos['lema'] ?? 'Dios · Patria · Cultura' }}
                 </p>
             </div>
         </div>
@@ -162,10 +244,6 @@
     {{-- ========================================================= --}}
     {{-- 3. SALUDO DEL DIRECTOR --}}
     {{-- ========================================================= --}}
-    @php
-    $saludoDirector = $informacionInstitucional->get('saludo_director');
-    @endphp
-
     <section id="saludo-director" class="relative overflow-hidden bg-white py-24">
         <div class="pointer-events-none absolute -left-24 bottom-0 h-96 w-96 rounded-full bg-emerald-200/25 blur-3xl"></div>
         <div class="pointer-events-none absolute -right-24 top-0 h-96 w-96 rounded-full bg-amber-200/35 blur-3xl"></div>
@@ -177,14 +255,17 @@
 
                 <div class="relative overflow-hidden rounded-[32px] bg-emerald-950 shadow-2xl">
                     <img
-                        src="{{ asset('images/director.jpeg') }}"
+                        src="{{ $imagenContenido(
+                            $saludoDirector?->imagen,
+                            'images/director.jpeg'
+                        ) }}"
                         alt="Director de la IE Crl. José Joaquín Inclán"
                         class="h-[520px] w-full object-cover object-top"
                         onerror="this.src='{{ asset('images/personal-default.jpg') }}'">
 
                     <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-emerald-950 via-emerald-950/85 to-transparent p-7 pt-24 text-white">
                         <p class="text-xs font-bold uppercase tracking-[0.2em] text-amber-300">
-                            Dirección institucional
+                            {{ $saludoDirector->subtitulo ?? 'Dirección institucional' }}
                         </p>
 
                         <h3 class="mt-2 text-2xl font-extrabold">
@@ -273,7 +354,10 @@
 
                     <div class="relative h-56 overflow-hidden">
                         <img
-                            src="{{ asset('images/mision.png') }}"
+                            src="{{ $imagenContenido(
+                                $misionInfo?->imagen,
+                                'images/mision.png'
+                            ) }}"
                             alt="Misión institucional"
                             class="h-full w-full object-cover transition duration-700 group-hover:scale-105"
                             onerror="this.src='{{ asset('images/portada-institucion.jpg') }}'">
@@ -294,18 +378,17 @@
                             </div>
 
                             <h3 class="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
-                                Misión
+                                {{ $misionInfo->titulo ?? 'Misión' }}
                             </h3>
                         </div>
                     </div>
 
                     <div class="flex flex-1 flex-col p-7">
                         <p class="text-base leading-7 text-gray-600">
-                            Brindar un servicio educativo de calidad mediante procesos
-                            permanentes de mejora continua, aplicando un modelo pedagógico
-                            <strong class="text-emerald-900">
-                                Socio Constructivista Humanista
-                            </strong>.
+                            {!! nl2br(e(
+                                $misionInfo->contenido
+                                    ?? 'Brindar un servicio educativo de calidad mediante procesos permanentes de mejora continua, aplicando un modelo pedagógico Socio Constructivista Humanista.'
+                            )) !!}
                         </p>
 
                         <div class="mt-6 space-y-3">
@@ -341,7 +424,10 @@
 
                     <div class="relative h-56 overflow-hidden">
                         <img
-                            src="{{ asset('images/vision.png') }}"
+                            src="{{ $imagenContenido(
+                                $visionInfo?->imagen,
+                                'images/vision.png'
+                            ) }}"
                             alt="Visión institucional"
                             class="h-full w-full object-cover transition duration-700 group-hover:scale-105"
                             onerror="this.src='{{ asset('images/infraestructura-biblioteca.jpg') }}'">
@@ -362,19 +448,17 @@
                             </div>
 
                             <h3 class="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
-                                Visión
+                                {{ $visionInfo->titulo ?? 'Visión' }}
                             </h3>
                         </div>
                     </div>
 
                     <div class="flex flex-1 flex-col p-7">
                         <p class="text-base leading-7 text-gray-600">
-                            Consolidarnos como una institución educativa de calidad,
-                            moderna, reconocida e integrada al sistema educativo nacional,
-                            alineada con la visión del
-                            <strong class="text-emerald-900">
-                                Sector Defensa
-                            </strong>.
+                            {!! nl2br(e(
+                                $visionInfo->contenido
+                                    ?? 'Consolidarnos como una institución educativa de calidad, moderna, reconocida e integrada al sistema educativo nacional, alineada con la visión del Sector Defensa.'
+                            )) !!}
                         </p>
 
                         <div class="mt-6 space-y-3">
@@ -410,7 +494,10 @@
 
                     <div class="relative h-56 overflow-hidden">
                         <img
-                            src="{{ asset('images/valores.png') }}"
+                            src="{{ $imagenContenido(
+                                $valoresInfo?->imagen,
+                                'images/valores.png'
+                            ) }}"
                             alt="Valores institucionales"
                             class="h-full w-full object-cover transition duration-700 group-hover:scale-105"
                             onerror="this.src='{{ asset('images/servicio-toece.jpg') }}'">
@@ -428,49 +515,38 @@
                             </div>
 
                             <h3 class="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
-                                Valores
+                                {{ $valoresInfo->titulo ?? 'Valores' }}
                             </h3>
                         </div>
                     </div>
 
                     <div class="flex flex-1 flex-col p-7">
                         <p class="text-base leading-7 text-gray-600">
-                            Promovemos valores que fortalecen la convivencia, el servicio
-                            y la excelencia, formando ciudadanos responsables y
-                            comprometidos con su comunidad.
+                            {{ $valoresInfo->contenido
+                                ?? 'Promovemos valores que fortalecen la convivencia, el servicio y la excelencia, formando ciudadanos responsables y comprometidos con su comunidad.' }}
                         </p>
 
                         @php
-                        $valoresInstitucionales = [
-                        [
-                        'nombre' => 'Vocación de servicio',
-                        'icono' => 'corazon',
-                        ],
-                        [
-                        'nombre' => 'Disciplina',
-                        'icono' => 'libro',
-                        ],
-                        [
-                        'nombre' => 'Integridad',
-                        'icono' => 'escudo',
-                        ],
-                        [
-                        'nombre' => 'Compromiso',
-                        'icono' => 'manos',
-                        ],
-                        [
-                        'nombre' => 'Responsabilidad',
-                        'icono' => 'check',
-                        ],
-                        [
-                        'nombre' => 'Excelencia',
-                        'icono' => 'estrella',
-                        ],
-                        ];
+                            $iconosValores = [
+                                'corazon',
+                                'libro',
+                                'escudo',
+                                'manos',
+                                'check',
+                                'estrella',
+                            ];
+
+                            $valoresConIcono = $valoresInstitucionales
+                                ->map(function ($nombre, $indice) use ($iconosValores) {
+                                    return [
+                                        'nombre' => $nombre,
+                                        'icono' => $iconosValores[$indice] ?? 'estrella',
+                                    ];
+                                });
                         @endphp
 
                         <div class="mt-7 grid gap-3">
-                            @foreach ($valoresInstitucionales as $valor)
+                            @foreach ($valoresConIcono as $valor)
                             <div
                                 class="group/valor flex min-h-[58px] w-full min-w-0 items-center
                                        gap-3 rounded-2xl border border-amber-200 bg-white
@@ -587,12 +663,12 @@
                                 </span>
 
                                 <p class="text-xs font-extrabold uppercase tracking-[0.22em] text-amber-300 sm:text-sm">
-                                    Enfoque institucional actual
+                                    {{ $enfoqueInfo->subtitulo ?? 'Enfoque institucional actual' }}
                                 </p>
                             </div>
 
                             <h3 class="mt-6 max-w-2xl text-3xl font-extrabold leading-[1.15] tracking-tight text-white sm:text-4xl">
-                                Innovación, acompañamiento y mejora continua
+                                {{ $enfoqueInfo->titulo ?? 'Innovación, acompañamiento y mejora continua' }}
                             </h3>
 
                             <div class="mt-5 flex items-center gap-3">
@@ -601,10 +677,8 @@
                             </div>
 
                             <p class="mt-7 max-w-3xl text-base leading-8 text-emerald-50 sm:text-lg">
-                                La institución fortalece sus procesos educativos mediante
-                                tecnologías de la información y comunicación, estrategias de
-                                evaluación formativa y acompañamiento docente, con el propósito
-                                de garantizar una educación inclusiva, equitativa y de calidad.
+                                {{ $enfoqueInfo->contenido
+                                    ?? 'La institución fortalece sus procesos educativos mediante tecnologías de la información y comunicación, estrategias de evaluación formativa y acompañamiento docente, con el propósito de garantizar una educación inclusiva, equitativa y de calidad.' }}
                             </p>
 
                             <div class="mt-8 grid gap-3 sm:grid-cols-2">
@@ -656,7 +730,10 @@
                     <div class="relative min-h-[380px] overflow-hidden lg:min-h-full">
 
                         <img
-                            src="{{ asset('images/enfoque-institucional.png') }}"
+                            src="{{ $imagenContenido(
+                                $enfoqueInfo?->imagen,
+                                'images/enfoque-institucional.png'
+                            ) }}"
                             alt="Innovación y acompañamiento educativo"
                             class="absolute inset-0 h-full w-full object-cover"
                             onerror="this.src='{{ asset('images/vision.png') }}'">
@@ -700,11 +777,11 @@
             <div class="mx-auto max-w-3xl text-center">
 
                 <p class="text-sm font-bold uppercase tracking-[0.2em] text-amber-600">
-                    Bienestar estudiantil
+                    {{ $serviciosInfo->subtitulo ?? 'Bienestar estudiantil' }}
                 </p>
 
                 <h2 class="mt-3 text-4xl font-extrabold text-emerald-950 sm:text-5xl">
-                    Servicios complementarios
+                    {{ $serviciosInfo->titulo ?? 'Servicios complementarios' }}
                 </h2>
 
                 <div class="mx-auto mt-5 flex w-fit items-center gap-3">
@@ -713,37 +790,12 @@
                 </div>
 
                 <p class="mt-5 text-lg leading-8 text-gray-600">
-                    Atención, orientación y acompañamiento para el bienestar integral
-                    de nuestros estudiantes.
+                    {{ $serviciosInfo->contenido
+                        ?? 'Atención, orientación y acompañamiento para el bienestar integral de nuestros estudiantes.' }}
                 </p>
             </div>
 
-            {{-- Datos de los servicios --}}
-            @php
-            $serviciosComplementarios = [
-            [
-            'imagen' => 'servicio-topico.jpeg',
-            'titulo' => 'Tópico',
-            'slug' => 'topico',
-            'subtitulo' => 'Salud y primeros auxilios',
-            'descripcion' => 'Atención y cuidado básico de la salud para nuestra comunidad educativa.',
-            ],
-            [
-            'imagen' => 'servicio-toece.jpeg',
-            'titulo' => 'TOECE',
-            'slug' => 'toece',
-            'subtitulo' => 'Tutoría y convivencia escolar',
-            'descripcion' => 'Orientación educativa, convivencia escolar y acompañamiento a estudiantes.',
-            ],
-            [
-            'imagen' => 'servicio-psicologia.jpeg',
-            'titulo' => 'Psicología',
-            'slug' => 'psicologia',
-            'subtitulo' => 'Bienestar socioemocional',
-            'descripcion' => 'Acompañamiento emocional, familiar y personal para nuestra comunidad.',
-            ],
-            ];
-            @endphp
+            {{-- Datos de los servicios cargados desde Contenido institucional --}}
 
             {{-- Tarjetas --}}
             <div class="mt-12 grid gap-7 md:grid-cols-3">
@@ -760,7 +812,7 @@
                     <div class="relative h-72 overflow-hidden bg-gray-100">
 
                         <img
-                            src="{{ asset('images/' . $servicio['imagen']) }}"
+                            src="{{ $servicio['imagen'] }}"
                             alt="Imagen del servicio {{ $servicio['titulo'] }}"
                             class="h-full w-full object-cover object-center
                                    transition duration-700
@@ -1415,11 +1467,11 @@
 
                 <div>
                     <p class="text-sm font-extrabold uppercase tracking-[0.2em] text-amber-600">
-                        Excelencia institucional
+                        {{ $logrosInfo->subtitulo ?? 'Excelencia institucional' }}
                     </p>
 
                     <h2 class="mt-3 text-4xl font-extrabold tracking-tight text-emerald-950 sm:text-5xl">
-                        Logros y reconocimientos
+                        {{ $logrosInfo->titulo ?? 'Logros y reconocimientos' }}
                     </h2>
 
                     <div class="mt-5 flex items-center gap-3">
@@ -1428,8 +1480,8 @@
                     </div>
 
                     <p class="mt-5 max-w-2xl text-lg leading-8 text-gray-600">
-                        Reconocemos el esfuerzo, la dedicación y los resultados alcanzados
-                        por nuestros estudiantes, docentes y la comunidad educativa.
+                        {{ $logrosInfo->contenido
+                            ?? 'Reconocemos el esfuerzo, la dedicación y los resultados alcanzados por nuestros estudiantes, docentes y la comunidad educativa.' }}
                     </p>
                 </div>
 
@@ -1484,22 +1536,27 @@
 
                 $rutaImagenGuardada = $logro->imagen;
 
-                if (
-                $rutaImagenGuardada &&
-                file_exists(public_path($rutaImagenGuardada))
-                ) {
-                $imagenLogro = asset($rutaImagenGuardada);
+                if ($rutaImagenGuardada) {
+                    $imagenLogro = str_starts_with(
+                        $rutaImagenGuardada,
+                        'images/'
+                    )
+                        ? asset($rutaImagenGuardada)
+                        : asset('storage/' . ltrim(
+                            $rutaImagenGuardada,
+                            '/'
+                        ));
                 } elseif (
-                isset($imagenesLogros[$logro->titulo]) &&
-                file_exists(public_path($imagenesLogros[$logro->titulo]))
+                    isset($imagenesLogros[$logro->titulo]) &&
+                    file_exists(public_path($imagenesLogros[$logro->titulo]))
                 ) {
-                $imagenLogro = asset(
-                $imagenesLogros[$logro->titulo]
-                );
+                    $imagenLogro = asset(
+                        $imagenesLogros[$logro->titulo]
+                    );
                 } else {
-                $imagenLogro = asset(
-                'images/logro-default.jpg'
-                );
+                    $imagenLogro = asset(
+                        'images/logro-default.jpg'
+                    );
                 }
 
                 $fechaLogro = $logro->fecha

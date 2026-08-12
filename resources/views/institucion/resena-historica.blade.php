@@ -1,78 +1,14 @@
 <x-public-layout title="Reseña histórica">
 
     @php
-        $hitos = [
-            [
-                'anio' => '1995',
-                'fecha' => '20 de enero',
-                'titulo' => 'Creación oficial',
-                'descripcion' => 'La Institución Educativa “Crl. José Joaquín Inclán” fue creada mediante Resolución Directoral N.° 021, con la finalidad de brindar educación a los hijos del personal militar y civil del Ejército, así como a estudiantes de la comunidad piurana.',
-                'icono' => 'documento',
-            ],
-            [
-                'anio' => '1995',
-                'fecha' => '5 de mayo',
-                'titulo' => 'Inicio de labores académicas',
-                'descripcion' => 'La institución inició sus actividades con 130 estudiantes, siete docentes y bajo la dirección del Crl. José Beltrán Lora. En sus primeros años atendió los niveles de primaria y secundaria en los turnos mañana y tarde.',
-                'icono' => 'estudiantes',
-            ],
-            [
-                'anio' => '1996',
-                'fecha' => null,
-                'titulo' => 'Incorporación del nivel inicial',
-                'descripcion' => 'Se amplió el servicio educativo con la atención del nivel inicial, comenzando con aulas prefabricadas para estudiantes de cuatro y cinco años.',
-                'icono' => 'escuela',
-            ],
-            [
-                'anio' => '1997',
-                'fecha' => null,
-                'titulo' => 'Primeras grandes ampliaciones',
-                'descripcion' => 'Se construyeron cuatro aulas de material noble para inicial, tres aulas para secundaria, una plataforma deportiva y el busto del coronel José Joaquín Inclán.',
-                'icono' => 'construccion',
-            ],
-            [
-                'anio' => '1998',
-                'fecha' => null,
-                'titulo' => 'Secundaria completa',
-                'descripcion' => 'Debido a la creciente demanda se cerró el turno de tarde y se amplió la atención secundaria hasta quinto año. También se construyeron nuevas aulas, una escalera, servicios higiénicos y el laboratorio de Física y Química.',
-                'icono' => 'laboratorio',
-            ],
-            [
-                'anio' => '1999',
-                'fecha' => null,
-                'titulo' => 'Nuevos espacios institucionales',
-                'descripcion' => 'Se construyeron tres aulas en el segundo piso del nivel secundario y oficinas prefabricadas destinadas a las coordinaciones académicas.',
-                'icono' => 'oficinas',
-            ],
-            [
-                'anio' => '2000–2004',
-                'fecha' => null,
-                'titulo' => 'Mejoramiento de los ambientes',
-                'descripcion' => 'Con apoyo de Foncodes se construyeron aulas y servicios higiénicos para primaria. Posteriormente se implementaron techos para los patios de secundaria y primaria, así como el estrado institucional.',
-                'icono' => 'infraestructura',
-            ],
-            [
-                'anio' => '2010–2015',
-                'fecha' => null,
-                'titulo' => 'Modernización integral',
-                'descripcion' => 'Se remodelaron baños, aulas, oficinas y el laboratorio. Además, se construyeron nuevas aulas, canchas sintéticas, almacenes, una cocina para Qali Warma y un aula de innovación tecnológica.',
-                'icono' => 'modernizacion',
-            ],
-            [
-                'anio' => '2013',
-                'fecha' => '21 de noviembre',
-                'titulo' => 'Primera aula Smart School del Perú',
-                'descripcion' => 'Se inauguró un aula inteligente equipada con herramientas tecnológicas interactivas, mediante un convenio con Samsung, empresarios de la educación y el Gobierno Regional de Piura.',
-                'icono' => 'tecnologia',
-            ],
-            [
-                'anio' => 'Actualidad',
-                'fecha' => null,
-                'titulo' => 'Una institución en constante crecimiento',
-                'descripcion' => 'La institución atiende los niveles inicial, primaria y secundaria, cuenta con docentes permanentemente capacitados y continúa fortaleciendo su infraestructura y propuesta educativa.',
-                'icono' => 'actualidad',
-            ],
-        ];
+        $datos = $contenido?->datos ?? [];
+
+        $portada = $datos['portada'] ?? [];
+        $destacados = $datos['destacados'] ?? [];
+        $convenio = $datos['convenio'] ?? [];
+        $timeline = $datos['timeline'] ?? [];
+        $smartSchool = $datos['smart_school'] ?? [];
+        $legado = $datos['legado'] ?? [];
 
         $iconos = [
             'documento' => '
@@ -126,6 +62,17 @@
                 <circle cx="12" cy="12" r="9"/>
                 <path d="m8 12 2.5 2.5L16 9"/>
             ',
+        ];
+
+        $imagenPortada = !empty($portada['imagen'])
+            ? asset('storage/' . $portada['imagen'])
+            : asset('images/resena-historica.png');
+
+        $beneficiosSmart = $smartSchool['beneficios'] ?? [
+            'Capacitación docente',
+            'Tecnología interactiva',
+            'Mejora de los aprendizajes',
+            'Inclusión digital familiar',
         ];
     @endphp
 
@@ -190,14 +137,14 @@
                                 <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
                             </svg>
 
-                            Nuestra trayectoria
+                            {{ $portada['etiqueta'] ?? 'Nuestra trayectoria' }}
                         </div>
 
                         <h1
                             class="mt-6 text-4xl font-extrabold tracking-tight
                                    text-emerald-950 sm:text-5xl lg:text-6xl"
                         >
-                            Reseña histórica
+                            {{ $portada['titulo'] ?? 'Reseña histórica' }}
                         </h1>
 
                         <div class="mt-5 flex items-center gap-3">
@@ -206,12 +153,8 @@
                         </div>
 
                         <p class="mt-7 text-base leading-8 text-gray-700">
-                            La Institución Educativa “Crl. José Joaquín Inclán”
-                            fue creada oficialmente el 20 de enero de 1995,
-                            mediante Resolución Directoral N.° 021, para brindar
-                            educación a los hijos del personal militar y civil
-                            del Ejército, así como a estudiantes de la comunidad
-                            piurana.
+                            {{ $portada['descripcion']
+                                ?? 'La Institución Educativa “Crl. José Joaquín Inclán” fue creada oficialmente el 20 de enero de 1995, mediante Resolución Directoral N.° 021, para brindar educación a los hijos del personal militar y civil del Ejército, así como a estudiantes de la comunidad piurana.' }}
                         </p>
 
                         <div
@@ -240,14 +183,12 @@
 
                                 <div>
                                     <p class="font-extrabold text-emerald-950">
-                                        Origen de nuestra denominación
+                                        {{ $portada['origen_titulo'] ?? 'Origen de nuestra denominación' }}
                                     </p>
 
                                     <p class="mt-2 text-sm leading-7 text-gray-600">
-                                        El nombre de la institución rinde homenaje
-                                        al coronel José Joaquín Inclán, héroe del
-                                        Combate del Dos de Mayo de 1866 y patrono
-                                        del arma de Artillería del Ejército del Perú.
+                                        {{ $portada['origen_descripcion']
+                                            ?? 'El nombre de la institución rinde homenaje al coronel José Joaquín Inclán, héroe del Combate del Dos de Mayo de 1866 y patrono del arma de Artillería del Ejército del Perú.' }}
                                     </p>
                                 </div>
                             </div>
@@ -268,7 +209,7 @@
                                    shadow-[0_25px_70px_rgba(6,78,59,0.18)]"
                         >
                             <img
-                                src="{{ asset('images/resena-historica.png') }}"
+                                src="{{ $imagenPortada }}"
                                 alt="Historia de la IE Crl. José Joaquín Inclán"
                                 class="h-[460px] w-full object-cover
                                        sm:h-[540px]"
@@ -301,7 +242,7 @@
                                     <rect x="3" y="4" width="18" height="17" rx="2"/>
                                 </svg>
 
-                                Desde 1995
+                                {{ $portada['desde'] ?? 'Desde 1995' }}
                             </div>
 
                             <div class="absolute bottom-0 left-0 right-0 p-7 text-white">
@@ -310,11 +251,11 @@
                                     class="text-xs font-extrabold uppercase
                                            tracking-[0.18em] text-amber-300"
                                 >
-                                    IE Crl. José Joaquín Inclán
+                                    {{ $portada['institucion'] ?? 'IE Crl. José Joaquín Inclán' }}
                                 </p>
 
                                 <h2 class="mt-2 text-2xl font-extrabold sm:text-3xl">
-                                    Educación, valores y compromiso
+                                    {{ $portada['frase'] ?? 'Educación, valores y compromiso' }}
                                 </h2>
                             </div>
                         </div>
@@ -345,11 +286,11 @@
                         </div>
 
                         <p class="mt-5 text-3xl font-extrabold text-emerald-950">
-                            1995
+                            {{ $destacados['anio']['valor'] ?? '1995' }}
                         </p>
 
                         <p class="mt-1 text-sm font-semibold text-gray-500">
-                            Año de creación
+                            {{ $destacados['anio']['texto'] ?? 'Año de creación' }}
                         </p>
                     </article>
 
@@ -376,11 +317,11 @@
                         </div>
 
                         <p class="mt-5 text-3xl font-extrabold text-emerald-950">
-                            130
+                            {{ $destacados['estudiantes']['valor'] ?? '130' }}
                         </p>
 
                         <p class="mt-1 text-sm font-semibold text-gray-500">
-                            Estudiantes al iniciar
+                            {{ $destacados['estudiantes']['texto'] ?? 'Estudiantes al iniciar' }}
                         </p>
                     </article>
 
@@ -405,11 +346,11 @@
                         </div>
 
                         <p class="mt-5 text-3xl font-extrabold text-emerald-950">
-                            7
+                            {{ $destacados['docentes']['valor'] ?? '7' }}
                         </p>
 
                         <p class="mt-1 text-sm font-semibold text-gray-500">
-                            Docentes fundadores
+                            {{ $destacados['docentes']['texto'] ?? 'Docentes fundadores' }}
                         </p>
                     </article>
 
@@ -435,11 +376,11 @@
                         </div>
 
                         <p class="mt-5 text-3xl font-extrabold text-emerald-950">
-                            3
+                            {{ $destacados['niveles']['valor'] ?? '3' }}
                         </p>
 
                         <p class="mt-1 text-sm font-semibold text-gray-500">
-                            Niveles educativos
+                            {{ $destacados['niveles']['texto'] ?? 'Niveles educativos' }}
                         </p>
                     </article>
                 </div>
@@ -482,17 +423,16 @@
                             class="mt-7 text-xs font-extrabold uppercase
                                    tracking-[0.18em] text-amber-300"
                         >
-                            1995–1999
+                            {{ $destacados['anio']['valor'] ?? '1995' }}–1999
                         </p>
 
                         <h2 class="mt-3 text-3xl font-extrabold">
-                            Convenio educativo inicial
+                            {{ $convenio['titulo'] ?? 'Convenio educativo inicial' }}
                         </h2>
 
                         <p class="mt-5 leading-8 text-emerald-100">
-                            El inicio de la institución estuvo respaldado por
-                            una alianza entre la Universidad de Piura y la
-                            Primera Región Militar.
+                            {{ $convenio['descripcion']
+                                ?? 'El inicio de la institución estuvo respaldado por una alianza entre la Universidad de Piura y la Primera Región Militar.' }}
                         </p>
                     </div>
 
@@ -522,14 +462,13 @@
                                 </span>
 
                                 <h3 class="text-xl font-extrabold text-emerald-950">
-                                    Universidad de Piura
+                                    {{ $convenio['entidad_1']['nombre'] ?? 'Universidad de Piura' }}
                                 </h3>
                             </div>
 
                             <p class="mt-5 text-sm leading-7 text-gray-600">
-                                Tuvo a su cargo la selección del personal académico,
-                                la elaboración del plan de estudios y la asesoría
-                                permanente en organización, enseñanza y capacitación.
+                                {{ $convenio['entidad_1']['descripcion']
+                                    ?? 'Tuvo a su cargo la selección del personal académico, la elaboración del plan de estudios y la asesoría permanente en organización, enseñanza y capacitación.' }}
                             </p>
                         </article>
 
@@ -557,14 +496,13 @@
                                 </span>
 
                                 <h3 class="text-xl font-extrabold text-emerald-950">
-                                    Primera Región Militar
+                                    {{ $convenio['entidad_2']['nombre'] ?? 'Primera Región Militar' }}
                                 </h3>
                             </div>
 
                             <p class="mt-5 text-sm leading-7 text-gray-600">
-                                Asumió la conducción administrativa, económica
-                                y operativa del colegio, además de proporcionar
-                                infraestructura, equipamiento y material pedagógico.
+                                {{ $convenio['entidad_2']['descripcion']
+                                    ?? 'Asumió la conducción administrativa, económica y operativa del colegio, además de proporcionar infraestructura, equipamiento y material pedagógico.' }}
                             </p>
                         </article>
                     </div>
@@ -601,19 +539,19 @@
                         class="mt-6 text-xs font-extrabold uppercase
                                tracking-[0.18em] text-amber-600"
                     >
-                        Evolución institucional
+                        {{ $timeline['etiqueta'] ?? 'Evolución institucional' }}
                     </p>
 
                     <h2
                         class="mt-3 text-3xl font-extrabold
                                text-emerald-950 sm:text-4xl"
                     >
-                        Una historia de crecimiento permanente
+                        {{ $timeline['titulo'] ?? 'Una historia de crecimiento permanente' }}
                     </h2>
 
                     <p class="mt-5 text-base leading-8 text-gray-600">
-                        Cada etapa representa el esfuerzo por ofrecer mejores
-                        espacios, servicios y oportunidades educativas.
+                        {{ $timeline['descripcion']
+                            ?? 'Cada etapa representa el esfuerzo por ofrecer mejores espacios, servicios y oportunidades educativas.' }}
                     </p>
                 </div>
 
@@ -653,7 +591,7 @@
                                         stroke-linecap="round"
                                         stroke-linejoin="round"
                                     >
-                                        {!! $iconos[$hito['icono']] !!}
+                                        {!! $iconos[$hito->icono] ?? $iconos['documento'] !!}
                                     </svg>
                                 </div>
 
@@ -693,16 +631,16 @@
                                                     <rect x="3" y="4" width="18" height="17" rx="2"/>
                                                 </svg>
 
-                                                {{ $hito['anio'] }}
+                                                {{ $hito->anio }}
                                             </span>
 
-                                            @if ($hito['fecha'])
+                                            @if ($hito->fecha_texto)
                                                 <span
                                                     class="text-xs font-extrabold
                                                            uppercase tracking-[0.12em]
                                                            text-amber-700"
                                                 >
-                                                    {{ $hito['fecha'] }}
+                                                    {{ $hito->fecha_texto }}
                                                 </span>
                                             @endif
                                         </div>
@@ -711,12 +649,25 @@
                                             class="mt-5 text-xl font-extrabold
                                                    text-emerald-950 sm:text-2xl"
                                         >
-                                            {{ $hito['titulo'] }}
+                                            {{ $hito->titulo }}
                                         </h3>
 
                                         <p class="mt-4 text-sm leading-7 text-gray-600">
-                                            {{ $hito['descripcion'] }}
+                                            {{ $hito->descripcion }}
                                         </p>
+
+                                        @if ($hito->imagen)
+                                            <div
+                                                class="mt-5 overflow-hidden rounded-2xl
+                                                       border border-amber-100 bg-gray-100"
+                                            >
+                                                <img
+                                                    src="{{ asset('storage/' . $hito->imagen) }}"
+                                                    alt="{{ $hito->titulo }}"
+                                                    class="h-56 w-full object-cover sm:h-64"
+                                                >
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             </article>
@@ -756,38 +707,29 @@
                                 <path d="M8 21h8M12 17v4"/>
                             </svg>
 
-                            Innovación educativa
+                            {{ $smartSchool['etiqueta'] ?? 'Innovación educativa' }}
                         </div>
 
                         <h2
                             class="mt-6 text-3xl font-extrabold
                                    sm:text-4xl lg:text-5xl"
                         >
-                            Primera aula Smart School del país
+                            {{ $smartSchool['titulo'] ?? 'Primera aula Smart School del país' }}
                         </h2>
 
                         <p class="mt-6 max-w-3xl leading-8 text-emerald-100">
-                            El 21 de noviembre de 2013 se inauguró un aula
-                            inteligente equipada con herramientas tecnológicas
-                            interactivas para fortalecer el rendimiento y la
-                            experiencia de aprendizaje.
+                            {{ $smartSchool['parrafo_1']
+                                ?? 'El 21 de noviembre de 2013 se inauguró un aula inteligente equipada con herramientas tecnológicas interactivas para fortalecer el rendimiento y la experiencia de aprendizaje.' }}
                         </p>
 
                         <p class="mt-4 max-w-3xl leading-8 text-emerald-100">
-                            El proyecto integró asesoría institucional,
-                            capacitación docente, acompañamiento pedagógico,
-                            mejora de los aprendizajes e inclusión digital
-                            para las familias.
+                            {{ $smartSchool['parrafo_2']
+                                ?? 'El proyecto integró asesoría institucional, capacitación docente, acompañamiento pedagógico, mejora de los aprendizajes e inclusión digital para las familias.' }}
                         </p>
 
                         <div class="mt-8 grid gap-4 sm:grid-cols-2">
 
-                            @foreach ([
-                                'Capacitación docente',
-                                'Tecnología interactiva',
-                                'Mejora de los aprendizajes',
-                                'Inclusión digital familiar',
-                            ] as $beneficio)
+                            @foreach ($beneficiosSmart as $beneficio)
 
                                 <div
                                     class="flex items-center gap-3
@@ -820,9 +762,18 @@
                     </div>
 
                     <div
-                        class="rounded-[32px] border border-amber-300
-                               bg-emerald-900 p-8"
+                        class="overflow-hidden rounded-[32px] border border-amber-300
+                               bg-emerald-900"
                     >
+                        @if (!empty($smartSchool['imagen']))
+                            <img
+                                src="{{ asset('storage/' . $smartSchool['imagen']) }}"
+                                alt="{{ $smartSchool['titulo'] ?? 'Smart School' }}"
+                                class="h-64 w-full object-cover"
+                            >
+                        @endif
+
+                        <div class="p-8">
                         <div
                             class="flex h-20 w-20 items-center
                                    justify-center rounded-[26px]
@@ -846,19 +797,20 @@
                             class="mt-7 text-xs font-extrabold uppercase
                                    tracking-[0.18em] text-amber-300"
                         >
-                            Fecha de inauguración
+                            {{ $smartSchool['fecha_etiqueta'] ?? 'Fecha de inauguración' }}
                         </p>
 
                         <p class="mt-3 text-3xl font-extrabold">
-                            21 de noviembre de 2013
+                            {{ $smartSchool['fecha'] ?? '21 de noviembre de 2013' }}
                         </p>
 
                         <div class="mt-7 h-px bg-emerald-700"></div>
 
                         <p class="mt-7 text-sm leading-7 text-emerald-100">
-                            Iniciativa desarrollada con Samsung, empresarios
-                            de la educación y el Gobierno Regional de Piura.
+                            {{ $smartSchool['participantes']
+                                ?? 'Iniciativa desarrollada con Samsung, empresarios de la educación y el Gobierno Regional de Piura.' }}
                         </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -902,28 +854,24 @@
                                 class="mt-7 text-xs font-extrabold uppercase
                                        tracking-[0.18em] text-amber-600"
                             >
-                                Legado institucional
+                                {{ $legado['etiqueta'] ?? 'Legado institucional' }}
                             </p>
 
                             <h2
                                 class="mt-3 text-3xl font-extrabold
                                        text-emerald-950 sm:text-4xl"
                             >
-                                Una historia construida con esfuerzo y compromiso
+                                {{ $legado['titulo'] ?? 'Una historia construida con esfuerzo y compromiso' }}
                             </h2>
 
                             <p class="mt-5 max-w-4xl leading-8 text-gray-600">
-                                A lo largo de su trayectoria, la institución ha
-                                trabajado de manera permanente para mejorar sus
-                                ambientes, fortalecer la enseñanza y ofrecer
-                                mejores oportunidades de formación.
+                                {{ $legado['parrafo_1']
+                                    ?? 'A lo largo de su trayectoria, la institución ha trabajado de manera permanente para mejorar sus ambientes, fortalecer la enseñanza y ofrecer mejores oportunidades de formación.' }}
                             </p>
 
                             <p class="mt-4 max-w-4xl leading-8 text-gray-600">
-                                La Dirección General continúa promoviendo el
-                                bienestar de los estudiantes mediante talleres,
-                                actividades deportivas, música, innovación
-                                tecnológica y mejoras continuas de la infraestructura.
+                                {{ $legado['parrafo_2']
+                                    ?? 'La Dirección General continúa promoviendo el bienestar de los estudiantes mediante talleres, actividades deportivas, música, innovación tecnológica y mejoras continuas de la infraestructura.' }}
                             </p>
                         </div>
 
@@ -960,11 +908,11 @@
                                            uppercase tracking-[0.18em]
                                            text-amber-300"
                                 >
-                                    Nuestro compromiso
+                                    {{ $legado['compromiso_etiqueta'] ?? 'Nuestro compromiso' }}
                                 </p>
 
                                 <p class="mt-3 text-xl font-extrabold">
-                                    Seguir creciendo al servicio de la educación
+                                    {{ $legado['compromiso'] ?? 'Seguir creciendo al servicio de la educación' }}
                                 </p>
                             </div>
                         </div>

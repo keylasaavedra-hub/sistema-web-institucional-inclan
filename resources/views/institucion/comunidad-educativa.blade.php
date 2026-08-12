@@ -1,7 +1,21 @@
-<x-public-layout title="Comunidad educativa">
+<x-public-layout title="{{ $contenido?->titulo ?: 'Comunidad educativa' }}">
 
     @php
+        $datosContenido = $contenido?->datos ?? [];
+
         $imagenRespaldo = asset('images/comunidad-educativa-default.jpg');
+
+        $imagenUrl = function (?string $ruta) use ($imagenRespaldo): string {
+            if (! $ruta) {
+                return $imagenRespaldo;
+            }
+
+            if (str_starts_with($ruta, 'images/')) {
+                return asset($ruta);
+            }
+
+            return asset('storage/' . ltrim($ruta, '/'));
+        };
     @endphp
 
     <section class="relative overflow-hidden bg-white">
@@ -63,7 +77,7 @@
                             <path d="M10 20v-2a4 4 0 0 1 8 0v2"/>
                         </svg>
 
-                        Nuestra comunidad
+                        {{ $contenido?->subtitulo ?: 'Nuestra comunidad' }}
                     </div>
 
                     <h1
@@ -82,9 +96,7 @@
                         class="mx-auto mt-7 max-w-3xl text-base
                                leading-8 text-gray-600 sm:text-lg"
                     >
-                        Nuestra institución está conformada por equipos
-                        comprometidos con la formación, el bienestar y el
-                        desarrollo integral de nuestros estudiantes.
+                        {{ $contenido?->contenido ?: 'Nuestra institución está conformada por equipos comprometidos con la formación, el bienestar y el desarrollo integral de nuestros estudiantes.' }}
                     </p>
                 </div>
             </div>
@@ -121,20 +133,18 @@
                             class="text-xs font-extrabold uppercase
                                    tracking-[0.18em] text-amber-600"
                         >
-                            Trabajo colaborativo
+                            {{ $datosContenido['trabajo_etiqueta'] ?? 'Trabajo colaborativo' }}
                         </p>
 
                         <h2
                             class="mt-3 text-3xl font-extrabold
                                    text-emerald-950 sm:text-4xl"
                         >
-                            Un equipo comprometido con la educación
+                            {{ $datosContenido['trabajo_titulo'] ?? 'Un equipo comprometido con la educación' }}
                         </h2>
 
                         <p class="mt-5 max-w-4xl text-base leading-8 text-gray-600">
-                            Directivos, docentes, especialistas y personal de
-                            apoyo trabajan de manera coordinada para brindar un
-                            servicio educativo organizado, humano y de calidad.
+                            {{ $datosContenido['trabajo_descripcion'] ?? 'Directivos, docentes, especialistas y personal de apoyo trabajan de manera coordinada para brindar un servicio educativo organizado, humano y de calidad.' }}
                         </p>
                     </div>
                 </div>
@@ -183,8 +193,8 @@
                             <div class="relative h-72 overflow-hidden bg-emerald-950">
 
                                 <img
-                                    src="{{ asset($grupo['imagen']) }}"
-                                    alt="{{ $grupo['titulo'] }}"
+                                    src="{{ $imagenUrl($grupo->imagen) }}"
+                                    alt="{{ $grupo->titulo }}"
                                     class="h-full w-full object-cover
                                            transition duration-500
                                            group-hover:scale-105"
@@ -205,7 +215,7 @@
                                            bg-emerald-950/90 text-amber-300
                                            backdrop-blur"
                                 >
-                                    @switch($grupo['icono'])
+                                    @switch($grupo->icono)
 
                                         @case('directivos')
                                             <svg class="h-6 w-6" viewBox="0 0 24 24"
@@ -327,7 +337,7 @@
                                         class="text-xl font-extrabold
                                                text-emerald-950"
                                     >
-                                        {{ $grupo['titulo'] }}
+                                        {{ $grupo->titulo }}
                                     </h3>
 
                                     <span
@@ -339,7 +349,7 @@
                                 </div>
 
                                 <p class="mt-4 text-sm leading-7 text-gray-600">
-                                    {{ $grupo['descripcion'] }}
+                                    {{ $grupo->descripcion }}
                                 </p>
                             </div>
                         </article>
@@ -368,23 +378,21 @@
                                 class="text-xs font-extrabold uppercase
                                        tracking-[0.18em] text-amber-300"
                             >
-                                Compromiso compartido
+                                {{ $datosContenido['cierre_etiqueta'] ?? 'Compromiso compartido' }}
                             </p>
 
                             <h2
                                 class="mt-3 text-3xl font-extrabold
                                        sm:text-4xl"
                             >
-                                Unidos por una educación de calidad
+                                {{ $datosContenido['cierre_titulo'] ?? 'Unidos por una educación de calidad' }}
                             </h2>
 
                             <p
                                 class="mt-5 max-w-4xl text-base
                                        leading-8 text-emerald-100"
                             >
-                                Nuestra comunidad educativa trabaja con
-                                responsabilidad, vocación de servicio y
-                                compromiso institucional.
+                                {{ $datosContenido['cierre_descripcion'] ?? 'Nuestra comunidad educativa trabaja con responsabilidad, vocación de servicio y compromiso institucional.' }}
                             </p>
                         </div>
 

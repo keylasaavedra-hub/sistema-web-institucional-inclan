@@ -103,9 +103,18 @@
                             ? \Illuminate\Support\Carbon::parse($convenio->fecha_fin)
                             : null;
 
-                        $logoConvenio = !empty($convenio->logo)
-                            ? asset(ltrim($convenio->logo, '/'))
-                            : null;
+                        $imagenConvenio = null;
+
+                        if (!empty($convenio->imagen)) {
+                            $rutaImagen = ltrim($convenio->imagen, '/');
+
+                            $imagenConvenio = str_starts_with(
+                                $rutaImagen,
+                                'images/'
+                            )
+                                ? asset($rutaImagen)
+                                : asset('storage/' . $rutaImagen);
+                        }
                     @endphp
 
                     <article
@@ -120,22 +129,25 @@
                                    overflow-hidden bg-emerald-950 p-8"
                         >
                             <div
-                                class="absolute -right-10 -top-10 h-32 w-32
+                                class="absolute -right-10 -top-10 z-10 h-32 w-32
                                        rounded-full bg-amber-300/10"
                             ></div>
 
-                            @if ($logoConvenio)
+                            @if ($imagenConvenio)
                                 <img
-                                    src="{{ $logoConvenio }}"
+                                    src="{{ $imagenConvenio }}"
                                     alt="{{ $convenio->nombre }}"
-                                    class="relative max-h-28 max-w-[220px] object-contain"
-                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                                    class="absolute inset-0 h-full w-full object-cover"
+                                    onerror="
+                                        this.style.display='none';
+                                        this.nextElementSibling.style.display='flex';
+                                    "
                                 >
                             @endif
 
                             <div
-                                class="{{ $logoConvenio ? 'hidden' : 'flex' }}
-                                       relative h-20 w-20 items-center justify-center
+                                class="{{ $imagenConvenio ? 'hidden' : 'flex' }}
+                                       relative z-10 h-20 w-20 items-center justify-center
                                        rounded-3xl border border-amber-300
                                        bg-emerald-900 text-amber-300"
                             >

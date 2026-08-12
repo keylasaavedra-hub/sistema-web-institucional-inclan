@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\InformacionInstitucional;
 use Illuminate\View\View;
 
 class ServicioComplementarioController extends Controller
 {
     public function mostrar(string $servicio): View
     {
-        $servicios = [
+        $serviciosBase = [
             'topico' => [
                 'titulo' => 'Tópico',
                 'subtitulo' => 'Salud y primeros auxilios',
@@ -70,10 +71,92 @@ class ServicioComplementarioController extends Controller
             ],
         ];
 
-        abort_unless(isset($servicios[$servicio]), 404);
+        abort_unless(isset($serviciosBase[$servicio]), 404);
 
-        return view('servicios.mostrar', [
-            'servicio' => $servicios[$servicio],
-        ]);
+        $contenidoServicios = InformacionInstitucional::query()
+            ->where('tipo', 'servicios_inicio')
+            ->where('estado', true)
+            ->first();
+
+        $datosServicios = $contenidoServicios?->datos ?? [];
+        $datosEditados = $datosServicios[$servicio] ?? [];
+
+        $base = $serviciosBase[$servicio];
+
+        $imagenPortada = $this->normalizarRutaPublica(
+            $datosEditados['imagen'] ?? null,
+            $base['imagen_portada']
+        );
+
+        $galeriaEditada = collect(
+            $datosEditados['galeria'] ?? []
+        )
+            ->filter()
+            ->map(
+                fn (string $ruta) => $this->normalizarRutaPublica(
+                    $ruta,
+                    $ruta
+                )
+            )
+            ->values()
+            ->all();
+
+        $servicioFinal = [
+            'titulo' =>
+                $datosEditados['titulo']
+                ?? $base['titulo'],
+
+            'subtitulo' =>
+                $datosEditados['subtitulo']
+                ?? $base['subtitulo'],
+
+            'descripcion' =>
+                $datosEditados['descripcion']
+                ?? $base['descripcion'],
+
+            'imagen_portada' =>
+                $imagenPortada,
+
+            'horario' =>
+                $datosEditados['horario']
+                ?? $base['horario'],
+
+            'funciones' =>
+                !empty($datosEditados['funciones'])
+                    ? array_values($datosEditados['funciones'])
+                    : $base['funciones'],
+
+            'galeria' =>
+                !empty($galeriaEditada)
+                    ? $galeriaEditada
+                    : $base['galeria'],
+        ];
+
+        return view(
+            'servicios.mostrar',
+            [
+                'servicio' => $servicioFinal,
+            ]
+        );
+    }
+
+    private function normalizarRutaPublica(
+        ?string $ruta,
+        string $fallback
+    ): string {
+        if (!$ruta) {
+            return $fallback;
+        }
+
+        $ruta = ltrim($ruta, '/');
+
+        if (
+            str_starts_with($ruta, 'images/')
+            || str_starts_with($ruta, 'storage/')
+        ) {
+            return $ruta;
+        }
+
+        return 'storage/' . $ruta;
     }
 }

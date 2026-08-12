@@ -14,6 +14,8 @@ use App\Http\Controllers\Admin\RolController;
 use App\Http\Controllers\Admin\TramiteController as AdminTramiteController;
 use App\Http\Controllers\Admin\UsuarioController;
 use App\Http\Controllers\Admin\VideoController as AdminVideoController;
+use App\Http\Controllers\Admin\AuditoriaController;
+
 use App\Http\Controllers\BusquedaController;
 use App\Http\Controllers\CalendarioController;
 use App\Http\Controllers\ConsultaController;
@@ -30,8 +32,8 @@ use App\Http\Controllers\PromocionController;
 use App\Http\Controllers\PublicacionController;
 use App\Http\Controllers\ServicioComplementarioController;
 use App\Http\Controllers\VideoController;
+
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\AuditoriaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -66,6 +68,7 @@ Route::get('/publicaciones/{slug}', [PublicacionController::class, 'show'])
 Route::prefix('institucion')
     ->name('institucion.')
     ->group(function () {
+
         Route::get(
             '/resena-historica',
             [InstitucionController::class, 'resenaHistorica']
@@ -108,12 +111,7 @@ Route::prefix('institucion')
             '/convenios/{convenio}',
             [InstitucionController::class, 'mostrarConvenio']
         )
-            ->whereIn('convenio', [
-                'crecer',
-                'alianza-francesa',
-                'utp',
-                'essalud',
-            ])
+            ->where('convenio', '[A-Za-z0-9-]+')
             ->name('convenios.mostrar');
 
         Route::get(
@@ -327,6 +325,7 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 */
 
 Route::middleware('auth')->group(function () {
+
     /*
     |--------------------------------------------------------------------------
     | USUARIOS
@@ -337,6 +336,7 @@ Route::middleware('auth')->group(function () {
         ->name('admin.usuarios.')
         ->controller(UsuarioController::class)
         ->group(function () {
+
             Route::get('/', 'index')
                 ->middleware('permiso:usuarios.ver')
                 ->name('index');
@@ -381,9 +381,15 @@ Route::middleware('auth')->group(function () {
         ->controller(RolController::class)
         ->middleware('permiso:seguridad.administrar')
         ->group(function () {
-            Route::get('/', 'index')->name('index');
-            Route::get('/crear', 'crear')->name('crear');
-            Route::post('/', 'guardar')->name('guardar');
+
+            Route::get('/', 'index')
+                ->name('index');
+
+            Route::get('/crear', 'crear')
+                ->name('crear');
+
+            Route::post('/', 'guardar')
+                ->name('guardar');
 
             Route::get('/{rol}/editar', 'editar')
                 ->whereNumber('rol')
@@ -413,15 +419,27 @@ Route::middleware('auth')->group(function () {
         ->controller(AdminGaleriaController::class)
         ->middleware('permiso:galerias.gestionar')
         ->group(function () {
-            Route::get('/', 'index')->name('index');
-            Route::get('/crear', 'crear')->name('crear');
-            Route::post('/', 'guardar')->name('guardar');
 
-            Route::patch('/archivos/{archivo}/estado', 'cambiarEstadoArchivo')
+            Route::get('/', 'index')
+                ->name('index');
+
+            Route::get('/crear', 'crear')
+                ->name('crear');
+
+            Route::post('/', 'guardar')
+                ->name('guardar');
+
+            Route::patch(
+                '/archivos/{archivo}/estado',
+                'cambiarEstadoArchivo'
+            )
                 ->whereNumber('archivo')
                 ->name('archivos.estado');
 
-            Route::delete('/archivos/{archivo}', 'eliminarArchivo')
+            Route::delete(
+                '/archivos/{archivo}',
+                'eliminarArchivo'
+            )
                 ->whereNumber('archivo')
                 ->name('archivos.eliminar');
 
@@ -449,8 +467,12 @@ Route::middleware('auth')->group(function () {
         ->controller(CategoriaPublicacionController::class)
         ->middleware('permiso:publicaciones.gestionar')
         ->group(function () {
-            Route::get('/', 'index')->name('index');
-            Route::post('/', 'guardar')->name('guardar');
+
+            Route::get('/', 'index')
+                ->name('index');
+
+            Route::post('/', 'guardar')
+                ->name('guardar');
 
             Route::put('/{categoria}', 'actualizar')
                 ->whereNumber('categoria')
@@ -466,16 +488,17 @@ Route::middleware('auth')->group(function () {
         });
 
     /*
-|--------------------------------------------------------------------------
-| PUBLICACIONES
-|--------------------------------------------------------------------------
-*/
+    |--------------------------------------------------------------------------
+    | PUBLICACIONES
+    |--------------------------------------------------------------------------
+    */
 
     Route::prefix('admin/publicaciones')
         ->name('admin.publicaciones.')
         ->controller(AdminPublicacionController::class)
         ->middleware('permiso:publicaciones.gestionar')
         ->group(function () {
+
             Route::get('/', 'index')
                 ->name('index');
 
@@ -509,11 +532,20 @@ Route::middleware('auth')->group(function () {
         ->controller(AdminDocumentoController::class)
         ->middleware('permiso:documentos.gestionar')
         ->group(function () {
-            Route::get('/', 'index')->name('index');
-            Route::get('/crear', 'crear')->name('crear');
-            Route::post('/', 'guardar')->name('guardar');
 
-            Route::get('/versiones/{version}/descargar', 'descargarVersion')
+            Route::get('/', 'index')
+                ->name('index');
+
+            Route::get('/crear', 'crear')
+                ->name('crear');
+
+            Route::post('/', 'guardar')
+                ->name('guardar');
+
+            Route::get(
+                '/versiones/{version}/descargar',
+                'descargarVersion'
+            )
                 ->whereNumber('version')
                 ->name('versiones.descargar');
 
@@ -525,11 +557,17 @@ Route::middleware('auth')->group(function () {
                 ->whereNumber('documento')
                 ->name('actualizar');
 
-            Route::post('/{documento}/versiones', 'nuevaVersion')
+            Route::post(
+                '/{documento}/versiones',
+                'nuevaVersion'
+            )
                 ->whereNumber('documento')
                 ->name('versiones.guardar');
 
-            Route::get('/{documento}/descargar', 'descargarActual')
+            Route::get(
+                '/{documento}/descargar',
+                'descargarActual'
+            )
                 ->whereNumber('documento')
                 ->name('descargar');
 
@@ -549,15 +587,27 @@ Route::middleware('auth')->group(function () {
         ->controller(AdminPromocionController::class)
         ->middleware('permiso:promociones.gestionar')
         ->group(function () {
-            Route::get('/', 'index')->name('index');
-            Route::get('/crear', 'crear')->name('crear');
-            Route::post('/', 'guardar')->name('guardar');
 
-            Route::patch('/imagenes/{imagen}/estado', 'cambiarEstadoImagen')
+            Route::get('/', 'index')
+                ->name('index');
+
+            Route::get('/crear', 'crear')
+                ->name('crear');
+
+            Route::post('/', 'guardar')
+                ->name('guardar');
+
+            Route::patch(
+                '/imagenes/{imagen}/estado',
+                'cambiarEstadoImagen'
+            )
                 ->whereNumber('imagen')
                 ->name('imagenes.estado');
 
-            Route::delete('/imagenes/{imagen}', 'eliminarImagen')
+            Route::delete(
+                '/imagenes/{imagen}',
+                'eliminarImagen'
+            )
                 ->whereNumber('imagen')
                 ->name('imagenes.eliminar');
 
@@ -585,9 +635,15 @@ Route::middleware('auth')->group(function () {
         ->controller(AdminVideoController::class)
         ->middleware('permiso:galerias.gestionar')
         ->group(function () {
-            Route::get('/', 'index')->name('index');
-            Route::get('/crear', 'crear')->name('crear');
-            Route::post('/', 'guardar')->name('guardar');
+
+            Route::get('/', 'index')
+                ->name('index');
+
+            Route::get('/crear', 'crear')
+                ->name('crear');
+
+            Route::post('/', 'guardar')
+                ->name('guardar');
 
             Route::get('/{video}/editar', 'editar')
                 ->whereNumber('video')
@@ -613,9 +669,15 @@ Route::middleware('auth')->group(function () {
         ->controller(AdminConvocatoriaController::class)
         ->middleware('permiso:convocatorias.gestionar')
         ->group(function () {
-            Route::get('/', 'index')->name('index');
-            Route::get('/crear', 'create')->name('create');
-            Route::post('/', 'store')->name('store');
+
+            Route::get('/', 'index')
+                ->name('index');
+
+            Route::get('/crear', 'create')
+                ->name('create');
+
+            Route::post('/', 'store')
+                ->name('store');
 
             Route::get('/{convocatoria}/editar', 'edit')
                 ->whereNumber('convocatoria')
@@ -628,6 +690,7 @@ Route::middleware('auth')->group(function () {
             Route::delete('/{convocatoria}', 'destroy')
                 ->whereNumber('convocatoria')
                 ->name('destroy');
+
             Route::patch(
                 '/{convocatoria}/publicar-resultados',
                 'publicarResultados'
@@ -654,7 +717,9 @@ Route::middleware('auth')->group(function () {
         ->controller(AdminPostulacionController::class)
         ->middleware('permiso:postulaciones.revisar')
         ->group(function () {
-            Route::get('/', 'index')->name('index');
+
+            Route::get('/', 'index')
+                ->name('index');
 
             Route::get('/{postulacion}', 'mostrar')
                 ->whereNumber('postulacion')
@@ -676,9 +741,15 @@ Route::middleware('auth')->group(function () {
         ->controller(AdminEventoController::class)
         ->middleware('permiso:publicaciones.gestionar')
         ->group(function () {
-            Route::get('/', 'index')->name('index');
-            Route::get('/crear', 'create')->name('create');
-            Route::post('/', 'store')->name('store');
+
+            Route::get('/', 'index')
+                ->name('index');
+
+            Route::get('/crear', 'create')
+                ->name('create');
+
+            Route::post('/', 'store')
+                ->name('store');
 
             Route::get('/{evento}/editar', 'edit')
                 ->whereNumber('evento')
@@ -703,6 +774,7 @@ Route::middleware('auth')->group(function () {
         ->name('admin.tramites.')
         ->controller(AdminTramiteController::class)
         ->group(function () {
+
             Route::get('/', 'index')
                 ->middleware('permiso:solicitudes.ver')
                 ->name('index');
@@ -733,6 +805,7 @@ Route::middleware('auth')->group(function () {
         ->name('admin.consultas.')
         ->controller(AdminConsultaController::class)
         ->group(function () {
+
             Route::get('/', 'index')
                 ->middleware('permiso:consultas.ver')
                 ->name('index');
@@ -747,17 +820,19 @@ Route::middleware('auth')->group(function () {
                 ->middleware('permiso:consultas.atender')
                 ->name('actualizar');
         });
+
     /*
-|--------------------------------------------------------------------------
-| AUDITORÍA
-|--------------------------------------------------------------------------
-*/
+    |--------------------------------------------------------------------------
+    | AUDITORÍA
+    |--------------------------------------------------------------------------
+    */
 
     Route::prefix('admin/auditorias')
         ->name('admin.auditorias.')
         ->controller(AuditoriaController::class)
         ->middleware('permiso:auditoria.ver')
         ->group(function () {
+
             Route::get('/', 'index')
                 ->name('index');
 
@@ -766,59 +841,391 @@ Route::middleware('auth')->group(function () {
                 ->name('mostrar');
         });
 
+    /*
+    |--------------------------------------------------------------------------
+    | CONTENIDO INSTITUCIONAL
+    |--------------------------------------------------------------------------
+    */
 
-/*
-|--------------------------------------------------------------------------
-| CONTENIDO INSTITUCIONAL
-|--------------------------------------------------------------------------
-*/
+    Route::prefix('admin/contenido-institucional')
+        ->name('admin.contenido-institucional.')
+        ->controller(ContenidoInstitucionalController::class)
+        ->middleware('permiso:publicaciones.gestionar')
+        ->group(function () {
 
-Route::prefix('admin/contenido-institucional')
-    ->name('admin.contenido-institucional.')
-    ->controller(ContenidoInstitucionalController::class)
-    ->middleware('permiso:publicaciones.gestionar')
-    ->group(function () {
+            /*
+            |--------------------------------------------------------------------------
+            | PÁGINA DE INICIO
+            |--------------------------------------------------------------------------
+            */
 
-        /*
-        |--------------------------------------------------------------------------
-        | PÁGINA DE INICIO
-        |--------------------------------------------------------------------------
-        */
+            Route::get('/inicio', 'inicio')
+                ->name('inicio');
 
-        Route::get('/inicio', 'inicio')
-            ->name('inicio');
+            Route::put('/inicio', 'actualizarInicio')
+                ->name('inicio.actualizar');
 
-        Route::put('/inicio', 'actualizarInicio')
-            ->name('inicio.actualizar');
+            /*
+            |--------------------------------------------------------------------------
+            | LOGROS Y RECONOCIMIENTOS
+            |--------------------------------------------------------------------------
+            */
 
+            Route::post('/logros', 'guardarLogro')
+                ->name('logros.guardar');
 
-        /*
-        |--------------------------------------------------------------------------
-        | LOGROS Y RECONOCIMIENTOS
-        |--------------------------------------------------------------------------
-        */
+            Route::put('/logros/{id}', 'actualizarLogro')
+                ->whereNumber('id')
+                ->name('logros.actualizar');
 
-        Route::post('/logros', 'guardarLogro')
-            ->name('logros.guardar');
+            Route::patch(
+                '/logros/{id}/estado',
+                'cambiarEstadoLogro'
+            )
+                ->whereNumber('id')
+                ->name('logros.estado');
 
-        Route::put('/logros/{id}', 'actualizarLogro')
-            ->name('logros.actualizar');
+            /*
+            |--------------------------------------------------------------------------
+            | INSTITUCIÓN - RESEÑA HISTÓRICA
+            |--------------------------------------------------------------------------
+            */
 
-        Route::patch('/logros/{id}/estado', 'cambiarEstadoLogro')
-            ->name('logros.estado');
-    });
-    
+            Route::get(
+                '/institucion/resena-historica',
+                'resenaHistorica'
+            )->name('institucion.resena');
+
+            Route::put(
+                '/institucion/resena-historica',
+                'actualizarResenaHistorica'
+            )->name('institucion.resena.actualizar');
+
+            /*
+            |--------------------------------------------------------------------------
+            | HITOS HISTÓRICOS
+            |--------------------------------------------------------------------------
+            */
+
+            Route::post(
+                '/institucion/resena-historica/hitos',
+                'guardarHitoHistorico'
+            )->name('institucion.resena.hitos.guardar');
+
+            Route::put(
+                '/institucion/resena-historica/hitos/{id}',
+                'actualizarHitoHistorico'
+            )
+                ->whereNumber('id')
+                ->name('institucion.resena.hitos.actualizar');
+
+            Route::patch(
+                '/institucion/resena-historica/hitos/{id}/estado',
+                'cambiarEstadoHitoHistorico'
+            )
+                ->whereNumber('id')
+                ->name('institucion.resena.hitos.estado');
+
+            /*
+            |--------------------------------------------------------------------------
+            | INSTITUCIÓN - MISIÓN, VISIÓN Y VALORES
+            |--------------------------------------------------------------------------
+            */
+
+            Route::get(
+                '/institucion/mision-vision-valores',
+                'misionVisionValores'
+            )->name('institucion.mision-vision-valores');
+
+            Route::put(
+                '/institucion/mision-vision-valores',
+                'actualizarMisionVisionValores'
+            )->name('institucion.mision-vision-valores.actualizar');
+
+            /*
+            |--------------------------------------------------------------------------
+            | INSTITUCIÓN - INFRAESTRUCTURA
+            |--------------------------------------------------------------------------
+            */
+
+            Route::get(
+                '/institucion/infraestructura',
+                'infraestructura'
+            )->name('institucion.infraestructura');
+
+            Route::put(
+                '/institucion/infraestructura',
+                'actualizarInfraestructura'
+            )->name('institucion.infraestructura.actualizar');
+
+            /*
+            |--------------------------------------------------------------------------
+            | AMBIENTES DE INFRAESTRUCTURA
+            |--------------------------------------------------------------------------
+            */
+
+            Route::put(
+                '/institucion/infraestructura/ambientes/{ambiente}',
+                'actualizarAmbienteInfraestructura'
+            )
+                ->whereNumber('ambiente')
+                ->name(
+                    'institucion.infraestructura.ambientes.actualizar'
+                );
+
+            Route::patch(
+                '/institucion/infraestructura/ambientes/{ambiente}/estado',
+                'cambiarEstadoInfraestructura'
+            )
+                ->whereNumber('ambiente')
+                ->name(
+                    'institucion.infraestructura.ambientes.estado'
+                );
+
+            /*
+            |--------------------------------------------------------------------------
+            | GALERÍA DE AMBIENTES
+            |--------------------------------------------------------------------------
+            */
+
+            Route::post(
+                '/institucion/infraestructura/ambientes/{ambiente}/imagenes',
+                'agregarImagenInfraestructura'
+            )
+                ->whereNumber('ambiente')
+                ->name(
+                    'institucion.infraestructura.ambientes.imagenes.guardar'
+                );
+
+            Route::delete(
+                '/institucion/infraestructura/imagenes/{imagen}',
+                'eliminarImagenInfraestructura'
+            )
+                ->whereNumber('imagen')
+                ->name(
+                    'institucion.infraestructura.imagenes.eliminar'
+                );
+
+            /*
+            |--------------------------------------------------------------------------
+            | INSTITUCIÓN - CONVENIOS
+            |--------------------------------------------------------------------------
+            */
+
+            Route::get(
+                '/institucion/convenios',
+                'convenios'
+            )->name('institucion.convenios');
+
+            Route::post(
+                '/institucion/convenios',
+                'guardarConvenio'
+            )->name('institucion.convenios.guardar');
+
+            Route::put(
+                '/institucion/convenios/{convenio}',
+                'actualizarConvenio'
+            )
+                ->whereNumber('convenio')
+                ->name('institucion.convenios.actualizar');
+
+            Route::patch(
+                '/institucion/convenios/{convenio}/estado',
+                'cambiarEstadoConvenio'
+            )
+                ->whereNumber('convenio')
+                ->name('institucion.convenios.estado');
+
+            Route::post(
+                '/institucion/convenios/{convenio}/imagenes',
+                'agregarImagenesConvenio'
+            )
+                ->whereNumber('convenio')
+                ->name('institucion.convenios.imagenes.guardar');
+
+            Route::delete(
+                '/institucion/convenios/imagenes/{imagen}',
+                'eliminarImagenConvenio'
+            )
+                ->whereNumber('imagen')
+                ->name('institucion.convenios.imagenes.eliminar');
+
+            Route::delete(
+                '/institucion/convenios/{convenio}',
+                'eliminarConvenio'
+            )
+                ->whereNumber('convenio')
+                ->name('institucion.convenios.eliminar');
+
+            /*
+            |--------------------------------------------------------------------------
+            | INSTITUCIÓN - COMUNIDAD EDUCATIVA
+            |--------------------------------------------------------------------------
+            */
+
+            Route::get(
+                '/institucion/comunidad-educativa',
+                'comunidadEducativa'
+            )->name('institucion.comunidad-educativa');
+
+            Route::put(
+                '/institucion/comunidad-educativa',
+                'actualizarComunidadEducativa'
+            )->name(
+                'institucion.comunidad-educativa.actualizar'
+            );
+
+            Route::post(
+                '/institucion/comunidad-educativa/grupos',
+                'guardarGrupoComunidadEducativa'
+            )->name(
+                'institucion.comunidad-educativa.grupos.guardar'
+            );
+
+            Route::put(
+                '/institucion/comunidad-educativa/grupos/{grupo}',
+                'actualizarGrupoComunidadEducativa'
+            )
+                ->whereNumber('grupo')
+                ->name(
+                    'institucion.comunidad-educativa.grupos.actualizar'
+                );
+
+            Route::patch(
+                '/institucion/comunidad-educativa/grupos/{grupo}/estado',
+                'cambiarEstadoGrupoComunidadEducativa'
+            )
+                ->whereNumber('grupo')
+                ->name(
+                    'institucion.comunidad-educativa.grupos.estado'
+                );
+
+            Route::delete(
+                '/institucion/comunidad-educativa/grupos/{grupo}',
+                'eliminarGrupoComunidadEducativa'
+            )
+                ->whereNumber('grupo')
+                ->name(
+                    'institucion.comunidad-educativa.grupos.eliminar'
+                );
+
+            /*
+            |--------------------------------------------------------------------------
+            | INSTITUCIÓN - NUESTRA FORMA DE ENSEÑAR
+            |--------------------------------------------------------------------------
+            */
+
+            Route::get(
+                '/institucion/nuestra-forma-de-ensenar',
+                'nuestraFormaEnsenar'
+            )->name(
+                'institucion.nuestra-forma-de-ensenar'
+            );
+
+            Route::put(
+                '/institucion/nuestra-forma-de-ensenar',
+                'actualizarNuestraFormaEnsenar'
+            )->name(
+                'institucion.nuestra-forma-de-ensenar.actualizar'
+            );
+
+            /*
+            |--------------------------------------------------------------------------
+            | PRINCIPIOS PEDAGÓGICOS
+            |--------------------------------------------------------------------------
+            */
+
+            Route::post(
+                '/institucion/nuestra-forma-de-ensenar/principios',
+                'guardarPrincipioFormaEnsenar'
+            )->name(
+                'institucion.nuestra-forma-de-ensenar.principios.guardar'
+            );
+
+            Route::put(
+                '/institucion/nuestra-forma-de-ensenar/principios/{principio}',
+                'actualizarPrincipioFormaEnsenar'
+            )
+                ->whereNumber('principio')
+                ->name(
+                    'institucion.nuestra-forma-de-ensenar.principios.actualizar'
+                );
+
+            Route::patch(
+                '/institucion/nuestra-forma-de-ensenar/principios/{principio}/estado',
+                'cambiarEstadoPrincipioFormaEnsenar'
+            )
+                ->whereNumber('principio')
+                ->name(
+                    'institucion.nuestra-forma-de-ensenar.principios.estado'
+                );
+
+            Route::delete(
+                '/institucion/nuestra-forma-de-ensenar/principios/{principio}',
+                'eliminarPrincipioFormaEnsenar'
+            )
+                ->whereNumber('principio')
+                ->name(
+                    'institucion.nuestra-forma-de-ensenar.principios.eliminar'
+                );
+
+            /*
+            |--------------------------------------------------------------------------
+            | ETAPAS DEL PROCESO DE APRENDIZAJE
+            |--------------------------------------------------------------------------
+            */
+
+            Route::post(
+                '/institucion/nuestra-forma-de-ensenar/etapas',
+                'guardarEtapaFormaEnsenar'
+            )->name(
+                'institucion.nuestra-forma-de-ensenar.etapas.guardar'
+            );
+
+            Route::put(
+                '/institucion/nuestra-forma-de-ensenar/etapas/{etapa}',
+                'actualizarEtapaFormaEnsenar'
+            )
+                ->whereNumber('etapa')
+                ->name(
+                    'institucion.nuestra-forma-de-ensenar.etapas.actualizar'
+                );
+
+            Route::patch(
+                '/institucion/nuestra-forma-de-ensenar/etapas/{etapa}/estado',
+                'cambiarEstadoEtapaFormaEnsenar'
+            )
+                ->whereNumber('etapa')
+                ->name(
+                    'institucion.nuestra-forma-de-ensenar.etapas.estado'
+                );
+
+            Route::delete(
+                '/institucion/nuestra-forma-de-ensenar/etapas/{etapa}',
+                'eliminarEtapaFormaEnsenar'
+            )
+                ->whereNumber('etapa')
+                ->name(
+                    'institucion.nuestra-forma-de-ensenar.etapas.eliminar'
+                );
+
+        });
+
     /*
     |--------------------------------------------------------------------------
     | PERFIL
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/profile', [ProfileController::class, 'edit'])
-        ->name('profile.edit');
+    Route::get(
+        '/profile',
+        [ProfileController::class, 'edit']
+    )->name('profile.edit');
 
-    Route::patch('/profile', [ProfileController::class, 'update'])
-        ->name('profile.update');
+    Route::patch(
+        '/profile',
+        [ProfileController::class, 'update']
+    )->name('profile.update');
 });
 
 /*

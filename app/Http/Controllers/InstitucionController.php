@@ -2,6 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\InformacionInstitucional;
+use App\Models\InfraestructuraAmbiente;
+use App\Models\Convenio;
+use App\Models\ComunidadEducativaGrupo;
+use App\Models\FormaEnsenarPrincipio;
+use App\Models\FormaEnsenarEtapa;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
@@ -9,24 +15,35 @@ class InstitucionController extends Controller
 {
     public function resenaHistorica(): View
     {
-        $contenido = DB::table('informacion_institucional')
+        $contenido = InformacionInstitucional::query()
             ->where('tipo', 'resena_historica')
             ->where('estado', true)
             ->first();
 
+        $hitos = DB::table('hitos_historicos')
+            ->where('estado', true)
+            ->orderBy('orden')
+            ->orderBy('id')
+            ->get();
+
         return view(
             'institucion.resena-historica',
-            compact('contenido')
+            compact(
+                'contenido',
+                'hitos'
+            )
         );
     }
 
     public function misionVisionValores(): View
     {
-        $informacion = DB::table('informacion_institucional')
+        $informacion = InformacionInstitucional::query()
             ->whereIn('tipo', [
+                'identidad_institucional',
                 'mision',
                 'vision',
                 'valores',
+                'enfoque_inicio',
             ])
             ->where('estado', true)
             ->get()
@@ -46,28 +63,64 @@ class InstitucionController extends Controller
 
     public function infraestructura(): View
     {
-        $ambientes = collect(
-            $this->ambientesInfraestructura()
-        );
+        $contenido = InformacionInstitucional::query()
+            ->where('tipo', 'infraestructura')
+            ->where('estado', true)
+            ->first();
+
+        $ambientes = InfraestructuraAmbiente::query()
+            ->where('estado', true)
+            ->orderBy('orden')
+            ->orderBy('id')
+            ->get()
+            ->map(function ($ambiente) {
+                return [
+                    'id' => $ambiente->id,
+                    'slug' => $ambiente->slug,
+                    'titulo' => $ambiente->titulo,
+                    'descripcion' => $ambiente->descripcion,
+                    'imagen' => $ambiente->imagen,
+                    'icono' => $ambiente->icono,
+                    'orden' => $ambiente->orden,
+                ];
+            });
 
         return view(
             'institucion.infraestructura',
-            compact('ambientes')
+            compact(
+                'contenido',
+                'ambientes'
+            )
         );
     }
 
     public function mostrarInfraestructura(string $ambiente): View
     {
-        $ambientes = collect(
-            $this->ambientesInfraestructura()
-        );
+        $registro = InfraestructuraAmbiente::query()
+            ->with([
+                'imagenes' => function ($query) {
+                    $query
+                        ->where('estado', true)
+                        ->orderBy('orden')
+                        ->orderBy('id');
+                },
+            ])
+            ->where('slug', $ambiente)
+            ->where('estado', true)
+            ->firstOrFail();
 
-        $detalle = $ambientes->firstWhere(
-            'slug',
-            $ambiente
-        );
-
-        abort_if(!$detalle, 404);
+        $detalle = [
+            'id' => $registro->id,
+            'slug' => $registro->slug,
+            'titulo' => $registro->titulo,
+            'descripcion' => $registro->descripcion,
+            'imagen' => $registro->imagen,
+            'icono' => $registro->icono,
+            'galeria' => $registro->imagenes
+                ->pluck('imagen')
+                ->values()
+                ->all(),
+        ];
 
         return view(
             'institucion.infraestructura-detalle',
@@ -220,34 +273,11 @@ class InstitucionController extends Controller
 
     public function convenios(): View
     {
-        $convenios = collect(
-            $this->conveniosInstitucionales()
-        )->map(function (array $convenio) {
-            return (object) [
-                'id' => $convenio['slug'],
-                'slug' => $convenio['slug'],
-
-                'nombre' => $convenio['nombre'],
-                'titulo' => $convenio['nombre'],
-                'institucion' => $convenio['nombre'],
-                'nombre_institucion' => $convenio['nombre'],
-
-                'tipo' => $convenio['tipo'],
-                'descripcion' => $convenio['descripcion'],
-                'estado' => $convenio['estado'],
-
-                'fecha' => $convenio['fecha'],
-                'fecha_inicio' => $convenio['fecha'] . '-01-01',
-                'fecha_fin' => null,
-
-                'imagen' => $convenio['imagen'],
-                'logo' => $convenio['imagen'],
-
-                'objetivos' => $convenio['objetivos'],
-                'beneficios' => $convenio['beneficios'],
-                'galeria' => $convenio['galeria'],
-            ];
-        });
+        $convenios = Convenio::query()
+            ->where('estado', true)
+            ->orderBy('orden')
+            ->orderBy('id')
+            ->get();
 
         return view(
             'institucion.convenios',
@@ -257,124 +287,55 @@ class InstitucionController extends Controller
 
     public function mostrarConvenio(string $convenio): View
     {
-        $convenios = collect(
-            $this->conveniosInstitucionales()
-        );
+        $registro = Convenio::query()
+            ->with([
+                'archivos' => function ($query) {
+                    $query
+                        ->where('estado', true)
+                        ->orderBy('orden')
+                        ->orderBy('id');
+                },
+            ])
+            ->where('slug', $convenio)
+            ->where('estado', true)
+            ->firstOrFail();
 
-        $detalle = $convenios->firstWhere(
-            'slug',
-            $convenio
-        );
-
-        abort_if(!$detalle, 404);
+        $detalle = [
+            'id' => $registro->id,
+            'slug' => $registro->slug,
+            'nombre' => $registro->nombre,
+            'titulo' => $registro->nombre,
+            'institucion' => $registro->institucion
+                ?: $registro->nombre,
+            'nombre_institucion' => $registro->institucion
+                ?: $registro->nombre,
+            'tipo' => $registro->tipo,
+            'descripcion' => $registro->descripcion,
+            'estado' => $registro->estado_texto
+                ?: 'Vigente',
+            'fecha' => $registro->fecha_inicio
+                ? $registro->fecha_inicio->format('Y')
+                : null,
+            'fecha_inicio' => $registro->fecha_inicio
+                ? $registro->fecha_inicio->format('Y-m-d')
+                : null,
+            'fecha_fin' => $registro->fecha_fin
+                ? $registro->fecha_fin->format('Y-m-d')
+                : null,
+            'imagen' => $registro->imagen,
+            'logo' => $registro->imagen,
+            'objetivos' => $registro->objetivos ?? [],
+            'beneficios' => $registro->beneficios ?? [],
+            'galeria' => $registro->archivos
+                ->pluck('archivo')
+                ->values()
+                ->all(),
+        ];
 
         return view(
             'institucion.convenio-detalle',
             compact('detalle')
         );
-    }
-
-    private function conveniosInstitucionales(): array
-    {
-        return [
-            [
-                'slug' => 'crecer',
-                'nombre' => 'Centro de Psicoterapia Integral CRECER',
-                'tipo' => 'Convenio de alianza estratégica',
-                'descripcion' => 'Alianza orientada al fortalecimiento de la salud mental, el acompañamiento psicológico y el bienestar de la comunidad educativa.',
-                'imagen' => 'images/convenios/crecer.jpg',
-                'estado' => 'Vigente',
-                'fecha' => '2026',
-                'objetivos' => [
-                    'Promover acciones de prevención y cuidado de la salud mental.',
-                    'Desarrollar talleres dirigidos a estudiantes, docentes y familias.',
-                    'Brindar orientación y acompañamiento psicológico especializado.',
-                    'Fortalecer las capacidades socioemocionales de la comunidad educativa.',
-                ],
-                'beneficios' => [
-                    'Atención y orientación psicológica.',
-                    'Capacitaciones en salud mental.',
-                    'Talleres preventivos y formativos.',
-                    'Acompañamiento a estudiantes y familias.',
-                ],
-                'galeria' => [
-                    'images/convenios/crecer/documento-1.jpg',
-                ],
-            ],
-            [
-                'slug' => 'alianza-francesa',
-                'nombre' => 'Alianza Francesa de Piura',
-                'tipo' => 'Convenio de cooperación interinstitucional',
-                'descripcion' => 'Cooperación educativa y cultural para promover el aprendizaje del idioma francés y acercar a la comunidad educativa a la cultura francófona.',
-                'imagen' => 'images/convenios/alianza-francesa.jpg',
-                'estado' => 'Vigente',
-                'fecha' => '2026',
-                'objetivos' => [
-                    'Promover la enseñanza y difusión del idioma francés.',
-                    'Impulsar actividades académicas y culturales conjuntas.',
-                    'Generar oportunidades educativas para estudiantes y docentes.',
-                    'Fortalecer la cooperación entre ambas instituciones.',
-                ],
-                'beneficios' => [
-                    'Acceso a formación en idioma francés.',
-                    'Actividades culturales y académicas.',
-                    'Beneficios para estudiantes, docentes y familiares.',
-                    'Participación en programas de cooperación educativa.',
-                ],
-                'galeria' => [
-                    'images/convenios/alianza-francesa/documento-1.jpg',
-                    'images/convenios/alianza-francesa/documento-2.jpg',
-                ],
-            ],
-            [
-                'slug' => 'utp',
-                'nombre' => 'Universidad Tecnológica del Perú',
-                'tipo' => 'Carta de intención de voluntariado',
-                'descripcion' => 'Alianza orientada al desarrollo de actividades de voluntariado y prácticas formativas con estudiantes universitarios de Psicología.',
-                'imagen' => 'images/convenios/utp.jpg',
-                'estado' => 'Vigente',
-                'fecha' => '2026',
-                'objetivos' => [
-                    'Facilitar espacios de voluntariado para estudiantes universitarios.',
-                    'Apoyar actividades de acompañamiento psicológico y educativo.',
-                    'Fortalecer la formación profesional mediante experiencias reales.',
-                    'Promover la colaboración entre la universidad y la institución educativa.',
-                ],
-                'beneficios' => [
-                    'Participación de estudiantes de Psicología.',
-                    'Actividades de voluntariado.',
-                    'Acompañamiento profesional supervisado.',
-                    'Coordinación académica interinstitucional.',
-                ],
-                'galeria' => [
-                    'images/convenios/utp/documento-1.jpg',
-                ],
-            ],
-            [
-                'slug' => 'essalud',
-                'nombre' => 'EsSalud',
-                'tipo' => 'Alianza de intervención preventiva',
-                'descripcion' => 'Alianza destinada a fortalecer la prevención de enfermedades y la promoción de hábitos saludables entre los trabajadores de la institución.',
-                'imagen' => 'images/convenios/essalud.jpg',
-                'estado' => 'Vigente',
-                'fecha' => '2026',
-                'objetivos' => [
-                    'Promover la prevención y el cuidado integral de la salud.',
-                    'Realizar evaluaciones preventivas a los trabajadores.',
-                    'Fomentar hábitos saludables en el entorno laboral.',
-                    'Facilitar orientación médica y seguimiento oportuno.',
-                ],
-                'beneficios' => [
-                    'Evaluaciones integrales de salud.',
-                    'Prevención de enfermedades.',
-                    'Promoción de hábitos saludables.',
-                    'Atención presencial y mediante telesalud.',
-                ],
-                'galeria' => [
-                    'images/convenios/essalud/documento-1.jpg',
-                ],
-            ],
-        ];
     }
 
     /*
@@ -385,74 +346,26 @@ class InstitucionController extends Controller
 
     public function comunidadEducativa(): View
     {
-        $grupos = collect([
-            [
-                'titulo' => 'Equipo directivo',
-                'descripcion' => 'Responsable de conducir, organizar y fortalecer la gestión institucional y educativa.',
-                'imagen' => 'images/comunidad-educativa/directivos.jpg',
-                'icono' => 'directivos',
-            ],
-            [
-                'titulo' => 'Docentes de nivel inicial',
-                'descripcion' => 'Acompañan los primeros aprendizajes y el desarrollo integral de nuestros estudiantes.',
-                'imagen' => 'images/comunidad-educativa/docentes-inicial.jpg',
-                'icono' => 'inicial',
-            ],
-            [
-                'titulo' => 'Docentes de nivel primario',
-                'descripcion' => 'Promueven aprendizajes fundamentales, valores y competencias para la vida.',
-                'imagen' => 'images/comunidad-educativa/docentes-primaria.jpg',
-                'icono' => 'primaria',
-            ],
-            [
-                'titulo' => 'Docentes de nivel secundario',
-                'descripcion' => 'Fortalecen la formación académica, ciudadana y personal de los estudiantes.',
-                'imagen' => 'images/comunidad-educativa/docentes-secundaria.jpg',
-                'icono' => 'secundaria',
-            ],
-            [
-                'titulo' => 'Personal administrativo',
-                'descripcion' => 'Apoya la gestión documental, organizativa y operativa de la institución.',
-                'imagen' => 'images/comunidad-educativa/administrativos.jpg',
-                'icono' => 'administrativos',
-            ],
-            [
-                'titulo' => 'Área de Psicología',
-                'descripcion' => 'Brinda orientación, acompañamiento emocional y apoyo a la comunidad educativa.',
-                'imagen' => 'images/comunidad-educativa/psicologia.jpg',
-                'icono' => 'psicologia',
-            ],
-            [
-                'titulo' => 'TOESE',
-                'descripcion' => 'Fortalece la tutoría, la convivencia escolar y el bienestar de los estudiantes.',
-                'imagen' => 'images/comunidad-educativa/toese.jpg',
-                'icono' => 'toese',
-            ],
-            [
-                'titulo' => 'Coordinadores',
-                'descripcion' => 'Articulan, supervisan y acompañan el desarrollo de los procesos educativos.',
-                'imagen' => 'images/comunidad-educativa/coordinadores.jpg',
-                'icono' => 'coordinadores',
-            ],
-            [
-                'titulo' => 'Personal técnico',
-                'descripcion' => 'Brinda soporte especializado para el funcionamiento de los servicios institucionales.',
-                'imagen' => 'images/comunidad-educativa/tecnicos.jpg',
-                'icono' => 'tecnicos',
-            ],
-            [
-                'titulo' => 'Suboficial',
-                'descripcion' => 'Contribuye al orden, la disciplina y el cumplimiento de las disposiciones institucionales.',
-                'imagen' => 'images/comunidad-educativa/suboficial.jpg',
-                'icono' => 'suboficial',
-            ],
-        ]);
+        $contenido = InformacionInstitucional::query()
+            ->where('tipo', 'comunidad_educativa')
+            ->where('estado', true)
+            ->first();
+
+        $grupos = ComunidadEducativaGrupo::query()
+            ->where('estado', true)
+            ->orderBy('orden')
+            ->orderBy('id')
+            ->get();
 
         return view(
             'institucion.comunidad-educativa',
-            compact('grupos')
+            compact(
+                'contenido',
+                'grupos'
+            )
         );
     }
+
     /*
     |--------------------------------------------------------------------------
     | NUESTRA FORMA DE ENSEÑAR
@@ -461,8 +374,30 @@ class InstitucionController extends Controller
 
     public function nuestraFormaDeEnsenar(): View
     {
+        $contenido = InformacionInstitucional::query()
+            ->where('tipo', 'forma_ensenar')
+            ->where('estado', true)
+            ->first();
+
+        $principios = FormaEnsenarPrincipio::query()
+            ->where('estado', true)
+            ->orderBy('orden')
+            ->orderBy('id')
+            ->get();
+
+        $etapas = FormaEnsenarEtapa::query()
+            ->where('estado', true)
+            ->orderBy('orden')
+            ->orderBy('id')
+            ->get();
+
         return view(
-            'institucion.nuestra-forma-de-ensenar'
+            'institucion.nuestra-forma-de-ensenar',
+            compact(
+                'contenido',
+                'principios',
+                'etapas'
+            )
         );
     }
 

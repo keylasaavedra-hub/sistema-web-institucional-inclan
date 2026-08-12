@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\InformacionInstitucional;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
@@ -77,7 +78,7 @@ class HomeController extends Controller
         $configuracion = DB::table('configuracion_sitio')
             ->first();
 
-        $informacionInstitucional = DB::table('informacion_institucional')
+        $informacionInstitucional = InformacionInstitucional::query()
             ->where('estado', true)
             ->orderBy('orden')
             ->get()

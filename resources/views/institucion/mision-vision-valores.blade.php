@@ -1,75 +1,103 @@
 <x-public-layout title="Misión, visión y valores">
 
     @php
-        /*
-        |--------------------------------------------------------------------------
-        | CONTENIDO DESDE LA BASE DE DATOS
-        |--------------------------------------------------------------------------
-        */
+        $identidad = $informacion->get('identidad_institucional');
+        $misionInfo = $informacion->get('mision');
+        $visionInfo = $informacion->get('vision');
+        $valoresInfo = $informacion->get('valores');
+        $enfoqueInfo = $informacion->get('enfoque_inicio');
 
-        $misionRegistrada = $informacion->get('mision')->contenido ?? null;
-        $visionRegistrada = $informacion->get('vision')->contenido ?? null;
-        $valoresRegistrados = $informacion->get('valores')->contenido ?? null;
-
-        /*
-        |--------------------------------------------------------------------------
-        | CONTENIDO DE RESPALDO
-        |--------------------------------------------------------------------------
-        */
-
-        $misionTexto = $misionRegistrada
+        $misionTexto = $misionInfo?->contenido
             ?: 'Brindar un servicio educativo de calidad mediante procesos permanentes de mejora continua, aplicando un modelo pedagógico Socio Constructivista Humanista, que favorezca el aprendizaje significativo, la formación integral y el desarrollo de ciudadanos responsables.';
 
-        $visionTexto = $visionRegistrada
+        $visionTexto = $visionInfo?->contenido
             ?: 'Consolidarnos como una institución educativa de calidad, moderna, reconocida e integrada al sistema educativo nacional, alineada con la visión del Sector Defensa y comprometida con la formación ética, cívica y patriótica.';
 
-        $valoresInstitucionales = [
-            [
-                'nombre' => 'Vocación de servicio',
-                'descripcion' => 'Atendemos las necesidades de nuestra comunidad educativa con disposición, empatía y compromiso.',
-                'icono' => 'corazon',
-            ],
-            [
-                'nombre' => 'Disciplina',
-                'descripcion' => 'Actuamos con orden, constancia y respeto por las normas que orientan nuestra convivencia.',
-                'icono' => 'libro',
-            ],
-            [
-                'nombre' => 'Integridad',
-                'descripcion' => 'Procedemos con honestidad, coherencia y transparencia en todas nuestras acciones.',
-                'icono' => 'escudo',
-            ],
-            [
-                'nombre' => 'Compromiso',
-                'descripcion' => 'Participamos activamente en la formación y el bienestar de nuestros estudiantes.',
-                'icono' => 'manos',
-            ],
-            [
-                'nombre' => 'Responsabilidad',
-                'descripcion' => 'Cumplimos nuestros deberes con puntualidad, dedicación y sentido institucional.',
-                'icono' => 'check',
-            ],
-            [
-                'nombre' => 'Excelencia',
-                'descripcion' => 'Buscamos mejorar continuamente nuestros procesos educativos y resultados.',
-                'icono' => 'estrella',
-            ],
-        ];
-
-        $pilaresMision = [
+        $pilaresMision = $misionInfo?->datos['pilares'] ?? [
             'Aprendizaje significativo y pensamiento crítico.',
             'Formación integral, humana e inclusiva.',
             'Uso responsable de la tecnología educativa.',
             'Mejora continua de los procesos pedagógicos.',
         ];
 
-        $pilaresVision = [
+        $pilaresVision = $visionInfo?->datos['pilares'] ?? [
             'Educación moderna y de calidad.',
             'Reconocimiento e integración nacional.',
             'Formación ética, cívica y patriótica.',
             'Comunidad preparada para nuevos desafíos.',
         ];
+
+        $valoresInstitucionales = $valoresInfo?->datos['items'] ?? [
+            [
+                'nombre' => 'Vocación de servicio',
+                'descripcion' => 'Atendemos las necesidades de nuestra comunidad educativa con disposición, empatía y compromiso.',
+            ],
+            [
+                'nombre' => 'Disciplina',
+                'descripcion' => 'Actuamos con orden, constancia y respeto por las normas que orientan nuestra convivencia.',
+            ],
+            [
+                'nombre' => 'Integridad',
+                'descripcion' => 'Procedemos con honestidad, coherencia y transparencia en todas nuestras acciones.',
+            ],
+            [
+                'nombre' => 'Compromiso',
+                'descripcion' => 'Participamos activamente en la formación y el bienestar de nuestros estudiantes.',
+            ],
+            [
+                'nombre' => 'Responsabilidad',
+                'descripcion' => 'Cumplimos nuestros deberes con puntualidad, dedicación y sentido institucional.',
+            ],
+            [
+                'nombre' => 'Excelencia',
+                'descripcion' => 'Buscamos mejorar continuamente nuestros procesos educativos y resultados.',
+            ],
+        ];
+
+        $enfoques = $enfoqueInfo?->datos['items'] ?? [
+            [
+                'titulo' => 'Tecnologías educativas',
+                'texto' => 'Recursos digitales para fortalecer los aprendizajes.',
+            ],
+            [
+                'titulo' => 'Evaluación formativa',
+                'texto' => 'Seguimiento y retroalimentación permanente.',
+            ],
+            [
+                'titulo' => 'Acompañamiento docente',
+                'texto' => 'Mejora continua de la práctica pedagógica.',
+            ],
+            [
+                'titulo' => 'Educación inclusiva',
+                'texto' => 'Atención equitativa y formación integral.',
+            ],
+        ];
+
+        $imagenContenido = function (?string $ruta, string $fallback): string {
+            if (!$ruta) {
+                return asset($fallback);
+            }
+
+            if (
+                str_starts_with($ruta, 'images/')
+                || str_starts_with($ruta, '/images/')
+            ) {
+                return asset(ltrim($ruta, '/'));
+            }
+
+            return asset('storage/' . ltrim($ruta, '/'));
+        };
+
+        $iconosValores = [
+            'corazon',
+            'libro',
+            'escudo',
+            'manos',
+            'check',
+            'estrella',
+        ];
     @endphp
+
 
     <section class="relative overflow-hidden bg-white">
 
@@ -130,7 +158,7 @@
                             <path d="m8 12 2.5 2.5L16 9"/>
                         </svg>
 
-                        Nuestra identidad institucional
+                        {{ $identidad?->subtitulo ?? 'Nuestra identidad institucional' }}
                     </div>
 
                     <h1
@@ -149,9 +177,9 @@
                         class="mx-auto mt-7 max-w-3xl text-base
                                leading-8 text-gray-600 sm:text-lg"
                     >
-                        Los principios que orientan nuestra labor educativa,
-                        fortalecen nuestra identidad y guían la formación
-                        integral de los estudiantes.
+                        {{ $identidad?->contenido
+                            ?? 'Los principios que orientan nuestra labor educativa, fortalecen nuestra identidad y guían la formación integral de los estudiantes.'
+                        }}
                     </p>
                 </div>
 
@@ -183,11 +211,11 @@
                                    shadow-[0_24px_65px_rgba(6,78,59,0.16)]"
                         >
                             <img
-                                src="{{ asset('images/mision.png') }}"
+                                src="{{ $imagenContenido($misionInfo?->imagen, 'images/mision.png') }}"
                                 alt="Misión institucional"
                                 class="h-[460px] w-full object-cover
                                        sm:h-[520px]"
-                                onerror="this.onerror=null; this.src='{{ asset('images/portada-institucion.jpg') }}';"
+                                onerror="this.onerror=null; this.src='/images/portada-institucion.jpg';"
                             >
 
                             <div
@@ -243,14 +271,14 @@
                             class="text-xs font-extrabold uppercase
                                    tracking-[0.2em] text-amber-600"
                         >
-                            Lo que hacemos
+                            {{ $misionInfo?->subtitulo ?? 'Lo que hacemos' }}
                         </p>
 
                         <h2
                             class="mt-3 text-3xl font-extrabold
                                    text-emerald-950 sm:text-4xl"
                         >
-                            Formamos estudiantes de manera integral
+                            {{ $misionInfo?->titulo ?? 'Formamos estudiantes de manera integral' }}
                         </h2>
 
                         <div class="mt-5 flex items-center gap-3">
@@ -324,14 +352,14 @@
                             class="text-xs font-extrabold uppercase
                                    tracking-[0.2em] text-amber-600"
                         >
-                            Hacia dónde avanzamos
+                            {{ $visionInfo?->subtitulo ?? 'Hacia dónde avanzamos' }}
                         </p>
 
                         <h2
                             class="mt-3 text-3xl font-extrabold
                                    text-emerald-950 sm:text-4xl"
                         >
-                            Una institución moderna y reconocida
+                            {{ $visionInfo?->titulo ?? 'Una institución moderna y reconocida' }}
                         </h2>
 
                         <div class="mt-5 flex items-center gap-3">
@@ -398,11 +426,11 @@
                                    shadow-[0_24px_65px_rgba(6,78,59,0.16)]"
                         >
                             <img
-                                src="{{ asset('images/vision.png') }}"
+                                src="{{ $imagenContenido($visionInfo?->imagen, 'images/vision.png') }}"
                                 alt="Visión institucional"
                                 class="h-[460px] w-full object-cover
                                        sm:h-[520px]"
-                                onerror="this.onerror=null; this.src='{{ asset('images/infraestructura-biblioteca.jpg') }}';"
+                                onerror="this.onerror=null; this.src='/images/infraestructura-biblioteca.jpg';"
                             >
 
                             <div
@@ -479,10 +507,10 @@
                                    shadow-[0_24px_65px_rgba(6,78,59,0.16)]"
                         >
                             <img
-                                src="{{ asset('images/valores.png') }}"
+                                src="{{ $imagenContenido($valoresInfo?->imagen, 'images/valores.png') }}"
                                 alt="Valores institucionales"
                                 class="h-[520px] w-full object-cover"
-                                onerror="this.onerror=null; this.src='{{ asset('images/servicio-toece.jpg') }}';"
+                                onerror="this.onerror=null; this.src='/images/servicio-toece.jpg';"
                             >
 
                             <div
@@ -535,24 +563,24 @@
                             class="text-xs font-extrabold uppercase
                                    tracking-[0.2em] text-amber-600"
                         >
-                            Nuestra forma de actuar
+                            {{ $valoresInfo?->subtitulo ?? 'Nuestra forma de actuar' }}
                         </p>
 
                         <h2
                             class="mt-3 text-3xl font-extrabold
                                    text-emerald-950 sm:text-4xl"
                         >
-                            Principios que fortalecen nuestra comunidad
+                            {{ $valoresInfo?->titulo ?? 'Principios que fortalecen nuestra comunidad' }}
                         </h2>
 
                         <p class="mt-5 text-base leading-8 text-gray-600">
-                            {{ $valoresRegistrados
+                            {{ $valoresInfo?->contenido
                                 ?: 'Promovemos valores que fortalecen la convivencia, el servicio y la excelencia, formando ciudadanos responsables y comprometidos con su comunidad.' }}
                         </p>
 
                         <div class="mt-9 grid gap-5 sm:grid-cols-2">
 
-                            @foreach ($valoresInstitucionales as $valor)
+                            @foreach ($valoresInstitucionales as $indiceValor => $valor)
 
                                 <article
                                     class="group rounded-[26px]
@@ -569,7 +597,7 @@
                                                    rounded-2xl bg-emerald-950
                                                    text-amber-300"
                                         >
-                                            @switch($valor['icono'])
+                                            @switch($valor['icono'] ?? ($iconosValores[$indiceValor] ?? 'estrella'))
 
                                                 @case('corazon')
                                                     <svg
@@ -725,7 +753,7 @@
                                         class="text-xs font-extrabold uppercase
                                                tracking-[0.2em] text-amber-300"
                                     >
-                                        Enfoque institucional
+                                        {{ $enfoqueInfo?->subtitulo ?? 'Enfoque institucional' }}
                                     </p>
                                 </div>
 
@@ -734,40 +762,21 @@
                                            font-extrabold leading-tight
                                            text-white sm:text-4xl"
                                 >
-                                    Innovación, acompañamiento y mejora continua
+                                    {{ $enfoqueInfo?->titulo ?? 'Innovación, acompañamiento y mejora continua' }}
                                 </h2>
 
                                 <p
                                     class="mt-6 max-w-3xl text-base
                                            leading-8 text-emerald-100"
                                 >
-                                    Fortalecemos nuestros procesos educativos
-                                    mediante tecnologías de la información,
-                                    evaluación formativa y acompañamiento docente,
-                                    con el propósito de brindar una educación
-                                    inclusiva, equitativa y de calidad.
+                                    {{ $enfoqueInfo?->contenido
+                                        ?? 'Fortalecemos nuestros procesos educativos mediante tecnologías de la información, evaluación formativa y acompañamiento docente, con el propósito de brindar una educación inclusiva, equitativa y de calidad.'
+                                    }}
                                 </p>
 
                                 <div class="mt-8 grid gap-4 sm:grid-cols-2">
 
-                                    @foreach ([
-                                        [
-                                            'titulo' => 'Tecnologías educativas',
-                                            'texto' => 'Recursos digitales para fortalecer los aprendizajes.',
-                                        ],
-                                        [
-                                            'titulo' => 'Evaluación formativa',
-                                            'texto' => 'Seguimiento y retroalimentación permanente.',
-                                        ],
-                                        [
-                                            'titulo' => 'Acompañamiento docente',
-                                            'texto' => 'Mejora continua de la práctica pedagógica.',
-                                        ],
-                                        [
-                                            'titulo' => 'Educación inclusiva',
-                                            'texto' => 'Atención equitativa y formación integral.',
-                                        ],
-                                    ] as $enfoque)
+                                    @foreach ($enfoques as $enfoque)
 
                                         <article
                                             class="rounded-2xl border
@@ -820,10 +829,10 @@
                                    lg:min-h-full lg:border-l lg:border-t-0"
                         >
                             <img
-                                src="{{ asset('images/enfoque-institucional.png') }}"
+                                src="{{ $imagenContenido($enfoqueInfo?->imagen, 'images/enfoque-institucional.png') }}"
                                 alt="Innovación y acompañamiento educativo"
                                 class="absolute inset-0 h-full w-full object-cover"
-                                onerror="this.onerror=null; this.src='{{ asset('images/vision.png') }}';"
+                                onerror="this.onerror=null; this.src='/images/vision.png';"
                             >
 
                             <div
@@ -843,11 +852,11 @@
                                     class="text-xs font-extrabold uppercase
                                            tracking-[0.16em] text-amber-300"
                                 >
-                                    Compromiso educativo
+                                    {{ $enfoqueInfo?->datos['compromiso_etiqueta'] ?? 'Compromiso educativo' }}
                                 </p>
 
                                 <p class="mt-1 font-extrabold">
-                                    Aprender · Innovar · Mejorar
+                                    {{ $enfoqueInfo?->datos['compromiso'] ?? 'Aprender · Innovar · Mejorar' }}
                                 </p>
                             </div>
                         </div>

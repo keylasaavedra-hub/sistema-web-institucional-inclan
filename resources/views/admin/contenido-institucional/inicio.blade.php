@@ -106,25 +106,63 @@
                 </div>
             </div>
 
-            {{-- MENSAJE DE ÉXITO --}}
+            {{-- NOTIFICACIÓN DE ÉXITO --}}
             @if (session('success'))
             <div
-                class="mt-6 flex items-start gap-3 rounded-2xl
-                           border border-emerald-200 bg-emerald-50
-                           p-5 text-emerald-800">
-                <svg
-                    class="mt-0.5 h-5 w-5 shrink-0"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2">
-                    <circle cx="12" cy="12" r="9" />
-                    <path d="m8 12 2.5 2.5L16 9" />
-                </svg>
+                x-data="{ visible: true }"
+                x-show="visible"
+                x-init="setTimeout(() => visible = false, 4000)"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-[-10px]"
+                x-transition:enter-end="opacity-100 translate-y-0"
+                x-transition:leave="transition ease-in duration-300"
+                x-transition:leave-start="opacity-100 translate-y-0"
+                x-transition:leave-end="opacity-0 translate-y-[-10px]"
+                class="fixed right-6 top-6 z-[9999] w-[calc(100%-3rem)] max-w-md">
+                <div
+                    class="flex items-start gap-4 rounded-2xl
+               border border-emerald-200 bg-white
+               p-5 shadow-[0_20px_60px_rgba(15,23,42,0.20)]">
+                    <div
+                        class="flex h-10 w-10 shrink-0 items-center
+                   justify-center rounded-xl
+                   bg-emerald-100 text-emerald-700">
+                        <svg
+                            class="h-5 w-5"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="12" cy="12" r="9" />
+                            <path d="m8 12 2.5 2.5L16 9" />
+                        </svg>
+                    </div>
 
-                <p class="text-sm font-bold">
-                    {{ session('success') }}
-                </p>
+                    <div class="min-w-0 flex-1">
+                        <p class="font-extrabold text-emerald-950">
+                            Cambios guardados
+                        </p>
+
+                        <p class="mt-1 text-sm leading-5 text-gray-600">
+                            {{ session('success') }}
+                        </p>
+                    </div>
+
+                    <button
+                        type="button"
+                        @click="visible = false"
+                        class="text-gray-400 transition hover:text-gray-700"
+                        aria-label="Cerrar notificación">
+                        <svg
+                            class="h-5 w-5"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M6 6l12 12M18 6 6 18" />
+                        </svg>
+                    </button>
+                </div>
             </div>
             @endif
 
@@ -146,6 +184,7 @@
             @endif
 
             <form
+                id="form-contenido-inicio"
                 method="POST"
                 action="{{ route('admin.contenido-institucional.inicio.actualizar') }}"
                 enctype="multipart/form-data"
@@ -1599,6 +1638,8 @@
         </div>
 
 
+        </form>
+
         {{-- =====================================================
         LOGROS REGISTRADOS
     ====================================================== --}}
@@ -1637,165 +1678,154 @@
                 </div>
 
             </div>
-{{-- =====================================================
+            {{-- =====================================================
     NUEVO LOGRO
 ====================================================== --}}
 
-<div
-    x-data="{ nuevoLogro: false }"
-    class="mt-6"
->
-    <button
-        type="button"
-        @click="nuevoLogro = ! nuevoLogro"
-        class="inline-flex items-center gap-2
+            <div
+                x-data="{ nuevoLogro: false }"
+                class="mt-6">
+                <button
+                    type="button"
+                    @click="nuevoLogro = ! nuevoLogro"
+                    class="inline-flex items-center gap-2
                rounded-xl bg-emerald-950
                px-5 py-3 text-sm font-extrabold
                text-white transition
-               hover:bg-emerald-900"
-    >
-        <span class="text-lg leading-none">+</span>
+               hover:bg-emerald-900">
+                    <span class="text-lg leading-none">+</span>
 
-        <span x-text="nuevoLogro ? 'Cerrar formulario' : 'Nuevo logro'"></span>
-    </button>
+                    <span x-text="nuevoLogro ? 'Cerrar formulario' : 'Nuevo logro'"></span>
+                </button>
 
-    <div
-        x-show="nuevoLogro"
-        x-cloak
-        x-transition
-        class="mt-5 rounded-3xl
+                <div
+                    x-show="nuevoLogro"
+                    x-cloak
+                    x-transition
+                    class="mt-5 rounded-3xl
                border border-emerald-100
-               bg-emerald-50/40 p-5"
-    >
-        <form
-            method="POST"
-            action="{{ route('admin.contenido-institucional.logros.guardar') }}"
-            enctype="multipart/form-data"
-            class="space-y-5"
-        >
-            @csrf
+               bg-emerald-50/40 p-5">
+                    <form
+                        method="POST"
+                        action="{{ route('admin.contenido-institucional.logros.guardar') }}"
+                        enctype="multipart/form-data"
+                        class="space-y-5">
+                        @csrf
 
-            <div class="grid gap-5 md:grid-cols-2">
+                        <div class="grid gap-5 md:grid-cols-2">
 
-                <div>
-                    <label class="block text-sm font-bold text-slate-700">
-                        Tipo
-                    </label>
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700">
+                                    Tipo
+                                </label>
 
-                    <select
-                        name="logro_tipo"
-                        required
-                        class="mt-2 h-12 w-full rounded-xl
-                               border-slate-300 bg-white"
-                    >
-                        <option value="logro">
-                            Logro
-                        </option>
+                                <select
+                                    name="logro_tipo"
+                                    required
+                                    class="mt-2 h-12 w-full rounded-xl
+                               border-slate-300 bg-white">
+                                    <option value="logro">
+                                        Logro
+                                    </option>
 
-                        <option value="reconocimiento">
-                            Reconocimiento
-                        </option>
-                    </select>
-                </div>
+                                    <option value="reconocimiento">
+                                        Reconocimiento
+                                    </option>
+                                </select>
+                            </div>
 
-                <div>
-                    <label class="block text-sm font-bold text-slate-700">
-                        Nivel educativo
-                    </label>
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700">
+                                    Nivel educativo
+                                </label>
 
-                    <select
-                        name="logro_nivel_educativo_id"
-                        class="mt-2 h-12 w-full rounded-xl
-                               border-slate-300 bg-white"
-                    >
-                        <option value="">
-                            Sin nivel
-                        </option>
+                                <select
+                                    name="logro_nivel_educativo_id"
+                                    class="mt-2 h-12 w-full rounded-xl
+                               border-slate-300 bg-white">
+                                    <option value="">
+                                        Sin nivel
+                                    </option>
 
-                        @foreach ($nivelesEducativos as $nivelEducativo)
-                            <option value="{{ $nivelEducativo->id }}">
-                                {{ $nivelEducativo->nombre }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+                                    @foreach ($nivelesEducativos as $nivelEducativo)
+                                    <option value="{{ $nivelEducativo->id }}">
+                                        {{ $nivelEducativo->nombre }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-            </div>
+                        </div>
 
-            <div>
-                <label class="block text-sm font-bold text-slate-700">
-                    Título
-                </label>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700">
+                                Título
+                            </label>
 
-                <input
-                    type="text"
-                    name="logro_titulo"
-                    required
-                    maxlength="255"
-                    class="mt-2 h-12 w-full rounded-xl
-                           border-slate-300 bg-white"
-                >
-            </div>
+                            <input
+                                type="text"
+                                name="logro_titulo"
+                                required
+                                maxlength="255"
+                                class="mt-2 h-12 w-full rounded-xl
+                           border-slate-300 bg-white">
+                        </div>
 
-            <div>
-                <label class="block text-sm font-bold text-slate-700">
-                    Fecha
-                </label>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700">
+                                Fecha
+                            </label>
 
-                <input
-                    type="date"
-                    name="logro_fecha"
-                    required
-                    class="mt-2 h-12 w-full rounded-xl
-                           border-slate-300 bg-white"
-                >
-            </div>
+                            <input
+                                type="date"
+                                name="logro_fecha"
+                                required
+                                class="mt-2 h-12 w-full rounded-xl
+                           border-slate-300 bg-white">
+                        </div>
 
-            <div>
-                <label class="block text-sm font-bold text-slate-700">
-                    Descripción
-                </label>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700">
+                                Descripción
+                            </label>
 
-                <textarea
-                    name="logro_descripcion"
-                    rows="5"
-                    required
-                    maxlength="5000"
-                    class="mt-2 w-full rounded-xl
-                           border-slate-300 bg-white"
-                ></textarea>
-            </div>
+                            <textarea
+                                name="logro_descripcion"
+                                rows="5"
+                                required
+                                maxlength="5000"
+                                class="mt-2 w-full rounded-xl
+                           border-slate-300 bg-white"></textarea>
+                        </div>
 
-            <div>
-                <label class="block text-sm font-bold text-slate-700">
-                    Imagen
-                </label>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700">
+                                Imagen
+                            </label>
 
-                <input
-                    type="file"
-                    name="logro_imagen"
-                    accept=".jpg,.jpeg,.png,.webp"
-                    class="mt-2 block w-full rounded-xl
+                            <input
+                                type="file"
+                                name="logro_imagen"
+                                accept=".jpg,.jpeg,.png,.webp"
+                                class="mt-2 block w-full rounded-xl
                            border border-slate-300
-                           bg-white p-3 text-sm"
-                >
-            </div>
+                           bg-white p-3 text-sm">
+                        </div>
 
-            <div class="flex justify-end">
-                <button
-                    type="submit"
-                    class="rounded-xl bg-emerald-950
+                        <div class="flex justify-end">
+                            <button
+                                type="submit"
+                                class="rounded-xl bg-emerald-950
                            px-6 py-3 text-sm font-extrabold
                            text-white transition
-                           hover:bg-emerald-900"
-                >
-                    Registrar logro
-                </button>
-            </div>
+                           hover:bg-emerald-900">
+                                Registrar logro
+                            </button>
+                        </div>
 
-        </form>
-    </div>
-</div>
+                    </form>
+                </div>
+            </div>
 
             {{-- =====================================================
             LISTADO
@@ -2247,6 +2277,7 @@
 
             <button
                 type="submit"
+                form="form-contenido-inicio"
                 class="inline-flex h-12 items-center
                                    justify-center gap-2 rounded-xl
                                    bg-emerald-950 px-6
@@ -2273,8 +2304,6 @@
             </button>
         </div>
     </div>
-
-    </form>
 
     </div>
     </div>
