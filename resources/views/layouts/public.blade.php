@@ -23,6 +23,11 @@
 
     @php
     $siewebUrl = $sieweb->url ?? 'https://inclanpiura.sieweb.com.pe/sistema/login';
+
+    $contactoFooter = \App\Models\InformacionInstitucional::query()
+        ->where('tipo', 'contacto_inicio')
+        ->where('estado', true)
+        ->first();
     @endphp
 
     <header
@@ -801,17 +806,17 @@
 
                 <div>
                     <p class="text-sm text-emerald-100">¿Tienes consultas?</p>
-                    <p class="mt-1 font-bold">Estamos para ayudarte</p>
+                    <p class="mt-1 font-bold">{{ $contactoFooter?->titulo ?? 'Estamos para ayudarte' }}</p>
                 </div>
 
                 <div>
                     <p class="text-sm text-emerald-100">Teléfono</p>
-                    <p class="mt-1 font-bold">Próximamente</p>
+                    <p class="mt-1 font-bold">{{ $contactoFooter?->subtitulo ?? 'Próximamente' }}</p>
                 </div>
 
                 <div>
                     <p class="text-sm text-emerald-100">Correo institucional</p>
-                    <p class="mt-1 font-bold">Próximamente</p>
+                    <p class="mt-1 font-bold">{{ $contactoFooter?->contenido ?? 'Próximamente' }}</p>
                 </div>
             </div>
         </div>

@@ -260,8 +260,7 @@
                             'images/director.jpeg'
                         ) }}"
                         alt="Director de la IE Crl. José Joaquín Inclán"
-                        class="h-[520px] w-full object-cover object-top"
-                        onerror="this.src='{{ asset('images/personal-default.jpg') }}'">
+                        class="h-[520px] w-full object-cover object-top">
 
                     <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-emerald-950 via-emerald-950/85 to-transparent p-7 pt-24 text-white">
                         <p class="text-xs font-bold uppercase tracking-[0.2em] text-amber-300">
@@ -359,8 +358,7 @@
                                 'images/mision.png'
                             ) }}"
                             alt="Misión institucional"
-                            class="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                            onerror="this.src='{{ asset('images/portada-institucion.jpg') }}'">
+                            class="h-full w-full object-cover transition duration-700 group-hover:scale-105">
 
                         <div class="absolute inset-0 bg-gradient-to-t from-emerald-950/90 via-emerald-950/20 to-transparent"></div>
 
@@ -429,8 +427,7 @@
                                 'images/vision.png'
                             ) }}"
                             alt="Visión institucional"
-                            class="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                            onerror="this.src='{{ asset('images/infraestructura-biblioteca.jpg') }}'">
+                            class="h-full w-full object-cover transition duration-700 group-hover:scale-105">
 
                         <div class="absolute inset-0 bg-gradient-to-t from-emerald-950/90 via-emerald-950/20 to-transparent"></div>
 
@@ -499,8 +496,7 @@
                                 'images/valores.png'
                             ) }}"
                             alt="Valores institucionales"
-                            class="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                            onerror="this.src='{{ asset('images/servicio-toece.jpg') }}'">
+                            class="h-full w-full object-cover transition duration-700 group-hover:scale-105">
 
                         <div class="absolute inset-0 bg-gradient-to-t from-emerald-950/90 via-emerald-950/20 to-transparent"></div>
 
@@ -735,8 +731,7 @@
                                 'images/enfoque-institucional.png'
                             ) }}"
                             alt="Innovación y acompañamiento educativo"
-                            class="absolute inset-0 h-full w-full object-cover"
-                            onerror="this.src='{{ asset('images/vision.png') }}'">
+                            class="absolute inset-0 h-full w-full object-cover">
 
                         <div class="absolute inset-0 bg-gradient-to-r from-emerald-950/80 via-emerald-950/20 to-transparent"></div>
 
@@ -1744,15 +1739,44 @@
     {{-- ========================================================= --}}
     {{-- 8. CHATBOT FLOTANTE --}}
     {{-- ========================================================= --}}
+
+    @php
+        $contactoChatbot = \App\Models\InformacionInstitucional::query()
+            ->where('tipo', 'contacto_inicio')
+            ->where('estado', true)
+            ->first();
+
+        $telefonoChatbot = $contactoChatbot?->subtitulo ?? 'Próximamente';
+        $correoChatbot = $contactoChatbot?->contenido ?? 'Próximamente';
+    @endphp
+
     <div
-        x-data="{ abierto: false }"
-        class="fixed bottom-5 right-5 z-[60]">
+        id="chatbot-institucional"
+        class="fixed bottom-5 right-5 z-[60]"
+        data-telefono="{{ e($telefonoChatbot) }}"
+        data-correo="{{ e($correoChatbot) }}"
+        data-consultas="{{ route('consultas.crear') }}"
+        data-mesa-partes="{{ route('mesa-partes.crear') }}"
+        data-documentos="{{ route('documentos.index') }}"
+        data-convocatorias="{{ route('convocatorias.index') }}"
+        data-postulacion="{{ route('postulaciones.seguimiento') }}"
+        data-resultados="{{ route('postulaciones.resultados') }}"
+        data-calendario="{{ route('calendario.index') }}"
+        data-mision="{{ route('institucion.mision-vision-valores') }}"
+        data-resena="{{ route('institucion.resena-historica') }}"
+        data-infraestructura="{{ route('institucion.infraestructura') }}"
+        data-comunidad="{{ route('institucion.comunidad-educativa') }}"
+        data-ensenar="{{ route('institucion.nuestra-forma-de-ensenar') }}"
+        data-topico="{{ route('servicios.mostrar', ['servicio' => 'topico']) }}"
+        data-toece="{{ route('servicios.mostrar', ['servicio' => 'toece']) }}"
+        data-psicologia="{{ route('servicios.mostrar', ['servicio' => 'psicologia']) }}"
+        data-logros="{{ route('logros.index') }}">
+
         <div
-            x-cloak
-            x-show="abierto"
-            x-transition
-            class="mb-4 w-[calc(100vw-2.5rem)] max-w-sm overflow-hidden rounded-[28px] border border-amber-300 bg-white shadow-2xl shadow-emerald-950/25">
-            <div class="flex items-center justify-between bg-emerald-950 px-5 py-4 text-white">
+            id="chatbot-panel"
+            class="mb-4 hidden h-[min(680px,calc(100vh-7rem))] w-[calc(100vw-2.5rem)] max-w-md flex-col overflow-hidden rounded-[28px] border border-amber-300 bg-white shadow-2xl shadow-emerald-950/25">
+
+            <div class="flex shrink-0 items-center justify-between bg-emerald-950 px-5 py-4 text-white">
                 <div>
                     <p class="text-xs font-bold uppercase tracking-[0.18em] text-amber-300">
                         Asistente virtual
@@ -1761,53 +1785,97 @@
                     <h3 class="mt-1 font-extrabold">
                         Chatbot institucional
                     </h3>
+
+                    <div class="mt-1 flex items-center gap-2 text-[11px] text-emerald-100">
+                        <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+                        Disponible
+                    </div>
                 </div>
 
                 <button
+                    id="chatbot-cerrar"
                     type="button"
-                    @click="abierto = false"
-                    class="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 hover:bg-white/20"
+                    class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-xl transition hover:bg-white/20"
                     aria-label="Cerrar chatbot">
                     ×
                 </button>
             </div>
 
-            <div class="max-h-[440px] overflow-y-auto p-5">
-                <div class="rounded-2xl bg-emerald-50 p-4 text-sm leading-6 text-emerald-950">
-                    ¡Hola! Soy el asistente virtual de la IE Crl. José Joaquín Inclán.
-                    ¿En qué puedo ayudarte?
+            <div
+                id="chatbot-mensajes"
+                class="min-h-0 flex-1 space-y-4 overflow-y-auto bg-slate-50 p-5">
+
+                <div class="flex justify-start">
+                    <div class="max-w-[88%] rounded-2xl rounded-bl-md border border-emerald-100 bg-white px-4 py-3 text-sm leading-6 text-emerald-950 shadow-sm">
+                        ¡Hola! Soy el asistente virtual de la IE Crl. José Joaquín Inclán.
+                        Puedes escribirme una pregunta o usar uno de los accesos rápidos.
+                    </div>
                 </div>
 
-                <div class="mt-4 grid gap-2">
-                    @foreach ([
-                    ['Consultas institucionales', route('consultas.crear')],
-                    ['Mesa de partes virtual', route('mesa-partes.crear')],
-                    ['Documentos y formatos', route('documentos.index')],
-                    ['Convocatorias vigentes', route('convocatorias.index')],
-                    ['Consultar postulación', route('postulaciones.seguimiento')],
-                    ['Resultados de convocatorias', route('postulaciones.resultados')],
-                    ['Calendario institucional', '#calendario'],
-                    ] as $opcion)
-                    <a
-                        href="{{ $opcion[1] }}"
-                        class="rounded-xl border border-gray-200 px-4 py-3 text-sm font-bold text-gray-700 transition hover:border-amber-300 hover:bg-amber-50 hover:text-emerald-950">
-                        {{ $opcion[0] }} →
-                    </a>
-                    @endforeach
-                </div>
+                <div id="chatbot-accesos" class="border-t border-slate-200 pt-4">
+                    <p class="mb-3 text-[11px] font-extrabold uppercase tracking-[0.14em] text-slate-500">
+                        Accesos rápidos
+                    </p>
 
-                <p class="mt-4 text-xs leading-5 text-gray-500">
-                    La conversación automática y las respuestas desde la base de conocimientos se conectarán en la siguiente etapa.
+                    <div class="flex gap-2 overflow-x-auto pb-1">
+                        <button type="button" data-pregunta="Consultas institucionales" class="chatbot-acceso shrink-0 rounded-full border border-amber-200 bg-white px-3 py-2 text-xs font-bold text-emerald-950 transition hover:border-amber-400 hover:bg-amber-50">
+                            Consultas institucionales
+                        </button>
+
+                        <button type="button" data-pregunta="Mesa de partes virtual" class="chatbot-acceso shrink-0 rounded-full border border-amber-200 bg-white px-3 py-2 text-xs font-bold text-emerald-950 transition hover:border-amber-400 hover:bg-amber-50">
+                            Mesa de partes virtual
+                        </button>
+
+                        <button type="button" data-pregunta="Documentos y formatos" class="chatbot-acceso shrink-0 rounded-full border border-amber-200 bg-white px-3 py-2 text-xs font-bold text-emerald-950 transition hover:border-amber-400 hover:bg-amber-50">
+                            Documentos y formatos
+                        </button>
+
+                        <button type="button" data-pregunta="Convocatorias vigentes" class="chatbot-acceso shrink-0 rounded-full border border-amber-200 bg-white px-3 py-2 text-xs font-bold text-emerald-950 transition hover:border-amber-400 hover:bg-amber-50">
+                            Convocatorias vigentes
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="shrink-0 border-t border-slate-200 bg-white p-4">
+                <form id="chatbot-form" class="flex items-end gap-2">
+                    <textarea
+                        id="chatbot-entrada"
+                        rows="1"
+                        maxlength="500"
+                        placeholder="Escribe tu consulta..."
+                        class="max-h-28 min-h-12 flex-1 resize-none rounded-2xl border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-800 placeholder:text-slate-400 focus:border-emerald-700 focus:ring-emerald-700"></textarea>
+
+                    <button
+                        id="chatbot-enviar"
+                        type="submit"
+                        class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-2 border-amber-400 bg-emerald-950 text-white transition hover:bg-emerald-900 disabled:cursor-not-allowed disabled:opacity-40"
+                        aria-label="Enviar mensaje">
+                        <svg
+                            class="h-5 w-5 text-amber-300"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2">
+                            <path d="m22 2-7 20-4-9-9-4Z" />
+                            <path d="M22 2 11 13" />
+                        </svg>
+                    </button>
+                </form>
+
+                <p class="mt-2 text-center text-[10px] leading-4 text-slate-400">
+                    Asistente informativo para orientación dentro del portal institucional.
                 </p>
             </div>
         </div>
 
         <button
+            id="chatbot-boton"
             type="button"
-            @click="abierto = !abierto"
             class="group flex h-16 w-16 items-center justify-center rounded-full border-2 border-amber-400 bg-emerald-950 text-white shadow-xl shadow-emerald-950/30 transition hover:-translate-y-1 hover:bg-emerald-900"
             aria-label="Abrir chatbot institucional">
             <svg
+                id="chatbot-icono-abrir"
                 class="h-7 w-7 text-amber-300"
                 viewBox="0 0 24 24"
                 fill="none"
@@ -1816,7 +1884,320 @@
                 <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z" />
                 <path d="M8 9h8M8 13h5" />
             </svg>
+
+            <svg
+                id="chatbot-icono-cerrar"
+                class="hidden h-6 w-6 text-amber-300"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2">
+                <path d="M6 6l12 12M18 6 6 18" />
+            </svg>
         </button>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const raiz = document.getElementById('chatbot-institucional');
+            const panel = document.getElementById('chatbot-panel');
+            const boton = document.getElementById('chatbot-boton');
+            const cerrar = document.getElementById('chatbot-cerrar');
+            const form = document.getElementById('chatbot-form');
+            const entrada = document.getElementById('chatbot-entrada');
+            const mensajes = document.getElementById('chatbot-mensajes');
+            const iconoAbrir = document.getElementById('chatbot-icono-abrir');
+            const iconoCerrar = document.getElementById('chatbot-icono-cerrar');
+
+            if (!raiz || !panel || !boton || !cerrar || !form || !entrada || !mensajes) {
+                return;
+            }
+
+            const datos = raiz.dataset;
+
+            function normalizar(texto) {
+                return texto
+                    .toLowerCase()
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '')
+                    .trim();
+            }
+
+            function contiene(texto, palabras) {
+                return palabras.some(function (palabra) {
+                    return texto.includes(normalizar(palabra));
+                });
+            }
+
+            function irAlFinal() {
+                mensajes.scrollTop = mensajes.scrollHeight;
+            }
+
+            function abrirChat() {
+                panel.classList.remove('hidden');
+                panel.classList.add('flex');
+                iconoAbrir.classList.add('hidden');
+                iconoCerrar.classList.remove('hidden');
+                boton.setAttribute('aria-label', 'Cerrar chatbot institucional');
+
+                window.setTimeout(function () {
+                    entrada.focus();
+                    irAlFinal();
+                }, 50);
+            }
+
+            function cerrarChat() {
+                panel.classList.add('hidden');
+                panel.classList.remove('flex');
+                iconoAbrir.classList.remove('hidden');
+                iconoCerrar.classList.add('hidden');
+                boton.setAttribute('aria-label', 'Abrir chatbot institucional');
+            }
+
+            function agregarMensaje(tipo, texto, enlace, enlaceTexto) {
+                const fila = document.createElement('div');
+                fila.className = tipo === 'usuario'
+                    ? 'flex justify-end'
+                    : 'flex justify-start';
+
+                const burbuja = document.createElement('div');
+                burbuja.className = tipo === 'usuario'
+                    ? 'max-w-[88%] rounded-2xl rounded-br-md bg-emerald-950 px-4 py-3 text-sm leading-6 text-white shadow-sm'
+                    : 'max-w-[88%] rounded-2xl rounded-bl-md border border-emerald-100 bg-white px-4 py-3 text-sm leading-6 text-emerald-950 shadow-sm';
+
+                const parrafo = document.createElement('p');
+                parrafo.textContent = texto;
+                burbuja.appendChild(parrafo);
+
+                if (enlace && enlaceTexto) {
+                    const link = document.createElement('a');
+                    link.href = enlace;
+                    link.className = 'mt-3 inline-flex items-center gap-2 rounded-xl border border-amber-300 bg-amber-50 px-3 py-2 text-xs font-extrabold text-emerald-950 transition hover:bg-amber-100';
+                    link.textContent = enlaceTexto + ' →';
+                    burbuja.appendChild(link);
+                }
+
+                fila.appendChild(burbuja);
+
+                const accesos = document.getElementById('chatbot-accesos');
+
+                if (accesos) {
+                    mensajes.insertBefore(fila, accesos);
+                } else {
+                    mensajes.appendChild(fila);
+                }
+
+                irAlFinal();
+            }
+
+            function obtenerRespuesta(pregunta) {
+                const texto = normalizar(pregunta);
+
+                if (contiene(texto, ['hola', 'buenos dias', 'buenas tardes', 'buenas noches', 'saludos'])) {
+                    return {
+                        texto: '¡Hola! Estoy aquí para orientarte sobre los servicios e información de la institución. ¿Qué necesitas consultar?'
+                    };
+                }
+
+                if (contiene(texto, ['consulta', 'consultas institucionales', 'hacer una consulta', 'enviar consulta'])) {
+                    return {
+                        texto: 'Puedes registrar una consulta institucional desde el formulario de Consultas. Allí podrás enviar tu mensaje y luego hacer seguimiento con el código generado.',
+                        enlace: datos.consultas,
+                        enlaceTexto: 'Ir a Consultas'
+                    };
+                }
+
+                if (contiene(texto, ['mesa de partes', 'presentar documento', 'presentar solicitud', 'tramite'])) {
+                    return {
+                        texto: 'La Mesa de Partes Virtual permite presentar solicitudes y documentos en línea. Después podrás consultar el estado de tu trámite.',
+                        enlace: datos.mesaPartes,
+                        enlaceTexto: 'Ir a Mesa de Partes'
+                    };
+                }
+
+                if (contiene(texto, ['documento', 'documentos', 'formato', 'formatos', 'descarga', 'descargar'])) {
+                    return {
+                        texto: 'En Documentos y descargas encontrarás reglamentos, planes, formatos y otros archivos institucionales disponibles para el público.',
+                        enlace: datos.documentos,
+                        enlaceTexto: 'Ver documentos'
+                    };
+                }
+
+                if (contiene(texto, ['resultado', 'resultados', 'seleccionado', 'ganador'])) {
+                    return {
+                        texto: 'Puedes revisar los resultados publicados de las convocatorias desde la sección de Resultados.',
+                        enlace: datos.resultados,
+                        enlaceTexto: 'Ver resultados'
+                    };
+                }
+
+                if (contiene(texto, ['postulacion', 'estado de postulacion', 'seguimiento de postulacion'])) {
+                    return {
+                        texto: 'Para consultar el estado de una postulación utiliza la opción “Consultar postulación” e ingresa los datos solicitados.',
+                        enlace: datos.postulacion,
+                        enlaceTexto: 'Consultar postulación'
+                    };
+                }
+
+                if (contiene(texto, ['convocatoria', 'convocatorias', 'postular', 'vacante'])) {
+                    return {
+                        texto: 'En Convocatorias vigentes puedes revisar los procesos disponibles, sus requisitos, fechas y opciones de postulación.',
+                        enlace: datos.convocatorias,
+                        enlaceTexto: 'Ver convocatorias'
+                    };
+                }
+
+                if (contiene(texto, ['calendario', 'actividad', 'actividades', 'fecha', 'evento'])) {
+                    return {
+                        texto: 'El Calendario institucional reúne actividades, reuniones, celebraciones y fechas importantes de la institución.',
+                        enlace: datos.calendario,
+                        enlaceTexto: 'Ver calendario'
+                    };
+                }
+
+                if (contiene(texto, ['telefono', 'numero de telefono', 'celular'])) {
+                    return {
+                        texto: 'El teléfono institucional registrado es: ' + datos.telefono + '.'
+                    };
+                }
+
+                if (contiene(texto, ['correo', 'email', 'e-mail', 'correo institucional'])) {
+                    return {
+                        texto: 'El correo institucional registrado es: ' + datos.correo + '.'
+                    };
+                }
+
+                if (contiene(texto, ['mision', 'vision', 'valores'])) {
+                    return {
+                        texto: 'Puedes conocer la misión, visión y los valores que orientan la labor educativa de la institución.',
+                        enlace: datos.mision,
+                        enlaceTexto: 'Ver misión, visión y valores'
+                    };
+                }
+
+                if (contiene(texto, ['historia', 'resena', 'fundacion'])) {
+                    return {
+                        texto: 'La Reseña histórica presenta la trayectoria, los principales hitos y la evolución de la IE Crl. José Joaquín Inclán.',
+                        enlace: datos.resena,
+                        enlaceTexto: 'Ver reseña histórica'
+                    };
+                }
+
+                if (contiene(texto, ['infraestructura', 'aulas', 'ambientes', 'laboratorio', 'patio'])) {
+                    return {
+                        texto: 'Puedes conocer los ambientes y espacios educativos disponibles en la sección de Infraestructura.',
+                        enlace: datos.infraestructura,
+                        enlaceTexto: 'Ver infraestructura'
+                    };
+                }
+
+                if (contiene(texto, ['comunidad educativa', 'docentes', 'directivos', 'personal administrativo'])) {
+                    return {
+                        texto: 'En Comunidad educativa encontrarás información sobre los grupos que forman parte de la institución.',
+                        enlace: datos.comunidad,
+                        enlaceTexto: 'Ver comunidad educativa'
+                    };
+                }
+
+                if (contiene(texto, ['forma de ensenar', 'como ensenan', 'metodologia', 'propuesta educativa'])) {
+                    return {
+                        texto: 'La sección “Nuestra forma de enseñar” explica los principios pedagógicos y el proceso de aprendizaje de la institución.',
+                        enlace: datos.ensenar,
+                        enlaceTexto: 'Ver propuesta educativa'
+                    };
+                }
+
+                if (contiene(texto, ['topico', 'primeros auxilios', 'salud'])) {
+                    return {
+                        texto: 'El Tópico brinda atención básica, orientación y cuidado de la salud para la comunidad educativa.',
+                        enlace: datos.topico,
+                        enlaceTexto: 'Ver Tópico'
+                    };
+                }
+
+                if (contiene(texto, ['toece', 'tutoria', 'convivencia escolar'])) {
+                    return {
+                        texto: 'TOECE desarrolla acciones de tutoría, orientación educativa y convivencia escolar.',
+                        enlace: datos.toece,
+                        enlaceTexto: 'Ver TOECE'
+                    };
+                }
+
+                if (contiene(texto, ['psicologia', 'psicologo', 'emocional'])) {
+                    return {
+                        texto: 'El servicio de Psicología brinda orientación y acompañamiento socioemocional a estudiantes y familias.',
+                        enlace: datos.psicologia,
+                        enlaceTexto: 'Ver Psicología'
+                    };
+                }
+
+                if (contiene(texto, ['logro', 'logros', 'reconocimiento'])) {
+                    return {
+                        texto: 'Puedes revisar los logros y reconocimientos obtenidos por estudiantes, docentes y la institución.',
+                        enlace: datos.logros,
+                        enlaceTexto: 'Ver logros'
+                    };
+                }
+
+                return {
+                    texto: 'Puedo orientarte sobre consultas, mesa de partes, documentos, convocatorias, postulaciones, calendario, servicios, información institucional, teléfono y correo. Prueba escribiendo, por ejemplo: “¿Cómo presento un documento?”'
+                };
+            }
+
+            function procesarPregunta(pregunta) {
+                const texto = pregunta.trim();
+
+                if (!texto) {
+                    return;
+                }
+
+                agregarMensaje('usuario', texto);
+
+                window.setTimeout(function () {
+                    const respuesta = obtenerRespuesta(texto);
+
+                    agregarMensaje(
+                        'bot',
+                        respuesta.texto,
+                        respuesta.enlace || null,
+                        respuesta.enlaceTexto || null
+                    );
+
+                    entrada.focus();
+                }, 250);
+            }
+
+            boton.addEventListener('click', function () {
+                if (panel.classList.contains('hidden')) {
+                    abrirChat();
+                } else {
+                    cerrarChat();
+                }
+            });
+
+            cerrar.addEventListener('click', cerrarChat);
+
+            form.addEventListener('submit', function (evento) {
+                evento.preventDefault();
+
+                const texto = entrada.value;
+                entrada.value = '';
+                procesarPregunta(texto);
+            });
+
+            entrada.addEventListener('keydown', function (evento) {
+                if (evento.key === 'Enter' && !evento.shiftKey) {
+                    evento.preventDefault();
+                    form.requestSubmit();
+                }
+            });
+
+            document.querySelectorAll('.chatbot-acceso').forEach(function (acceso) {
+                acceso.addEventListener('click', function () {
+                    procesarPregunta(acceso.dataset.pregunta || '');
+                });
+            });
+        });
+    </script>
 
 </x-public-layout>

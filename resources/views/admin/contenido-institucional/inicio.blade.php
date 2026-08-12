@@ -7,6 +7,7 @@
     $vision = $contenidos->get('vision');
     $valores = $contenidos->get('valores');
     $enfoque = $contenidos->get('enfoque_inicio');
+    $contacto = $contenidos->get('contacto_inicio');
 
     $listaValores = old(
     'valores_lista',
@@ -2249,6 +2250,110 @@
         </div>
 
     </section>
+
+    {{-- ================================================== --}}
+    {{-- 7. CONTACTO DEL PIE DE PÁGINA --}}
+    {{-- ================================================== --}}
+    <section
+        class="rounded-[28px] border border-gray-200
+               bg-white p-6
+               shadow-[0_18px_50px_rgba(15,23,42,0.05)]
+               sm:p-8">
+        <div>
+            <p
+                class="text-xs font-extrabold uppercase
+                       tracking-[0.15em] text-amber-600">
+                Sección 07
+            </p>
+
+            <h2
+                class="mt-1 text-xl font-extrabold
+                       text-emerald-950">
+                Contacto del pie de página
+            </h2>
+
+            <p class="mt-2 text-sm leading-6 text-gray-500">
+                Estos datos se muestran en la franja verde inferior del portal público.
+            </p>
+        </div>
+
+        <div class="mt-6 grid gap-5 lg:grid-cols-3">
+
+            <div>
+                <label
+                    for="contacto_ayuda"
+                    class="block text-sm font-extrabold
+                           text-emerald-950">
+                    Mensaje de ayuda
+                </label>
+
+                <input
+                    id="contacto_ayuda"
+                    name="contacto_ayuda"
+                    type="text"
+                    required
+                    maxlength="180"
+                    value="{{ old(
+                        'contacto_ayuda',
+                        $contacto?->titulo ?? 'Estamos para ayudarte'
+                    ) }}"
+                    class="mt-2 h-12 w-full rounded-xl
+                           border-gray-300 bg-gray-50
+                           focus:border-emerald-700
+                           focus:ring-emerald-700">
+            </div>
+
+            <div>
+                <label
+                    for="contacto_telefono"
+                    class="block text-sm font-extrabold
+                           text-emerald-950">
+                    Teléfono
+                </label>
+
+                <input
+                    id="contacto_telefono"
+                    name="contacto_telefono"
+                    type="text"
+                    required
+                    maxlength="100"
+                    value="{{ old(
+                        'contacto_telefono',
+                        $contacto?->subtitulo ?? 'Próximamente'
+                    ) }}"
+                    class="mt-2 h-12 w-full rounded-xl
+                           border-gray-300 bg-gray-50
+                           focus:border-emerald-700
+                           focus:ring-emerald-700">
+            </div>
+
+            <div>
+                <label
+                    for="contacto_correo"
+                    class="block text-sm font-extrabold
+                           text-emerald-950">
+                    Correo institucional
+                </label>
+
+                <input
+                    id="contacto_correo"
+                    name="contacto_correo"
+                    type="email"
+                    required
+                    maxlength="180"
+                    value="{{ old(
+                        'contacto_correo',
+                        $contacto?->contenido ?? 'contacto@inclan.edu.pe'
+                    ) }}"
+                    class="mt-2 h-12 w-full rounded-xl
+                           border-gray-300 bg-gray-50
+                           focus:border-emerald-700
+                           focus:ring-emerald-700">
+            </div>
+
+        </div>
+    </section>
+
 
     {{-- ================================================== --}}
     {{-- GUARDAR CAMBIOS --}}

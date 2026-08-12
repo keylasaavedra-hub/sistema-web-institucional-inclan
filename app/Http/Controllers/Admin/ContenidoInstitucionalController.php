@@ -45,6 +45,7 @@ class ContenidoInstitucionalController extends Controller
                 'enfoque_inicio',
                 'servicios_inicio',
                 'logros_inicio',
+                'contacto_inicio',
             ])
             ->get()
             ->keyBy('tipo');
@@ -554,6 +555,30 @@ class ContenidoInstitucionalController extends Controller
                 'string',
                 'max:1000',
             ],
+
+            /*
+            |--------------------------------------------------------------------------
+            | CONTACTO DEL PIE DE PÁGINA
+            |--------------------------------------------------------------------------
+            */
+
+            'contacto_ayuda' => [
+                'required',
+                'string',
+                'max:180',
+            ],
+
+            'contacto_telefono' => [
+                'required',
+                'string',
+                'max:100',
+            ],
+
+            'contacto_correo' => [
+                'required',
+                'email',
+                'max:180',
+            ],
         ]);
 
         /*
@@ -983,6 +1008,25 @@ class ContenidoInstitucionalController extends Controller
         $logros->usuario_id = Auth::id();
 
         $logros->save();
+
+        /*
+        |--------------------------------------------------------------------------
+        | CONTACTO DEL PIE DE PÁGINA
+        |--------------------------------------------------------------------------
+        */
+
+        $contacto = InformacionInstitucional::firstOrNew([
+            'tipo' => 'contacto_inicio',
+        ]);
+
+        $contacto->titulo = $datos['contacto_ayuda'];
+        $contacto->subtitulo = $datos['contacto_telefono'];
+        $contacto->contenido = $datos['contacto_correo'];
+        $contacto->datos = [];
+        $contacto->orden = 9;
+        $contacto->estado = true;
+        $contacto->usuario_id = Auth::id();
+        $contacto->save();
 
         return redirect()
             ->route(
