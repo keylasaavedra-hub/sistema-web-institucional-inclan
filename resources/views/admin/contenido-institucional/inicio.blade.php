@@ -2251,166 +2251,176 @@
 
     </section>
 
-    {{-- ================================================== --}}
-    {{-- 7. CONTACTO DEL PIE DE PÁGINA --}}
-    {{-- ================================================== --}}
-    <section
-        class="rounded-[28px] border border-gray-200
-               bg-white p-6
-               shadow-[0_18px_50px_rgba(15,23,42,0.05)]
-               sm:p-8">
+{{-- ================================================== --}}
+{{-- 7. CONTACTO DEL PIE DE PÁGINA --}}
+{{-- ================================================== --}}
+<section
+    class="rounded-[28px] border border-gray-200
+           bg-white p-6
+           shadow-[0_18px_50px_rgba(15,23,42,0.05)]
+           sm:p-8">
+
+    <div>
+        <p
+            class="text-xs font-extrabold uppercase
+                   tracking-[0.15em] text-amber-600">
+            Sección 07
+        </p>
+
+        <h2
+            class="mt-1 text-xl font-extrabold
+                   text-emerald-950">
+            Contacto del pie de página
+        </h2>
+
+        <p class="mt-2 text-sm leading-6 text-gray-500">
+            Estos datos se muestran en la franja verde inferior del portal público.
+        </p>
+    </div>
+
+    <div class="mt-6 grid gap-5 lg:grid-cols-3">
+
+        {{-- MENSAJE DE AYUDA --}}
         <div>
-            <p
-                class="text-xs font-extrabold uppercase
-                       tracking-[0.15em] text-amber-600">
-                Sección 07
-            </p>
-
-            <h2
-                class="mt-1 text-xl font-extrabold
+            <label
+                for="contacto_ayuda"
+                class="block text-sm font-extrabold
                        text-emerald-950">
-                Contacto del pie de página
-            </h2>
+                Mensaje de ayuda
+            </label>
 
-            <p class="mt-2 text-sm leading-6 text-gray-500">
-                Estos datos se muestran en la franja verde inferior del portal público.
-            </p>
+            <input
+                id="contacto_ayuda"
+                name="contacto_ayuda"
+                form="form-contenido-inicio"
+                type="text"
+                required
+                maxlength="180"
+                value="{{ old(
+                    'contacto_ayuda',
+                    $contacto?->titulo ?? 'Estamos para ayudarte'
+                ) }}"
+                class="mt-2 h-12 w-full rounded-xl
+                       border-gray-300 bg-gray-50
+                       focus:border-emerald-700
+                       focus:ring-emerald-700">
         </div>
 
-        <div class="mt-6 grid gap-5 lg:grid-cols-3">
+        {{-- TELÉFONO --}}
+        <div>
+            <label
+                for="contacto_telefono"
+                class="block text-sm font-extrabold
+                       text-emerald-950">
+                Teléfono
+            </label>
 
-            <div>
-                <label
-                    for="contacto_ayuda"
-                    class="block text-sm font-extrabold
-                           text-emerald-950">
-                    Mensaje de ayuda
-                </label>
-
-                <input
-                    id="contacto_ayuda"
-                    name="contacto_ayuda"
-                    type="text"
-                    required
-                    maxlength="180"
-                    value="{{ old(
-                        'contacto_ayuda',
-                        $contacto?->titulo ?? 'Estamos para ayudarte'
-                    ) }}"
-                    class="mt-2 h-12 w-full rounded-xl
-                           border-gray-300 bg-gray-50
-                           focus:border-emerald-700
-                           focus:ring-emerald-700">
-            </div>
-
-            <div>
-                <label
-                    for="contacto_telefono"
-                    class="block text-sm font-extrabold
-                           text-emerald-950">
-                    Teléfono
-                </label>
-
-                <input
-                    id="contacto_telefono"
-                    name="contacto_telefono"
-                    type="text"
-                    required
-                    maxlength="100"
-                    value="{{ old(
-                        'contacto_telefono',
-                        $contacto?->subtitulo ?? 'Próximamente'
-                    ) }}"
-                    class="mt-2 h-12 w-full rounded-xl
-                           border-gray-300 bg-gray-50
-                           focus:border-emerald-700
-                           focus:ring-emerald-700">
-            </div>
-
-            <div>
-                <label
-                    for="contacto_correo"
-                    class="block text-sm font-extrabold
-                           text-emerald-950">
-                    Correo institucional
-                </label>
-
-                <input
-                    id="contacto_correo"
-                    name="contacto_correo"
-                    type="email"
-                    required
-                    maxlength="180"
-                    value="{{ old(
-                        'contacto_correo',
-                        $contacto?->contenido ?? 'contacto@inclan.edu.pe'
-                    ) }}"
-                    class="mt-2 h-12 w-full rounded-xl
-                           border-gray-300 bg-gray-50
-                           focus:border-emerald-700
-                           focus:ring-emerald-700">
-            </div>
-
+            <input
+                id="contacto_telefono"
+                name="contacto_telefono"
+                form="form-contenido-inicio"
+                type="text"
+                required
+                maxlength="100"
+                value="{{ old(
+                    'contacto_telefono',
+                    $contacto?->subtitulo ?? 'Próximamente'
+                ) }}"
+                class="mt-2 h-12 w-full rounded-xl
+                       border-gray-300 bg-gray-50
+                       focus:border-emerald-700
+                       focus:ring-emerald-700">
         </div>
-    </section>
+
+        {{-- CORREO INSTITUCIONAL --}}
+        <div>
+            <label
+                for="contacto_correo"
+                class="block text-sm font-extrabold
+                       text-emerald-950">
+                Correo institucional
+            </label>
+
+            <input
+                id="contacto_correo"
+                name="contacto_correo"
+                form="form-contenido-inicio"
+                type="email"
+                required
+                maxlength="180"
+                value="{{ old(
+                    'contacto_correo',
+                    $contacto?->contenido ?? 'contacto@inclan.edu.pe'
+                ) }}"
+                class="mt-2 h-12 w-full rounded-xl
+                       border-gray-300 bg-gray-50
+                       focus:border-emerald-700
+                       focus:ring-emerald-700">
+        </div>
+
+    </div>
+</section>
 
 
-    {{-- ================================================== --}}
-    {{-- GUARDAR CAMBIOS --}}
-    {{-- ================================================== --}}
+{{-- ================================================== --}}
+{{-- GUARDAR CAMBIOS --}}
+{{-- ================================================== --}}
+<div
+    class="sticky bottom-4 z-30 rounded-[24px]
+           border border-emerald-900/10
+           bg-white/95 p-4
+           shadow-[0_20px_60px_rgba(15,23,42,0.15)]
+           backdrop-blur sm:p-5">
 
     <div
-        class="sticky bottom-4 z-30 rounded-[24px]
-                           border border-emerald-900/10
-                           bg-white/95 p-4
-                           shadow-[0_20px_60px_rgba(15,23,42,0.15)]
-                           backdrop-blur sm:p-5">
-        <div
-            class="flex flex-col gap-4
-                               sm:flex-row sm:items-center
-                               sm:justify-between">
-            <div>
-                <p class="font-extrabold text-emerald-950">
-                    Guardar contenido institucional
-                </p>
+        class="flex flex-col gap-4
+               sm:flex-row sm:items-center
+               sm:justify-between">
 
-                <p class="mt-1 text-sm text-gray-500">
-                    Guarda los cambios realizados en las
-                    secciones de la página de inicio.
-                </p>
-            </div>
+        <div>
+            <p class="font-extrabold text-emerald-950">
+                Guardar contenido institucional
+            </p>
 
-            <button
-                type="submit"
-                form="form-contenido-inicio"
-                class="inline-flex h-12 items-center
-                                   justify-center gap-2 rounded-xl
-                                   bg-emerald-950 px-6
-                                   text-sm font-extrabold text-white
-                                   shadow-lg shadow-emerald-950/10
-                                   transition
-                                   hover:bg-emerald-900
-                                   focus:outline-none
-                                   focus:ring-4
-                                   focus:ring-emerald-200">
-                <svg
-                    class="h-5 w-5"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2">
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M5 12.5 9.5 17 19 7.5" />
-                </svg>
-
-                Guardar cambios
-            </button>
+            <p class="mt-1 text-sm text-gray-500">
+                Guarda los cambios realizados en las
+                secciones de la página de inicio.
+            </p>
         </div>
-    </div>
 
+        <button
+            type="submit"
+            form="form-contenido-inicio"
+            class="inline-flex h-12 items-center
+                   justify-center gap-2 rounded-xl
+                   bg-emerald-950 px-6
+                   text-sm font-extrabold text-white
+                   shadow-lg shadow-emerald-950/10
+                   transition
+                   hover:bg-emerald-900
+                   focus:outline-none
+                   focus:ring-4
+                   focus:ring-emerald-200">
+
+            <svg
+                class="h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2">
+
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M5 12.5 9.5 17 19 7.5" />
+            </svg>
+
+            Guardar cambios
+        </button>
     </div>
-    </div>
+</div>
+
+</div>
+</div>
 
 </x-app-layout>
